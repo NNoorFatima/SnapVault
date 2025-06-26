@@ -19,7 +19,7 @@ const UserCard = ({name, phone, email,avatar}: any) => (
         <Divider />
         <View style={styles.leftSection}>
             <ProfileOption icon={<Feather name="edit-3" size={20} color="grey" />} label="Edit Profile" onPress={() => {}} />
-            {/* <ProfileOption icon={<Feather name="lock" size={20}  color="grey"/>} label="Change Password" onPress={() => {}} /> */}
+            <ProfileOption icon={<Feather name="lock" size={20}  color="grey"/>} label="Change Password" onPress={() => {}} />
             <ProfileOption icon={<Feather name="log-out" size={20} color="grey" />} label="Logout" onPress={() => {}} />
             <ProfileOption icon={<Feather name="trash-2" size={20} color="grey"/>} label="Delete Account" onPress={() => {}} />
         </View>

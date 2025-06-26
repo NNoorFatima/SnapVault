@@ -7,10 +7,13 @@ import LinearGradient from 'react-native-linear-gradient';
 const UserProfile = () => (
 
   <LinearGradient
-      colors={['#0F0C29', '#302B63', '#24243e']} // replace with your desired colors
-      style={{ flex: 1 }}
-  >
-    <ScrollView style={{flex:1, backgroundColor:'#f2f2f2' }}>
+  colors={['#000000', '#3b0049', '#8e007c', '#a0008d', '#00a5b5']}
+  locations={[0, 0.3, 0.5, 0.7, 1]}
+  start={{ x: 0.1, y: 0 }}
+  end={{ x: 1, y: 1 }}
+  style={{ flex: 1 }}
+>
+    <ScrollView style={{flex:1 }}>
       <UserCard 
       name="John Doe"
       phone="123-456-7890" 
