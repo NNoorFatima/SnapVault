@@ -22,21 +22,21 @@ const ConfirmationPopUp: React.FC<Props> = ({  message, onCancel, onConfirm}) =>
         <View style={styles.container}>
             <Text style={styles.message}>{message}</Text>
             <View style={styles.buttonRow}>
-            <Button
-                title="Cancel"
-                onPress={onCancel} //should go back to the current screen 
-                backgroundColor="#D7EDEF"
-                textColor="black"
-                style={{ width: '50%' }}
+                <Button
+                    title="Cancel"
+                    onPress={onCancel} //should go back to the current screen 
+                    backgroundColor="#D7EDEF"
+                    textColor="black"
+                    style={{ width: '50%' }}
 
-            />
-            <Button
-                title="Confirm"
-                onPress={() => console.log('Button Pressed')} //should go to splash screen 
-                backgroundColor="#73DBE5"
-                textColor="black"
-                style={{ width: '50%' }}
-            />
+                />
+                <Button
+                    title="Confirm"
+                    onPress={() => console.log('Button Pressed')} //should go to splash screen 
+                    backgroundColor="#73DBE5"
+                    textColor="black"
+                    style={{ width: '50%' }}
+                />
             </View>
         </View>
         </View>

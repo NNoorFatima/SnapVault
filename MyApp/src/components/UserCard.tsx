@@ -10,13 +10,14 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 //for popup
 import ConfirmationPopUp from './ConfirmationPopUp';
-
+import NewPassword from './NewPassword';
 
 const Divider = () => <View style={styles.divider} />;
 const UserCard = ({name, phone, email,avatar}: any) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const [showLogoutPopup, setShowLogoutPopup] = useState(false);
     const [showDeletePopup, setShowDeletePopup] = useState(false);
+    const [showPasswordPopup, setShowPasswordPopup] = useState(false);
 
     return (
         <View style={styles.card}>
@@ -28,9 +29,28 @@ const UserCard = ({name, phone, email,avatar}: any) => {
             </View>
             <Divider />
             <View style={styles.leftSection}>
+                {/* Edit Profile */}
                 <ProfileOption icon={<Feather name="edit-3" size={20} color="grey" />} label="Edit Profile" 
                     onPress={() =>navigation.navigate('Edit Profile')} />
-                <ProfileOption icon={<Feather name="lock" size={20}  color="grey"/>} label="Change Password" onPress={() => {}} />
+                {/* Change Password */}
+                <ProfileOption icon={<Feather name="lock" size={20}  color="grey"/>} label="Change Password" 
+                    onPress={() => setShowPasswordPopup(true)}/>
+                    <Modal
+                        visible={showPasswordPopup}
+                        transparent
+                        animationType="fade"
+                        >
+                        <NewPassword
+                            visible={true}
+                            onClose={() => setShowPasswordPopup(false)}
+                            onUpdate={(newPassword:string) => {
+                            setShowPasswordPopup(false);
+                            // handle password update logic here
+                            console.log('Updated password:', newPassword);
+                            }}
+                        />
+                    </Modal>
+
                 {/* Logout */}
                 <ProfileOption icon={<Feather name="log-out" size={20} color="grey" />} label="Logout" 
                     onPress={() => setShowLogoutPopup(true)} />
