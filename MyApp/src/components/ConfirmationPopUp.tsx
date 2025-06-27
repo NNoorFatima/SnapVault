@@ -5,7 +5,7 @@ import styles from './ConfirmationPopup.styles';
 import { useNavigation } from '@react-navigation/native'; //used for navigation among pages 
 import { RootStackParamList } from '../navigation/AppNavigator';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-
+import Logo from '../assets/Logo';
 interface Props {
   message: string;
   onCancel: () => void;
@@ -20,6 +20,8 @@ const ConfirmationPopUp: React.FC<Props> = ({  message, onCancel, onConfirm}) =>
         
         <View style={styles.backdrop}>
         <View style={styles.container}>
+            <Logo
+                source={{ uri: 'https://codia-f2c.s3.us-west-1.amazonaws.com/image/2025-06-27/q89N1k9dDd.png'}}/>
             <Text style={styles.message}>{message}</Text>
             <View style={styles.buttonRow}>
                 <Button
