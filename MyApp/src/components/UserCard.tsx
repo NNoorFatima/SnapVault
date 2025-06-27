@@ -4,16 +4,19 @@ import ProfileOption from './ProfileOption';
 import styles from './UserCard.styles';
 // @ts-ignore
 import Feather from 'react-native-vector-icons/Feather';
-import { useNavigation } from '@react-navigation/native'; //used for navigation among pages 
+//used for navigation among pages 
+import { useNavigation } from '@react-navigation/native'; 
 import { RootStackParamList } from '../navigation/AppNavigator';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 //for popup
 import ConfirmationPopUp from './ConfirmationPopUp';
 
+
 const Divider = () => <View style={styles.divider} />;
 const UserCard = ({name, phone, email,avatar}: any) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const [showLogoutPopup, setShowLogoutPopup] = useState(false);
+    const [showDeletePopup, setShowDeletePopup] = useState(false);
 
     return (
         <View style={styles.card}>
@@ -28,23 +31,38 @@ const UserCard = ({name, phone, email,avatar}: any) => {
                 <ProfileOption icon={<Feather name="edit-3" size={20} color="grey" />} label="Edit Profile" 
                     onPress={() =>navigation.navigate('Edit Profile')} />
                 <ProfileOption icon={<Feather name="lock" size={20}  color="grey"/>} label="Change Password" onPress={() => {}} />
+                {/* Logout */}
                 <ProfileOption icon={<Feather name="log-out" size={20} color="grey" />} label="Logout" 
-                onPress={() => setShowLogoutPopup(true)} />
-                <Modal
-                    visible={showLogoutPopup}
-                    transparent
-                    animationType="fade"
-                    >
-                    <ConfirmationPopUp
-                        message="Are you sure you want to logout?"
-                        onCancel={() => setShowLogoutPopup(false)}  // just hide modal
-                        onConfirm={() => {setShowLogoutPopup(false);
-                        // perform logout logic here
-                        }}
-                    />
-                    </Modal>    
-
-                <ProfileOption icon={<Feather name="trash-2" size={20} color="grey"/>} label="Delete Account" onPress={() => {}} />
+                    onPress={() => setShowLogoutPopup(true)} />
+                    <Modal
+                        visible={showLogoutPopup}
+                        transparent
+                        animationType="fade"
+                        >
+                        <ConfirmationPopUp
+                            message="Are you sure you want to logout?"
+                            onCancel={() => setShowLogoutPopup(false)}  // just hide modal
+                            onConfirm={() => {setShowLogoutPopup(false);
+                            // perform logout logic here
+                            }}
+                        />
+                        </Modal>    
+                {/* Delete Acccount */}
+                <ProfileOption icon={<Feather name="trash-2" size={20} color="grey"/>} label="Delete Account" 
+                    onPress={() => setShowDeletePopup(true)} />
+                    <Modal
+                        visible={showDeletePopup}
+                        transparent
+                        animationType="fade"
+                        >
+                        <ConfirmationPopUp
+                            message="Are you sure you want to delete your account?"
+                            onCancel={() => setShowDeletePopup(false)}  // just hide modal
+                            onConfirm={() => {setShowDeletePopup(false);
+                            // perform delete logic here
+                            }}
+                        />
+                        </Modal>    
             </View>
         </View>
     );
