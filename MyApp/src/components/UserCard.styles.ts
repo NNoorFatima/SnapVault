@@ -4,10 +4,12 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#fff',
     borderRadius: 30,
-    padding: 30,
+    padding: 20,
     marginBottom: 20,
     elevation: 3,
     marginTop: 50,
+    marginRight:12,
+    marginLeft:12,
   },
   centeredSection: {
     alignItems: 'center',
