@@ -1,25 +1,26 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions, ScrollView } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions, ScrollView, ImageBackground } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient'; // Keep if used elsewhere, otherwise remove
 
 const DashboardScreen = () => {
   // Enhanced colorful group images with better color palette
   const groupImageUrls = [
-    'https://placehold.co/200x200/6366F1/FFFFFF?text=Group+1', // Indigo
-    'https://placehold.co/200x200/10B981/FFFFFF?text=Group+2', // Emerald
-    'https://placehold.co/200x200/F59E0B/FFFFFF?text=Group+3', // Amber
-    'https://placehold.co/200x200/EF4444/FFFFFF?text=Group+4', // Red
-    'https://placehold.co/200x200/8B5CF6/FFFFFF?text=Group+5', // Violet
-    'https://placehold.co/200x200/06B6D4/FFFFFF?text=Group+6', // Cyan
-    'https://placehold.co/200x200/84CC16/FFFFFF?text=Group+7', // Lime
-    'https://placehold.co/200x200/EC4899/FFFFFF?text=Group+8', // Pink
+    'https://placehold.co/200x200/6366F1/FFFFFF', // Indigo
+    'https://placehold.co/200x200/10B981/FFFFFF', // Emerald
+    'https://placehold.co/200x200/F59E0B/FFFFFF', // Amber
+    'https://placehold.co/200x200/EF4444/FFFFFF', // Red
+    'https://placehold.co/200x200/8B5CF6/FFFFFF', // Violet
+    'https://placehold.co/200x200/06B6D4/FFFFFF', // Cyan
+    'https://placehold.co/200x200/84CC16/FFFFFF', // Lime
+    'https://placehold.co/200x200/EC4899/FFFFFF', // Pink
   ];
 
   const screenWidth = Dimensions.get('window').width;
   const contentWrapperWidth = Math.min(screenWidth - 32, 420);
 
   return (
-    <View style={styles.container}>
-      <ScrollView 
+    <View style={styles.container}> {/* Main background is black */}
+      <ScrollView
         style={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
@@ -34,7 +35,7 @@ const DashboardScreen = () => {
             <View style={styles.profileSection}>
               <View style={styles.profilePicContainer}>
                 <Image
-                  source={{ uri: 'https://placehold.co/56x56/6366F1/ffffff?text=MW' }}
+                  source={require('./img/person-icon.png')}
                   style={styles.profilePic}
                 />
                 <View style={styles.onlineIndicator} />
@@ -50,31 +51,44 @@ const DashboardScreen = () => {
             </TouchableOpacity>
           </View>
 
-          {/* SnapVault Introduction Card */}
-          <View style={styles.introCard}>
-            <View style={styles.introHeader}>
-              <Text style={styles.appTitle}>SnapVault</Text>
-              <Text style={styles.versionTag}>v2.1</Text>
+          {/* SnapVault Introduction Card with BACKGROUND IMAGE and Border */}
+          <ImageBackground
+            // === PLACE YOUR IMAGE SOURCE HERE ===
+            // For a remote image: 
+            source={require('./img/background.png')}
+            // For a local image (assuming it's in an 'assets' folder at the project root, e.g., assets/intro_bg.png):
+            // source={require('../../assets/intro_bg.png')}
+            // You might need to adjust the path based on your project structure.
+            // ======================================
+            resizeMode="cover" // 'cover', 'contain', 'stretch', 'repeat', 'center'
+            style={styles.introCardImageBackground} // Apply styles for sizing, border, and rounded corners
+            imageStyle={styles.introCardImageStyle} // Styles specific to the image itself
+          >
+            <View style={styles.introContentWrapper}> {/* Wrapper for content inside ImageBackground */}
+              <View style={styles.introHeader}>
+                <Text style={styles.appTitle}>SnapVault</Text>
+                <Text style={styles.versionTag}>v2.1</Text>
+              </View>
+              <Text style={styles.introText}>
+                Simplify sharing, protect privacy, and ensure no memory gets lost.
+                Join groups and get your pictures filtered out automatically!
+              </Text>
+              <View style={styles.buttonRow}>
+                <TouchableOpacity style={[styles.button, styles.joinButton]}>
+                  <View style={styles.buttonIconContainer}>
+                    <Text style={styles.buttonIcon}>👥</Text>
+                  </View>
+                  <Text style={styles.buttonText}>Join Groups</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.button, styles.createButton]}>
+                  <View style={styles.buttonIconContainer}>
+                    <Text style={styles.buttonIcon}>➕</Text>
+                  </View>
+                  <Text style={styles.buttonText}>Create Groups</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-            <Text style={styles.introText}>
-              Simplify sharing, protect privacy, and ensure no memory gets lost. 
-              Join groups and get your pictures filtered out automatically!
-            </Text>
-            <View style={styles.buttonRow}>
-              <TouchableOpacity style={[styles.button, styles.joinButton]}>
-                <View style={styles.buttonIconContainer}>
-                  <Text style={styles.buttonIcon}>👥</Text>
-                </View>
-                <Text style={styles.buttonText}>Join Groups</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.button, styles.createButton]}>
-                <View style={styles.buttonIconContainer}>
-                  <Text style={styles.buttonIcon}>➕</Text>
-                </View>
-                <Text style={styles.buttonText}>Create Groups</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+          </ImageBackground>
 
           {/* Stats Section */}
           <View style={styles.statsContainer}>
@@ -93,8 +107,6 @@ const DashboardScreen = () => {
               <Text style={styles.statLabel}>Storage</Text>
             </View>
           </View>
-
-          {/* My Groups Section */}
           <View style={styles.myGroupsHeader}>
             <Text style={styles.myGroupsTitle}>My Groups</Text>
             <TouchableOpacity style={styles.viewAllButton}>
@@ -102,35 +114,52 @@ const DashboardScreen = () => {
               <Text style={styles.viewAllArrow}>→</Text>
             </TouchableOpacity>
           </View>
+ 
+          <ImageBackground
+            // === PLACE YOUR IMAGE SOURCE HERE ===
+            // For a remote image: 
+            source={require('./img/background2.png')}
+            // For a local image (assuming it's in an 'assets' folder at the project root, e.g., assets/intro_bg.png):
+            // source={require('../../assets/intro_bg.png')}
+            // You might need to adjust the path based on your project structure.
+            // ======================================
+            resizeMode="cover" // 'cover', 'contain', 'stretch', 'repeat', 'center'
+            style={styles.introCardImageBackground} // Apply styles for sizing, border, and rounded corners
+            imageStyle={styles.introCardImageStyle} // Styles specific to the image itself
+          >
 
-          {/* Image Grid */}
-          <View style={styles.imageGrid}>
-            {groupImageUrls.map((src, index) => (
-              <TouchableOpacity key={index} style={styles.imageWrapper} activeOpacity={0.8}>
-                <Image
-                  source={{ uri: src }}
-                  style={styles.groupImage}
-                />
-                <View style={styles.imageOverlay}>
-                  <Text style={styles.groupName}>Group {index + 1}</Text>
-                  <Text style={styles.memberCount}>{Math.floor(Math.random() * 20) + 3} members</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
+            {/* Image Grid */}
+            <View style={styles.imageGrid}>
+              {groupImageUrls.map((src, index) => (
+                <TouchableOpacity key={index} style={styles.imageWrapper} activeOpacity={0.8}>
+                  <Image
+                    source={require('./img/group1.png')}
+                    style={styles.groupImage}
+                    onError={() => console.warn(`Failed to load image: ${src}`)}
+                  />
+                  <View style={styles.imageOverlay}>
+                    <Text style={styles.groupName}>Group {index + 1}</Text>
+                    <Text style={styles.memberCount}>{Math.floor(Math.random() * 20) + 3} members</Text>
+                  </View>
+                </TouchableOpacity>
+              ))} 
+            </View>
+          </ImageBackground> {/* Close Groups Section Gradient */}
+
 
           {/* Bottom Spacer */}
           <View style={styles.bottomSpacer} />
         </View>
       </ScrollView>
-    </View>
+    </View>  
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000', // Deep dark blue
+    backgroundColor: '#000000', // Main background is black
+    paddingBottom: 10,
   },
   scrollContainer: {
     flex: 1,
@@ -145,7 +174,7 @@ const styles = StyleSheet.create({
   statusBarSpacer: {
     height: 50,
   },
-  
+
   // Header Styles
   header: {
     flexDirection: 'row',
@@ -220,19 +249,26 @@ const styles = StyleSheet.create({
     borderColor: '#0F0F23',
   },
 
-  // Intro Card Styles
-  introCard: {
-    backgroundColor: '#1E293B',
+  // Intro Card Styles - Now applied to ImageBackground
+  introCardImageBackground: { // Style for the ImageBackground component
     borderRadius: 24,
-    padding: 24,
+    borderWidth: 2,
+    borderColor: '#9573e5', // Specific border color
     marginBottom: 24,
-    borderWidth: 1,
-    borderColor: '#334155',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.3,
     shadowRadius: 12,
     elevation: 8,
+    overflow: 'hidden', // Crucial to clip children (like the image) to rounded corners
+  },
+  introCardImageStyle: { // Style applied directly to the image within ImageBackground
+    borderRadius: 24, // Match the parent border radius
+  },
+  introContentWrapper: { // New wrapper to apply padding to content inside ImageBackground
+    padding: 24,
+    backgroundColor: 'rgba(0,0,0,0.3)', // Optional: Add a subtle overlay for text readability
+    borderRadius: 24, // Match parent border radius
   },
   introHeader: {
     flexDirection: 'row',
@@ -247,16 +283,16 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
   },
   versionTag: {
-    color: '#6366F1',
+    color: '#CBD5E1',
     fontSize: 12,
     fontWeight: '600',
-    backgroundColor: '#312E81',
+    backgroundColor: 'rgba(0,0,0,0.3)',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
   },
   introText: {
-    color: '#CBD5E1',
+    color: '#F1F5F9',
     fontSize: 16,
     lineHeight: 24,
     marginBottom: 20,
@@ -299,7 +335,7 @@ const styles = StyleSheet.create({
     letterSpacing: -0.3,
   },
 
-  // Stats Styles
+  // Stats Styles (unchanged)
   statsContainer: {
     flexDirection: 'row',
     backgroundColor: '#1F2937',
@@ -333,12 +369,23 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
 
-  // Groups Header Styles
+  // My Groups Section - LinearGradient wrapper
+  groupsSectionGradient: {
+    borderRadius: 24,
+    borderWidth: 2,
+    borderColor: '#9573e5', // Specific border color
+    padding: 24, // Added padding inside the gradient wrapper
+    marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
+  },
   myGroupsHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 4,
     marginBottom: 16,
   },
   myGroupsTitle: {
@@ -367,36 +414,40 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  // Image Grid Styles
   imageGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    gap: 16,
-  },
-  imageWrapper: {
-    width: '48%',
-    height: 140,
-    borderRadius: 20,
-    overflow: 'hidden',
-    position: 'relative',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 6,
-  },
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+  padding: 5,
+  paddingHorizontal: 10, 
+  justifyContent: 'space-between', // Distribute items across the row
+},
+imageWrapper: {
+  width: '48%',
+  height: 140,
+  borderRadius: 20,
+  overflow: 'hidden',
+  position: 'relative',
+  marginBottom: 16, // acts like "row gap"
+  backgroundColor: '#1F2937',
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 6 },
+  shadowOpacity: 0.25,
+  shadowRadius: 10,
+  elevation: 6, 
+  borderWidth: 0, 
+},
+
   groupImage: {
     width: '100%',
     height: '100%',
-    resizeMode: 'cover',
+    resizeMode: 'cover', 
   },
   imageOverlay: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#1f2937',
+    backgroundColor: 'rgba(31, 41, 55, 0.7)', // Semi-transparent dark overlay for text readability
     padding: 12,
   },
   groupName: {
@@ -410,7 +461,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '400',
   },
-  
+
   bottomSpacer: {
     height: 40,
   },

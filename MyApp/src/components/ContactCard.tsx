@@ -17,7 +17,7 @@ const ContactCard: React.FC<ContactCardProps> = ({
   description,
   icon,
   backgroundColor,
-  iconBackgroundColor,
+  iconBackgroundColor, 
   onPress,
 }) => {
   return (
@@ -35,7 +35,7 @@ const ContactCard: React.FC<ContactCardProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 12,
+    borderRadius: 60,
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',

@@ -21,7 +21,7 @@ export type RootStackParamList = {
 
 export type TabParamList = {
   Dashboard: undefined;
-  ContactUs: undefined; // Renamed from Groups
+  ContactUs: undefined;  
   Camera: undefined;
   Gallery: undefined;
   Profile: undefined;
@@ -60,7 +60,7 @@ const TabIcon: React.FC<TabIconProps> = ({ icon, focused }) => (
         style={[
           styles.tabIcon,
           { color: focused ? '#FFFFFF' : '#9CA3AF' },
-        ]}
+        ]}  
       >
         {icon}
       </Text>
@@ -200,18 +200,13 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
   },
   tabBarBackground: {
-    flex: 1,
-    backgroundColor: '#1F2937',
-    borderRadius: 25,
-    marginHorizontal: 10,
-    marginVertical: 1,
-    borderWidth: 1,
-    borderColor: '#374151',
+    flex: 1,   
+    backgroundColor: 'black',
   },
   tabIconContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: 8,
+    paddingTop: 38,
   },
   iconWrapper: {
     width: 36,
@@ -244,10 +239,10 @@ const styles = StyleSheet.create({
   },
 
   // Placeholder Screen Styles
-  placeholderContainer: {
+  placeholderContainer: { 
     flex: 1,
     backgroundColor: '#0F0F23',
-    alignItems: 'center' as const,
+    alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 20,
   },

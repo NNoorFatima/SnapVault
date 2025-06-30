@@ -41,8 +41,8 @@ const ContactUs: React.FC = () => {
               title="Chat with Us"
               description="Need help with SnapVault? Contact our expert team for help"
               icon={<Text style={styles.cardIcon}>💬</Text>}
-              backgroundColor="#7c3aed"
-              iconBackgroundColor="#6d28d9"
+              backgroundColor="#950091"
+              iconBackgroundColor="#b134a6"
               onPress={handleChatPress}
             />
             
@@ -50,8 +50,8 @@ const ContactUs: React.FC = () => {
               title="Call Us"
               description="Need help with SnapVault? Call our team for help and get your queries solved"
               icon={<Text style={styles.cardIcon}>📞</Text>}
-              backgroundColor="#4338ca"
-              iconBackgroundColor="#3730a3"
+              backgroundColor="#5000a9"
+              iconBackgroundColor="#5000a9"
               onPress={handleCallPress}
             />
             
@@ -59,8 +59,8 @@ const ContactUs: React.FC = () => {
               title="Email Us"
               description="Email us and share your concerns"
               icon={<Text style={styles.cardIcon}>✉️</Text>}
-              backgroundColor="#2563eb"
-              iconBackgroundColor="#1d4ed8"
+              backgroundColor="#303f45"
+              iconBackgroundColor="#303f45"
               onPress={handleEmailPress}
             />
           </View>
@@ -93,11 +93,12 @@ const ContactUs: React.FC = () => {
     </View>
   );
 };
-
+ 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000',
+    paddingBottom: 55,
   },
   scrollView: {
     flex: 1,
@@ -106,8 +107,7 @@ const styles = StyleSheet.create({
     flex: 1,
     maxWidth: 400,
     alignSelf: 'center',
-    width: '100%',
-    backgroundColor: '#27272a',
+    width: '100%', 
     borderRadius: 24,
     overflow: 'hidden',
     margin: 16,
@@ -123,8 +123,8 @@ const styles = StyleSheet.create({
   },
   socialMediaSection: {
     backgroundColor: '#f3f4f6',
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32, 
     padding: 16,
     paddingTop: 32,
   },

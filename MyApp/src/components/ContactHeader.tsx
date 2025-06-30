@@ -47,8 +47,7 @@ const styles = StyleSheet.create({
   backButton: {
     position: 'absolute' as const,
     top: 10,
-    left: 24,
-    padding: 10,
+    left: 24, 
     backgroundColor: 'rgba(255, 255, 255, 0.2)', // Semi-transparent white
     borderRadius: 24,
     width: 44,
@@ -65,9 +64,9 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     color: 'white',
-    fontSize: 22, // Slightly larger for clarity
+    fontSize: 22,  
     fontWeight: 'bold' as const,
-    lineHeight: 24, // Ensure proper vertical alignment
+    lineHeight: 24,  
   },
   content: {
     flexDirection: 'row' as const,
