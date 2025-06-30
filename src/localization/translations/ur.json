@@ -1,0 +1,12 @@
+{
+    "profile":
+    {
+        "editProfile":"پروفائل ترمیم",
+        "changePassword":"پاس ورڈ تبدیل ",
+        "logout":"لاگ آؤٹ",
+        "deleteAccount":"اکاؤنٹ حذف",
+        "contactUs": "رابطہ کریں",
+        "reviewApp": " ریویو دیں"
+    }
+
+}

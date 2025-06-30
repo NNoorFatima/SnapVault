@@ -1,0 +1,12 @@
+{
+    "profile":
+    {
+        "editProfile":"Edit Profile",
+        "changePassword":"Change Password",
+        "logout":"Logout",
+        "deleteAccount":"Delete Account",
+        "contactUs": "Contact Us",
+        "reviewApp": "Review App"
+    }
+
+}

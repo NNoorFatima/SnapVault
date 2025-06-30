@@ -11,6 +11,10 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 //for popup
 import ConfirmationPopUp from './ConfirmationPopUp';
 import NewPassword from './NewPassword';
+//for localization
+import { useTranslation } from 'react-i18next';
+
+
 
 const Divider = () => <View style={styles.divider} />;
 const UserCard = ({name, phone, email,avatar}: any) => {
@@ -18,7 +22,9 @@ const UserCard = ({name, phone, email,avatar}: any) => {
     const [showLogoutPopup, setShowLogoutPopup] = useState(false);
     const [showDeletePopup, setShowDeletePopup] = useState(false);
     const [showPasswordPopup, setShowPasswordPopup] = useState(false);
-
+    //for localization 
+    const { t } = useTranslation();
+    
     return (
         <View style={styles.card}>
             <View style={styles.centeredSection}>
@@ -30,10 +36,10 @@ const UserCard = ({name, phone, email,avatar}: any) => {
             <Divider />
             <View style={styles.leftSection}>
                 {/* Edit Profile */}
-                <ProfileOption icon={<Feather name="edit-3" size={20} color="grey" />} label="Edit Profile" 
+                <ProfileOption icon={<Feather name="edit-3" size={20} color="grey" />} label={t('profile.editProfile')} 
                     onPress={() =>navigation.navigate('Edit Profile')} />
                 {/* Change Password */}
-                <ProfileOption icon={<Feather name="lock" size={20}  color="grey"/>} label="Change Password" 
+                <ProfileOption icon={<Feather name="lock" size={20}  color="grey"/>} label={t('profile.changePassword')} 
                     onPress={() => setShowPasswordPopup(true)}/>
                     <Modal
                         visible={showPasswordPopup}
@@ -52,7 +58,7 @@ const UserCard = ({name, phone, email,avatar}: any) => {
                     </Modal>
 
                 {/* Logout */}
-                <ProfileOption icon={<Feather name="log-out" size={20} color="grey" />} label="Logout" 
+                <ProfileOption icon={<Feather name="log-out" size={20} color="grey" />} label={t('profile.logout')} 
                     onPress={() => setShowLogoutPopup(true)} />
                     <Modal
                         visible={showLogoutPopup}
@@ -68,7 +74,7 @@ const UserCard = ({name, phone, email,avatar}: any) => {
                         />
                         </Modal>    
                 {/* Delete Acccount */}
-                <ProfileOption icon={<Feather name="trash-2" size={20} color="grey"/>} label="Delete Account" 
+                <ProfileOption icon={<Feather name="trash-2" size={20} color="grey"/>} label={t('profile.deleteAccount')} 
                     onPress={() => setShowDeletePopup(true)} />
                     <Modal
                         visible={showDeletePopup}
