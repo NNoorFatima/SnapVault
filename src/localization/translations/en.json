@@ -7,6 +7,15 @@
         "deleteAccount":"Delete Account",
         "contactUs": "Contact Us",
         "reviewApp": "Review App"
+    },
+    "editProfile":
+    {
+        "email":"Email",
+        "password":"Password",
+        "userName":"Username",
+        "phone":"Phone",
+        "bio":"Bio",
+        "update":"Update"
     }
 
 }

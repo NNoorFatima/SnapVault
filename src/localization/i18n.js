@@ -5,7 +5,8 @@ import * as RNLocalize from 'react-native-localize';
 
 import en from './translations/en.json';
 import ur from './translations/ur.json';
-
+import { I18nManager } from 'react-native';
+// import RNRestart from 'react-native-restart'; //used to restart app 
 const LANG_KEY = 'user-language';
 
 // A dictionary where the keys are languages and the values are objects
@@ -24,23 +25,12 @@ const resources = {
  *
  * If the user has chosen a language in their device settings that we
  * don't support, we fall back to English.
- *
+
  * If the user has chosen a language in their device settings that we do
  * support, we use that language. If the user has never chosen a language
  * in their device settings, we use the first language in the list of
  * supported languages.
  */
-// const detectLanguage = async () => {
-//   const savedLang = await AsyncStorage.getItem(LANG_KEY);
-//   if (savedLang) return savedLang;
-
-//   const bestLang = RNLocalize.findBestAvailableLanguage(Object.keys(resources));
-//   if (bestLang && resources[bestLang.languageTag]) {
-//     return bestLang.languageTag;
-//   } else {
-//     return 'en';
-//   }
-// };
 const detectLanguage = async () => {
   const savedLang = await AsyncStorage.getItem(LANG_KEY);
   if (savedLang) return savedLang;
@@ -91,8 +81,15 @@ export const initLocalization = async () => {
  * @param {string} lang The new language to use
  */
 export const changeAppLanguage = async (lang) => {
-  await i18n.changeLanguage(lang);
-  await AsyncStorage.setItem(LANG_KEY, lang);
+  const isRTL = lang === 'ur';
+  await i18n.changeLanguage(lang); //change the language in i18n 
+  await AsyncStorage.setItem(LANG_KEY, lang); //persist language 
+
+  // //apply RTL if needed 
+  // if (I18nManager.isRTL !== isRTL) {
+  //   I18nManager.forceRTL(isRTL);
+  //   RNRestart.Restart(); // Reload app to apply RTL
+  // }
 };
 
 export default i18n;
