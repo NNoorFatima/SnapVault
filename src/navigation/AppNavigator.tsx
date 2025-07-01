@@ -7,7 +7,7 @@ import { View, Text, StyleSheet, StyleProp, ViewStyle, TextStyle } from 'react-n
 // Import your screens
 import UserProfile from '../screens/UserProfile/UserProfile';
 import EditProfile from '../screens/UserProfile/EditProfile';
-import Logout from '../screens/UserProfile/Logout';
+// import Logout from '../screens/UserProfile/Logout';
 import ContactUs from '../screens/ContactUs/ContactUs';
 import DashboardScreen from '../screens/DashBoard/DashboardScreen';
 
@@ -168,7 +168,7 @@ const AppNavigator: React.FC = () => (
           headerBackTitle: 'Back',
         }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="Logout"
         component={Logout}
         options={{
@@ -178,7 +178,7 @@ const AppNavigator: React.FC = () => (
           headerTitleStyle: styles.modalHeaderTitle,
           headerBackTitle: 'Back',
         }}
-      />
+      /> */}
     </Stack.Navigator>
   </NavigationContainer>
 );

@@ -16,6 +16,25 @@
         "phone":"Phone",
         "bio":"Bio",
         "update":"Update"
+    },
+    "Logout":
+    {
+        "message":"Are you sure you want to logout?"
+    },
+    "DeleteAccount":
+    {
+        "message":"Are you sure you want to delete your account?"
+    },
+    "NewPassword":
+    {
+        "message":"Set New Password",
+        "label1":"New Password",
+        "label2":"Confirm New Password"
+    },
+    "Button":
+    {
+        "cancel":"Cancel",
+        "confirm":"Confirm"
     }
 
 }

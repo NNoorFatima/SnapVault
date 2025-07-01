@@ -66,7 +66,7 @@ const UserCard = ({name, phone, email,avatar}: any) => {
                         animationType="fade"
                         >
                         <ConfirmationPopUp
-                            message="Are you sure you want to logout?"
+                            message={t('Logout.message')}
                             onCancel={() => setShowLogoutPopup(false)}  // just hide modal
                             onConfirm={() => {setShowLogoutPopup(false);
                             // perform logout logic here
@@ -82,7 +82,7 @@ const UserCard = ({name, phone, email,avatar}: any) => {
                         animationType="fade"
                         >
                         <ConfirmationPopUp
-                            message="Are you sure you want to delete your account?"
+                            message={t('DeleteAccount.message')}
                             onCancel={() => setShowDeletePopup(false)}  // just hide modal
                             onConfirm={() => {setShowDeletePopup(false);
                             // perform delete logic here
