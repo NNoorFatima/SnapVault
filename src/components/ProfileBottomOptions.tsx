@@ -25,7 +25,8 @@ const styles = StyleSheet.create({
   leftSection: {
     // flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row',
     alignItems: 'flex-start',
-    width: '100%',
+    // width: '100%',
+    flex: 1,
   },
   card: {
     backgroundColor: '#fff',
