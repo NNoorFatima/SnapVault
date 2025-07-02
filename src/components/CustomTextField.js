@@ -4,7 +4,7 @@ import {
   Text,
   TextInput,
   StyleSheet,
-  Dimensions,
+  Dimensions, 
   Image
 } from 'react-native';
 
