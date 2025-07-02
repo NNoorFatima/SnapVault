@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, StyleSheet} from 'react-native';
+import { ScrollView, StyleSheet, I18nManager} from 'react-native';
 import UserCard from '../../components/UserCard';
 import ProfileBottomOptions from '../../components/ProfileBottomOptions';
 import BackgroundImage from '../../assets/UserProfileBackground';
@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
   container: 
   {
     flex: 1,
-    backgroundColor: 'transparent'
+    backgroundColor: 'transparent',
   }
 
 });

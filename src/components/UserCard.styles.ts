@@ -18,9 +18,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   leftSection: {
-    // alignItems: 'flex-start',
-    // alignItems: I18nManager.isRTL ? 'flex-end' : 'flex-start',
-    alignItems: I18nManager.isRTL ? 'flex-end' : 'flex-start',
+    alignItems: 'flex-start',
     width: '100%',
   },
   divider: {

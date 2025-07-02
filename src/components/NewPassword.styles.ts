@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-
+import { I18nManager } from 'react-native';
 
 const styles = StyleSheet.create({
     overlay: {
@@ -35,17 +35,17 @@ const styles = StyleSheet.create({
         marginTop: 8,
     },
     buttonContainer: {
-        flexDirection: 'row',
+        flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row',
         justifyContent: 'flex-end',
         marginTop: 10,
-        // gap:10,
+        gap: 43
     },
     updateButton: {
         backgroundColor: '#73DBE5',
         paddingVertical: 8,
         paddingHorizontal: 16,
         borderRadius: 6,
-        marginRight: 10,
+        marginEnd: 10,
     },
     cancelButton: {
         paddingVertical: 8,
