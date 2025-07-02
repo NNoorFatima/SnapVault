@@ -9,6 +9,7 @@ const ProfileOption = ({ icon, label, onPress }:any) => (
             <Text style={styles.label}>{label}</Text>
         </TouchableOpacity>
     );
+    
 const styles = StyleSheet.create({
   option: {
     flexDirection: 'row',
