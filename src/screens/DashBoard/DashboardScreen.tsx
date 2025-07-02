@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions, ScrollView, ImageBackground } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient'; // Keep if used elsewhere, otherwise remove
-
+import { useTranslation } from 'react-i18next'; //for localization
 const DashboardScreen = () => {
   // Enhanced colorful group images with better color palette
   const groupImageUrls = [
@@ -17,6 +17,7 @@ const DashboardScreen = () => {
 
   const screenWidth = Dimensions.get('window').width;
   const contentWrapperWidth = Math.min(screenWidth - 32, 420);
+  const {t} = useTranslation();
 
   return (
     <View style={styles.container}> {/* Main background is black */}
@@ -41,7 +42,7 @@ const DashboardScreen = () => {
                 <View style={styles.onlineIndicator} />
               </View>
               <View style={styles.greetingContainer}>
-                <Text style={styles.greetingSubtext}>Welcome back</Text>
+                <Text style={styles.greetingSubtext}>{t('Dashboard.welcome')}</Text>
                 <Text style={styles.greetingText}>Muhammad Waleed</Text>
               </View>
             </View>
@@ -70,21 +71,20 @@ const DashboardScreen = () => {
                 <Text style={styles.versionTag}>v2.1</Text>
               </View>
               <Text style={styles.introText}>
-                Simplify sharing, protect privacy, and ensure no memory gets lost.
-                Join groups and get your pictures filtered out automatically!
+                {t('Dashboard.introText')}
               </Text>
               <View style={styles.buttonRow}>
                 <TouchableOpacity style={[styles.button, styles.joinButton]}>
                   <View style={styles.buttonIconContainer}>
                     <Text style={styles.buttonIcon}>👥</Text>
                   </View>
-                  <Text style={styles.buttonText}>Join Groups</Text>
+                  <Text style={styles.buttonText}>{t('Dashboard.joinGrps')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={[styles.button, styles.createButton]}>
                   <View style={styles.buttonIconContainer}>
                     <Text style={styles.buttonIcon}>➕</Text>
                   </View>
-                  <Text style={styles.buttonText}>Create Groups</Text>
+                  <Text style={styles.buttonText}>{t('Dashboard.createGrps')}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -94,23 +94,23 @@ const DashboardScreen = () => {
           <View style={styles.statsContainer}>
             <View style={styles.statItem}>
               <Text style={styles.statValue}>8</Text>
-              <Text style={styles.statLabel}>Groups</Text>
+              <Text style={styles.statLabel}>{t('Dashboard.groups')}</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
               <Text style={styles.statValue}>124</Text>
-              <Text style={styles.statLabel}>Photos</Text>
+              <Text style={styles.statLabel}>{t('Dashboard.photos')}</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
               <Text style={styles.statValue}>2.3GB</Text>
-              <Text style={styles.statLabel}>Storage</Text>
+              <Text style={styles.statLabel}>{t('Dashboard.storage')}</Text>
             </View>
           </View>
           <View style={styles.myGroupsHeader}>
-            <Text style={styles.myGroupsTitle}>My Groups</Text>
+            <Text style={styles.myGroupsTitle}>{t('Dashboard.myGroups')}</Text>
             <TouchableOpacity style={styles.viewAllButton}>
-              <Text style={styles.viewAllText}>View All</Text>
+              <Text style={styles.viewAllText}>{t('Dashboard.view')}</Text>
               <Text style={styles.viewAllArrow}>→</Text>
             </TouchableOpacity>
           </View>

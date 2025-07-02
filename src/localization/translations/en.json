@@ -57,6 +57,19 @@
         "twitter":"Twitter",
         "facebook":"Facebook",
         "instagram":"Instagram"
+    },
+    "Dashboard":
+    {
+        "welcome":"Welcome back",
+        "introText":"Simplify sharing, protect privacy, and ensure no memory gets lost.Join groups and get your pictures filtered out automatically!",
+        "joinGrps":"Join Groups",
+        "createGrps":"Create Groups",
+        "groups":"Groups",
+        "storage":"Storage",
+        "photos":"Photos",
+        "myGroups":"My Groups",
+        "view":"View All"
+
     }
 
 }
