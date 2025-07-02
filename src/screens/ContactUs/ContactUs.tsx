@@ -5,8 +5,13 @@ import { useNavigation } from '@react-navigation/native';
 import ContactHeader from '../../components/ContactHeader';
 import ContactCard from '../../components/ContactCard';
 import SocialMediaCard from '../../components/SocialMediaCard';
+//for localization
+import { useTranslation } from 'react-i18next';
 
 const ContactUs: React.FC = () => {
+  //for localization
+  const { t } = useTranslation();
+
   const navigation = useNavigation();
 
   const handleBackPress = () => {
@@ -14,20 +19,24 @@ const ContactUs: React.FC = () => {
   };
 
   const handleChatPress = () => {
-    Alert.alert('Chat', 'Opening chat support...');
+    Alert.alert(t('ContactUs.chat'), t('ContactUs.chatMsg'));
   };
 
   const handleCallPress = () => {
-    Alert.alert('Call', 'Calling support team...');
+    Alert.alert(t('ContactUs.call'), t('ContactUs.callMsg'));
   };
 
   const handleEmailPress = () => {
-    Alert.alert('Email', 'Opening email client...');
+    Alert.alert(t('ContactUs.email'), t('ContactUs.emailMsg'));
   };
 
-  const handleSocialPress = (platform: string) => {
-    Alert.alert('Social Media', `Opening ${platform}...`);
-  };
+  const handleSocialPress = (platformKey: string) => {
+  const platformName = t(`platforms.${platformKey}`);
+  Alert.alert(
+    t('ContactUs.social'),
+    t('ContactUs.socialMsg', { platform: platformName })
+  );
+};
 
   return (
     <View style={styles.container}>
@@ -38,8 +47,8 @@ const ContactUs: React.FC = () => {
           {/* Action Cards */}
           <View style={styles.actionCardsContainer}>
             <ContactCard
-              title="Chat with Us"
-              description="Need help with SnapVault? Contact our expert team for help"
+              title={t('ContactUs.chat')}
+              description={t('ContactUs.chatDes')}
               icon={<Text style={styles.cardIcon}>💬</Text>}
               backgroundColor="#950091"
               iconBackgroundColor="#b134a6"
@@ -47,8 +56,8 @@ const ContactUs: React.FC = () => {
             />
             
             <ContactCard
-              title="Call Us"
-              description="Need help with SnapVault? Call our team for help and get your queries solved"
+              title={t('ContactUs.call')}
+              description={t('ContactUs.callDes')}
               icon={<Text style={styles.cardIcon}>📞</Text>}
               backgroundColor="#5000a9"
               iconBackgroundColor="#5000a9"
@@ -56,8 +65,8 @@ const ContactUs: React.FC = () => {
             />
             
             <ContactCard
-              title="Email Us"
-              description="Email us and share your concerns"
+              title={t('ContactUs.email')}
+              description={t('ContactUs.emailDes')}
               icon={<Text style={styles.cardIcon}>✉️</Text>}
               backgroundColor="#303f45"
               iconBackgroundColor="#303f45"
@@ -67,24 +76,24 @@ const ContactUs: React.FC = () => {
 
           {/* Social Media Section */}
           <View style={styles.socialMediaSection}>
-            <Text style={styles.socialMediaTitle}>Our social media</Text>
+            <Text style={styles.socialMediaTitle}>{t('ContactUs.social')}</Text>
             <View style={styles.socialMediaContainer}>
               <SocialMediaCard
-                title="Twitter"
+                title={t('platforms.twitter')}
                 icon={<Text style={styles.socialIcon}>🐦</Text>}
-                onPress={() => handleSocialPress('Twitter')}
+                onPress={() => handleSocialPress('twitter')}
               />
               
               <SocialMediaCard
-                title="Instagram"
+                title={t('platforms.instagram')}
                 icon={<Text style={styles.socialIcon}>📷</Text>}
-                onPress={() => handleSocialPress('Instagram')}
+                onPress={() => handleSocialPress('instagram')}
               />
               
               <SocialMediaCard
-                title="Facebook"
+                title={t('platforms.facebook')}
                 icon={<Text style={styles.socialIcon}>👥</Text>}
-                onPress={() => handleSocialPress('Facebook')}
+                onPress={() => handleSocialPress('facebook')}
               />
             </View>
           </View>

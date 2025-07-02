@@ -35,6 +35,28 @@
     {
         "cancel":"Cancel",
         "confirm":"Confirm"
+    },
+    "ContactUs":
+    {
+        "title":"Contact Us",
+        "call":"Contact Us",
+        "chat":"Chat with Us",
+        "email":"Email us and share your concerns",
+        "social":"Our social media",
+        "chatMsg":"'Opening chat support...",
+        "callMsg":"'Calling support team...",
+        "emailMsg":"'Opening email client...",
+        "socialMsg": "Opening {{platform}}...",
+        "chatDes":"Need help with SnapVault? Contact our expert team for help",
+        "callDes":"Need help with SnapVault? Call our team for help and get your queries solved",
+        "emailDes":"Email our team for assistance"
+
+    },
+    "platforms":
+    {
+        "twitter":"Twitter",
+        "facebook":"Facebook",
+        "instagram":"Instagram"
     }
 
 }
