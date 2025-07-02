@@ -1,3 +1,4 @@
+import { I18nManager } from 'react-native';
 import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
@@ -8,15 +9,18 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     elevation: 3,
     marginTop: 50,
-    marginRight:12,
-    marginLeft:12,
+    //replacing left/right with start end to handle rtl
+    marginStart:12,
+    marginEnd:12,
   },
   centeredSection: {
     alignItems: 'center',
     width: '100%',
   },
   leftSection: {
-    alignItems: 'flex-start',
+    // alignItems: 'flex-start',
+    // alignItems: I18nManager.isRTL ? 'flex-end' : 'flex-start',
+    alignItems: I18nManager.isRTL ? 'flex-end' : 'flex-start',
     width: '100%',
   },
   divider: {
@@ -31,10 +35,13 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 40,
     marginBottom: 10,
+    //added to handle rtl 
+    marginStart: 10,
+    marginEnd: 10
   },
-  name: { fontSize: 18, fontWeight: 'bold' },
-  phone: { fontSize: 14, color: '#999' },
-  email: { fontSize: 14, color: '#999' },
+  name: { fontSize: 18, fontWeight: 'bold', textAlign: I18nManager.isRTL ? 'right' : 'left' },
+  phone: { fontSize: 14, color: '#999', textAlign: I18nManager.isRTL ? 'right' : 'left' },
+  email: { fontSize: 14, color: '#999' , textAlign: I18nManager.isRTL ? 'right' : 'left'},
 });
 
 export default styles;

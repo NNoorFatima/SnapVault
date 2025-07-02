@@ -1,11 +1,11 @@
 import React from 'react';
-import { ScrollView, View, Image} from 'react-native';
+import { ScrollView, StyleSheet} from 'react-native';
 import UserCard from '../../components/UserCard';
 import ProfileBottomOptions from '../../components/ProfileBottomOptions';
 import BackgroundImage from '../../assets/UserProfileBackground';
 const UserProfile = () => (
 
-    <ScrollView style={{flex: 1, backgroundColor: 'transparent',}}>
+    <ScrollView style={styles.container}>
       <BackgroundImage />
       <UserCard 
       name="John Doe"
@@ -22,3 +22,12 @@ const UserProfile = () => (
 
 
 export default UserProfile; 
+
+const styles = StyleSheet.create({
+  container: 
+  {
+    flex: 1,
+    backgroundColor: 'transparent'
+  }
+
+});

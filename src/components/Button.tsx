@@ -31,6 +31,7 @@ const Button: React.FC<ButtonProps> = ({
 };
 
 export default Button;
+//styles
 const styles = StyleSheet.create({
   button: {
     paddingVertical: 12,

@@ -4,6 +4,7 @@ import ProfileOption from './ProfileOption';
 // import styles from './UserCard.styles';
 //for localization
 import { useTranslation } from 'react-i18next';
+import { I18nManager } from 'react-native';  
 
 // @ts-ignore
 import Feather from 'react-native-vector-icons/Feather';
@@ -22,6 +23,7 @@ const ProfileBottomOptions = () => {
 };
 const styles = StyleSheet.create({
   leftSection: {
+    // flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row',
     alignItems: 'flex-start',
     width: '100%',
   },
@@ -31,8 +33,8 @@ const styles = StyleSheet.create({
     padding: 20,
     marginBottom: 20,
     elevation: 3,
-    marginRight:12,
-    marginLeft:12,
+    marginStart:12,
+    marginEnd:12,
   },
 });
 

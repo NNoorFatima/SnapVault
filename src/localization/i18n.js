@@ -48,6 +48,15 @@ export const initLocalization = async () => {
   // Find the language that the user prefers
     // const language = await detectLanguage();
     const language = 'ur'; // just for now
+    const isRTL = language === 'ur';
+    
+
+    // Apply RTL before rendering anything
+  if (I18nManager.isRTL !== isRTL) {
+    I18nManager.allowRTL(true);
+    I18nManager.forceRTL(isRTL);
+    // Note: don't restart here — just set direction before UI starts
+  }
 
   // Initialize the i18n library with the translations and the preferred language
   // If the preferred language is not supported, use English
@@ -85,11 +94,12 @@ export const changeAppLanguage = async (lang) => {
   await i18n.changeLanguage(lang); //change the language in i18n 
   await AsyncStorage.setItem(LANG_KEY, lang); //persist language 
 
-  // //apply RTL if needed 
-  // if (I18nManager.isRTL !== isRTL) {
-  //   I18nManager.forceRTL(isRTL);
-  //   RNRestart.Restart(); // Reload app to apply RTL
-  // }
+  //apply RTL if needed 
+  if (I18nManager.isRTL !== isRTL) {
+    I18nManager.allowRTL(true);
+    I18nManager.forceRTL(isRTL);
+    RNRestart.Restart(); // Reload app to apply RTL
+  }
 };
 
 export default i18n;

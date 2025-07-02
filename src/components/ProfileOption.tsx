@@ -1,5 +1,6 @@
 import React from 'react';
-import { TouchableOpacity, Text, View, StyleSheet } from 'react-native';   
+import { TouchableOpacity, Text, View, StyleSheet } from 'react-native'; 
+import { I18nManager } from 'react-native';  
 
 const ProfileOption = ({ icon, label, onPress }:any) => (
 
@@ -12,7 +13,7 @@ const ProfileOption = ({ icon, label, onPress }:any) => (
     
 const styles = StyleSheet.create({
   option: {
-    flexDirection: 'row',
+    flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row',
     alignItems: 'center',
     paddingVertical: 13,
     paddingHorizontal: 20,   
@@ -20,9 +21,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',    
   },
   label: {
-    marginLeft: 20,
+    marginStart: 20,
     fontSize: 16,
     color: 'grey',
+    textAlign: I18nManager.isRTL ? 'right' : 'left',
   },
 });
 
