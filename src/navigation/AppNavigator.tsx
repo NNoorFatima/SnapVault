@@ -10,6 +10,7 @@ import EditProfile from '../screens/UserProfile/EditProfile';
 import Logout from '../screens/UserProfile/Logout';
 import ContactUs from '../screens/ContactUs/ContactUs';
 import DashboardScreen from '../screens/DashBoard/DashboardScreen';
+import ApiTestScreen from '../screens/ApiTest/ApiTestScreen';
 
 // Define route names and their parameters
 export type RootStackParamList = {
@@ -17,6 +18,7 @@ export type RootStackParamList = {
   'Edit Profile': undefined;
   Logout: undefined;
   'Contact Us': undefined;
+  'API Test': undefined;
 };
 
 export type TabParamList = {
@@ -25,6 +27,7 @@ export type TabParamList = {
   Camera: undefined;
   Gallery: undefined;
   Profile: undefined;
+  ApiTest: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -124,6 +127,15 @@ const MainTabs: React.FC = () => (
       options={{
         tabBarIcon: ({ focused }) => (
           <TabIcon icon="👤" focused={focused} />
+        ),
+      }}
+    />
+    <Tab.Screen
+      name="ApiTest"
+      component={ApiTestScreen}
+      options={{
+        tabBarIcon: ({ focused }) => (
+          <TabIcon icon="🧪" focused={focused} />
         ),
       }}
     />
