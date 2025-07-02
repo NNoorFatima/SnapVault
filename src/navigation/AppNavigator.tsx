@@ -21,30 +21,13 @@ export type RootStackParamList = {
 
 export type TabParamList = {
   Dashboard: undefined;
-  ContactUs: undefined;  
-  Camera: undefined;
-  Gallery: undefined;
+  ContactUs: undefined;   
   Profile: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
-
-// Placeholder screens for new tabs
-
-const CameraScreen = () => (
-  <View style={styles.placeholderContainer}>
-    <Text style={styles.placeholderTitle}>Camera</Text>
-    <Text style={styles.placeholderText}>Capture memories instantly</Text>
-  </View>
-);
-
-const GalleryScreen = () => (
-  <View style={styles.placeholderContainer}>
-    <Text style={styles.placeholderTitle}>Gallery</Text>
-    <Text style={styles.placeholderText}>Browse your photos</Text>
-  </View>
-);
+ 
 
 // Define props interface for TabIcon component
 interface TabIconProps {
@@ -97,24 +80,6 @@ const MainTabs: React.FC = () => (
       options={{
         tabBarIcon: ({ focused }) => (
           <TabIcon icon="📞" focused={focused} /> 
-        ),
-      }}
-    />
-    <Tab.Screen
-      name="Camera"
-      component={CameraScreen}
-      options={{
-        tabBarIcon: ({ focused }) => (
-          <TabIcon icon="📷" focused={focused} />
-        ),
-      }}
-    />
-    <Tab.Screen
-      name="Gallery"
-      component={GalleryScreen}
-      options={{
-        tabBarIcon: ({ focused }) => (
-          <TabIcon icon="🖼️" focused={focused} />
         ),
       }}
     />
