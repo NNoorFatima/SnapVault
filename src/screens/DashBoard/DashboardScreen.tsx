@@ -1,8 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions, ScrollView, ImageBackground } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient'; // Keep if used elsewhere, otherwise remove
+import Toast from 'react-native-toast-message';
+import CreateGroupPopup from '../../components/CreateGroupPopup';
+import JoinGroupPopup from '../../components/JoinGroupPopup';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../navigation/AppNavigator';
 
-const DashboardScreen = () => {
+type DashboardScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
+interface DashboardScreenProps {
+  navigation: DashboardScreenNavigationProp;
+}
+
+const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
+  // State for popups
+  const [showCreateGroupPopup, setShowCreateGroupPopup] = useState(false);
+  const [showJoinGroupPopup, setShowJoinGroupPopup] = useState(false);
+
   // Enhanced colorful group images with better color palette
   const groupImageUrls = [
     'https://placehold.co/200x200/6366F1/FFFFFF', // Indigo
@@ -14,6 +29,35 @@ const DashboardScreen = () => {
     'https://placehold.co/200x200/84CC16/FFFFFF', // Lime
     'https://placehold.co/200x200/EC4899/FFFFFF', // Pink
   ];
+
+  // Handlers for popup actions
+  const handleCreateGroup = (groupData: { name: string; description: string }) => {
+    // Here you would typically make an API call to create the group
+    console.log('Creating group:', groupData);
+    
+    // Show success toast
+    Toast.show({
+      type: 'success',
+      text1: 'Group Created!',
+      text2: `Group "${groupData.name}" has been created successfully.`,
+      position: 'bottom',
+      visibilityTime: 3000,
+    });
+  };
+
+  const handleJoinGroup = (groupData: { code: string }) => {
+    // Here you would typically make an API call to join the group
+    console.log('Joining group with code:', groupData.code);
+    
+    // Show success toast
+    Toast.show({
+      type: 'success',
+      text1: 'Group Joined!',
+      text2: `You have successfully joined the group.`,
+      position: 'bottom',
+      visibilityTime: 3000,
+    });
+  };
 
   const screenWidth = Dimensions.get('window').width;
   const contentWrapperWidth = Math.min(screenWidth - 32, 420);
@@ -74,13 +118,19 @@ const DashboardScreen = () => {
                 Join groups and get your pictures filtered out automatically!
               </Text>
               <View style={styles.buttonRow}>
-                <TouchableOpacity style={[styles.button, styles.joinButton]}>
+                <TouchableOpacity 
+                  style={[styles.button, styles.joinButton]}
+                  onPress={() => setShowJoinGroupPopup(true)}
+                >
                   <View style={styles.buttonIconContainer}>
                     <Text style={styles.buttonIcon}>👥</Text>
                   </View>
                   <Text style={styles.buttonText}>Join Groups</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={[styles.button, styles.createButton]}>
+                <TouchableOpacity 
+                  style={[styles.button, styles.createButton]}
+                  onPress={() => setShowCreateGroupPopup(true)}
+                >
                   <View style={styles.buttonIconContainer}>
                     <Text style={styles.buttonIcon}>➕</Text>
                   </View>
@@ -131,7 +181,19 @@ const DashboardScreen = () => {
             {/* Image Grid */}
             <View style={styles.imageGrid}>
               {groupImageUrls.map((src, index) => (
-                <TouchableOpacity key={index} style={styles.imageWrapper} activeOpacity={0.8}>
+                <TouchableOpacity 
+                  key={index} 
+                  style={styles.imageWrapper} 
+                  activeOpacity={0.8}
+                  onPress={() => {
+                    navigation.navigate('GroupScreen', {
+                      groupId: index + 1,
+                      groupName: `Group ${index + 1}`,
+                      groupDescription: `This is the description for Group ${index + 1}. A wonderful group for sharing memories and photos.`,
+                      groupCode: `GRP${String(index + 1).padStart(3, '0')}`
+                    });
+                  }}
+                >
                   <Image
                     source={require('./img/group1.png')}
                     style={styles.groupImage}
@@ -151,6 +213,19 @@ const DashboardScreen = () => {
           <View style={styles.bottomSpacer} />
         </View>
       </ScrollView>
+
+      {/* Popup Components */}
+      <CreateGroupPopup
+        visible={showCreateGroupPopup}
+        onClose={() => setShowCreateGroupPopup(false)}
+        onGroupCreated={handleCreateGroup}
+      />
+      
+      <JoinGroupPopup
+        visible={showJoinGroupPopup}
+        onClose={() => setShowJoinGroupPopup(false)}
+        onGroupJoined={handleJoinGroup}
+      />
     </View>  
   );
 };
