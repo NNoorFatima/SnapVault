@@ -1,8 +1,8 @@
-# API Architecture Documentation
+# SnapVault API Architecture Documentation
 
 ## Overview
 
-This document provides comprehensive documentation for the new API architecture implemented in the SnapVault project. The architecture follows SOLID principles and professional practices to ensure maintainable, scalable, and robust API communication.
+This document explains the SnapVault API architecture, which is built on SOLID principles for maintainability and extensibility. The system uses a FastAPI backend and a React Native frontend, with a modular API client and service layer.
 
 ## Table of Contents
 
@@ -468,6 +468,86 @@ try {
      NEW_ENDPOINT: '/new-endpoint',
    };
    ```
+
+## How to Add New APIs (SOLID Principles)
+
+### 1. Backend (FastAPI)
+- **Define your model** in `main.py` using Pydantic.
+- **Add storage** (in-memory or database) for the new entity.
+- **Create CRUD endpoints** using FastAPI decorators.
+- **Example:**
+  ```python
+  class Product(BaseModel):
+      name: str
+      price: float
+      # ...other fields
+
+  products_db: Dict[str, dict] = {}
+
+  @app.get('/products')
+  async def get_products():
+      return list(products_db.values())
+  # ...other CRUD endpoints
+  ```
+
+### 2. Frontend (React Native)
+- **Add endpoint** in `src/api/endpoints.js`:
+  ```js
+  export const ENDPOINTS = {
+    // ...existing
+    PRODUCTS: '/products',
+    PRODUCT_BY_ID: (id) => `/products/${id}`,
+  };
+  ```
+- **Create a service** in `src/services/productService.js`:
+  ```js
+  import { httpClient } from '../api/client.js';
+  import { ENDPOINTS } from '../api/endpoints.js';
+
+  class ProductService {
+    async getProducts() {
+      return httpClient.get(ENDPOINTS.PRODUCTS);
+    }
+    // ...other CRUD methods
+  }
+  export const productService = new ProductService();
+  ```
+- **Export the service** in `src/services/index.js`:
+  ```js
+  export { productService } from './productService.js';
+  ```
+- **Add test buttons** in the API Test Screen:
+  ```js
+  import { productService } from '../../services';
+
+  const testGetProducts = () => {
+    handleApiCall(() => productService.getProducts(), 'Get Products');
+  };
+  // ...add button in the UI
+  ```
+
+### 3. Why is this SOLID?
+- **Single Responsibility:** Each service handles one entity.
+- **Open/Closed:** Add new APIs by adding new files, not editing old ones.
+- **Liskov Substitution:** All services use the same interface.
+- **Interface Segregation:** Each service only exposes relevant methods.
+- **Dependency Inversion:** Services depend on the generic `httpClient`, not on fetch/axios directly.
+
+## Example: Adding a New API (Step-by-Step)
+
+1. **Backend:**
+   - Add a new Pydantic model and endpoints in FastAPI.
+2. **Frontend:**
+   - Add endpoints in `endpoints.js`.
+   - Create a new service file for the entity.
+   - Export the service in `index.js`.
+   - Add test buttons in the API Test Screen.
+
+## Current API Coverage
+- **Items**: Full CRUD
+- **Users**: Full CRUD
+
+You can extend this pattern for any new entity (e.g., products, orders, etc.) with minimal changes and maximum code reuse.
 
 ## Conclusion
 

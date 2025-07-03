@@ -1,4 +1,18 @@
-# API Architecture Implementation Summary
+# SnapVault Implementation Summary
+
+## Overview
+
+The SnapVault app now uses only the FastAPI backend for all API operations. All previous dummy/mock API code has been removed. The architecture is designed for easy extensibility using SOLID principles, making it simple to add new APIs both in the backend and frontend.
+
+- **Backend:** FastAPI, Pydantic models, modular endpoints
+- **Frontend:** Modular API client, service-per-entity, centralized endpoint management
+
+### How to Add New APIs
+- Add a new model and endpoints in FastAPI
+- Add endpoints and a new service in the frontend
+- Export the service and add test buttons in the API Test Screen
+
+This ensures maintainability, scalability, and rapid development for future features.
 
 ## 🎯 Project Overview
 

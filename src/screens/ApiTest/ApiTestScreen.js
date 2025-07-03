@@ -1,10 +1,10 @@
 /**
  * API Test Screen
- * Comprehensive testing interface for all API operations
- * Demonstrates the new API architecture and SOLID principles
+ * Comprehensive testing interface for FastAPI backend operations
+ * Tests only real backend endpoints (items and users)
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -16,14 +16,32 @@ import {
   StyleSheet,
   SafeAreaView,
 } from 'react-native';
-import { userService, productService, authService, itemService } from '../../services/index.js';
+import { itemService, userService } from '../../services/index.js';
 
 const ApiTestScreen = () => {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState({});
   const [searchQuery, setSearchQuery] = useState('');
-  const [userId, setUserId] = useState('1');
-  const [productId, setProductId] = useState('1');
+  const [itemId, setItemId] = useState('');
+  const [userId, setUserId] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+
+  // Sample data for testing
+  const sampleItem = {
+    name: 'Test Item',
+    description: 'A test item for API testing',
+    price: 99.99,
+    category: 'Electronics',
+    stock: 50,
+  };
+
+  const sampleUser = {
+    username: 'testuser',
+    email: 'test@example.com',
+    first_name: 'Test',
+    last_name: 'User',
+    password: 'password123',
+  };
 
   /**
    * Generic API call handler with error handling
@@ -43,7 +61,6 @@ const ApiTestScreen = () => {
       }));
       Alert.alert('Success', `${operationName} completed successfully!`);
     } catch (error) {
-      // Defensive: fallback to string if error.message is not available
       const errorMessage = error?.message || error?.toString() || 'Unknown error';
       const errorStatus = error?.statusCode || error?.response?.status || 'N/A';
       console.error(`${operationName} failed:`, error);
@@ -62,20 +79,165 @@ const ApiTestScreen = () => {
     }
   };
 
-  /**
-   * User API Tests
-   */
+  // === ITEM API TESTS ===
+
+  const testGetItems = () => {
+    handleApiCall(
+      () => itemService.getItems({ limit: 10 }),
+      'Get Items'
+    );
+  };
+
+  const testGetItemById = () => {
+    if (!itemId.trim()) {
+      Alert.alert('Error', 'Please enter an item ID');
+      return;
+    }
+    handleApiCall(
+      () => itemService.getItemById(itemId.trim()),
+      'Get Item by ID'
+    );
+  };
+
+  const testCreateItem = () => {
+    handleApiCall(
+      () => itemService.createItem(sampleItem),
+      'Create Item'
+    );
+  };
+
+  const testUpdateItem = () => {
+    if (!itemId.trim()) {
+      Alert.alert('Error', 'Please enter an item ID to update');
+      return;
+    }
+    const updateData = {
+      name: 'Updated Test Item',
+      price: 149.99,
+      stock: 75,
+    };
+    handleApiCall(
+      () => itemService.updateItem(itemId.trim(), updateData),
+      'Update Item'
+    );
+  };
+
+  const testDeleteItem = () => {
+    if (!itemId.trim()) {
+      Alert.alert('Error', 'Please enter an item ID to delete');
+      return;
+    }
+    Alert.alert(
+      'Confirm Delete',
+      `Are you sure you want to delete item ${itemId}?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            handleApiCall(
+              () => itemService.deleteItem(itemId.trim()),
+              'Delete Item'
+            );
+          },
+        },
+      ]
+    );
+  };
+
+  const testGetCategories = () => {
+    handleApiCall(
+      () => itemService.getCategories(),
+      'Get Categories'
+    );
+  };
+
+  const testSearchItems = () => {
+    if (!searchQuery.trim()) {
+      Alert.alert('Error', 'Please enter a search query');
+      return;
+    }
+    handleApiCall(
+      () => itemService.searchItems(searchQuery.trim()),
+      'Search Items'
+    );
+  };
+
+  const testGetItemsByCategory = () => {
+    if (!selectedCategory.trim()) {
+      Alert.alert('Error', 'Please enter a category');
+      return;
+    }
+    handleApiCall(
+      () => itemService.getItemsByCategory(selectedCategory.trim()),
+      'Get Items by Category'
+    );
+  };
+
+  // === USER API TESTS ===
+
   const testGetUsers = () => {
     handleApiCall(
-      () => userService.getUsers({ limit: 5 }),
+      () => userService.getUsers({ limit: 10 }),
       'Get Users'
     );
   };
 
   const testGetUserById = () => {
+    if (!userId.trim()) {
+      Alert.alert('Error', 'Please enter a user ID');
+      return;
+    }
     handleApiCall(
-      () => userService.getUserById(parseInt(userId)),
+      () => userService.getUserById(userId.trim()),
       'Get User by ID'
+    );
+  };
+
+  const testCreateUser = () => {
+    handleApiCall(
+      () => userService.createUser(sampleUser),
+      'Create User'
+    );
+  };
+
+  const testUpdateUser = () => {
+    if (!userId.trim()) {
+      Alert.alert('Error', 'Please enter a user ID to update');
+      return;
+    }
+    const updateData = {
+      first_name: 'Updated',
+      last_name: 'User',
+    };
+    handleApiCall(
+      () => userService.updateUser(userId.trim(), updateData),
+      'Update User'
+    );
+  };
+
+  const testDeleteUser = () => {
+    if (!userId.trim()) {
+      Alert.alert('Error', 'Please enter a user ID to delete');
+      return;
+    }
+    Alert.alert(
+      'Confirm Delete',
+      `Are you sure you want to delete user ${userId}?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            handleApiCall(
+              () => userService.deleteUser(userId.trim()),
+              'Delete User'
+            );
+          },
+        },
+      ]
     );
   };
 
@@ -85,114 +247,17 @@ const ApiTestScreen = () => {
       return;
     }
     handleApiCall(
-      () => userService.searchUsers(searchQuery),
+      () => userService.searchUsers(searchQuery.trim()),
       'Search Users'
     );
   };
 
-  const testCreateUser = () => {
-    const newUser = {
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'john.doe@example.com',
-      username: 'johndoe',
-      password: 'password123',
-    };
-    handleApiCall(
-      () => userService.createUser(newUser),
-      'Create User'
-    );
-  };
+  // === UTILITY FUNCTIONS ===
 
-  /**
-   * Product API Tests
-   */
-  const testGetProducts = () => {
-    handleApiCall(
-      () => productService.getProducts({ limit: 5 }),
-      'Get Products'
-    );
-  };
-
-  const testGetProductById = () => {
-    handleApiCall(
-      () => productService.getProductById(parseInt(productId)),
-      'Get Product by ID'
-    );
-  };
-
-  const testGetCategories = () => {
-    handleApiCall(
-      () => productService.getCategories(),
-      'Get Categories'
-    );
-  };
-
-  const testSearchProducts = () => {
-    if (!searchQuery.trim()) {
-      Alert.alert('Error', 'Please enter a search query');
-      return;
-    }
-    handleApiCall(
-      () => productService.searchProducts(searchQuery),
-      'Search Products'
-    );
-  };
-
-  const testGetProductsByCategory = () => {
-    handleApiCall(
-      () => productService.getProductsByCategory('smartphones'),
-      'Get Products by Category'
-    );
-  };
-
-  const testCreateProduct = () => {
-    const newProduct = {
-      title: 'Test Product',
-      description: 'A test product for API testing',
-      price: 99.99,
-      category: 'electronics',
-      brand: 'TestBrand',
-      stock: 100,
-    };
-    handleApiCall(
-      () => productService.createProduct(newProduct),
-      'Create Product'
-    );
-  };
-
-  /**
-   * Auth API Tests (Mock - since DummyJSON doesn't have auth endpoints)
-   */
-  const testAuthLogin = () => {
-    Alert.alert('Info', 'Auth endpoints are not available in DummyJSON. This would test login functionality.');
-  };
-
-  const testAuthRegister = () => {
-    Alert.alert('Info', 'Auth endpoints are not available in DummyJSON. This would test registration functionality.');
-  };
-
-  /**
-   * Item API Tests (Mock - since DummyJSON doesn't have items endpoints)
-   */
-  const testGetItems = () => {
-    Alert.alert('Info', 'Items endpoints are not available in DummyJSON. This would test getting items.');
-  };
-
-  const testCreateItem = () => {
-    Alert.alert('Info', 'Items endpoints are not available in DummyJSON. This would test creating items.');
-  };
-
-  /**
-   * Clear results
-   */
   const clearResults = () => {
     setResults({});
   };
 
-  /**
-   * Render API test button
-   */
   const renderTestButton = (title, onPress, color = '#007AFF') => (
     <TouchableOpacity
       style={[styles.button, { backgroundColor: color }]}
@@ -203,49 +268,30 @@ const ApiTestScreen = () => {
     </TouchableOpacity>
   );
 
-  /**
-   * Render result item
-   */
   const renderResult = (operation, result) => {
-    // Try to display a list of user names if the result is a user list
-    let userList = null;
-    if (Array.isArray(result?.data?.data) && result?.data?.data[0]?.firstName) {
-      userList = (
-        <View style={{ marginTop: 8 }}>
-          <Text style={{ fontWeight: 'bold', color: '#6366F1' }}>Users:</Text>
-          {result.data.data.map((user, idx) => (
-            <Text key={user.id || idx} style={{ fontSize: 12, color: '#222' }}>
-              {user.firstName} {user.lastName} (ID: {user.id})
-            </Text>
-          ))}
-        </View>
-      );
-    }
+    if (!result) return null;
+
+    const { success, data, error, message, timestamp } = result;
+    const backgroundColor = success ? '#E8F5E8' : '#FFEBEE';
+    const borderColor = success ? '#4CAF50' : '#F44336';
+
     return (
-      <View key={operation} style={styles.resultContainer}>
+      <View key={operation} style={[styles.resultCard, { backgroundColor, borderColor }]}>
         <Text style={styles.resultTitle}>{operation}</Text>
-        <Text style={[
-          styles.resultStatus,
-          { color: result.success ? '#34C759' : '#FF3B30' }
-        ]}>
-          {result.success ? '✅ Success' : '❌ Failed'}
+        <Text style={styles.resultStatus}>
+          Status: {success ? 'Success' : 'Error'}
         </Text>
-        <Text style={styles.resultTimestamp}>
-          {new Date(result.timestamp).toLocaleTimeString()}
+        <Text style={styles.resultMessage}>
+          {success ? message : error}
         </Text>
-        {result.success ? (
-          <>
-            <Text style={styles.resultData}>
-              {JSON.stringify(result.data, null, 2).substring(0, 200)}...
-            </Text>
-            {userList}
-          </>
-        ) : (
-          <Text style={styles.resultError}>
-            Error: {result.error || 'Unknown error'}
-            {result.statusCode ? ` (${result.statusCode})` : ''}
+        {data && (
+          <Text style={styles.resultData}>
+            Data: {JSON.stringify(data, null, 2)}
           </Text>
         )}
+        <Text style={styles.resultTimestamp}>
+          {new Date(timestamp).toLocaleTimeString()}
+        </Text>
       </View>
     );
   };
@@ -253,45 +299,53 @@ const ApiTestScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView}>
-        <Text style={styles.title}>API Testing Interface</Text>
-        <Text style={styles.subtitle}>
-          Test the new API architecture with DummyJSON endpoints
-        </Text>
-
+        <Text style={styles.title}>FastAPI Backend Testing</Text>
+        
         {/* Input Fields */}
         <View style={styles.inputSection}>
           <Text style={styles.sectionTitle}>Input Parameters</Text>
           
-          <View style={styles.inputRow}>
-            <Text style={styles.inputLabel}>Search Query:</Text>
-            <TextInput
-              style={styles.input}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              placeholder="Enter search term..."
-            />
-          </View>
+          <TextInput
+            style={styles.input}
+            placeholder="Item ID"
+            value={itemId}
+            onChangeText={setItemId}
+          />
+          
+          <TextInput
+            style={styles.input}
+            placeholder="User ID"
+            value={userId}
+            onChangeText={setUserId}
+          />
+          
+          <TextInput
+            style={styles.input}
+            placeholder="Search Query"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+          
+          <TextInput
+            style={styles.input}
+            placeholder="Category"
+            value={selectedCategory}
+            onChangeText={setSelectedCategory}
+          />
+        </View>
 
-          <View style={styles.inputRow}>
-            <Text style={styles.inputLabel}>User ID:</Text>
-            <TextInput
-              style={styles.input}
-              value={userId}
-              onChangeText={setUserId}
-              placeholder="Enter user ID..."
-              keyboardType="numeric"
-            />
-          </View>
-
-          <View style={styles.inputRow}>
-            <Text style={styles.inputLabel}>Product ID:</Text>
-            <TextInput
-              style={styles.input}
-              value={productId}
-              onChangeText={setProductId}
-              placeholder="Enter product ID..."
-              keyboardType="numeric"
-            />
+        {/* Item API Tests */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Item API Tests</Text>
+          <View style={styles.buttonGrid}>
+            {renderTestButton('Get All Items', testGetItems, '#4CAF50')}
+            {renderTestButton('Get Item by ID', testGetItemById, '#2196F3')}
+            {renderTestButton('Create Item', testCreateItem, '#FF9800')}
+            {renderTestButton('Update Item', testUpdateItem, '#9C27B0')}
+            {renderTestButton('Delete Item', testDeleteItem, '#F44336')}
+            {renderTestButton('Get Categories', testGetCategories, '#607D8B')}
+            {renderTestButton('Search Items', testSearchItems, '#795548')}
+            {renderTestButton('Get Items by Category', testGetItemsByCategory, '#009688')}
           </View>
         </View>
 
@@ -299,57 +353,28 @@ const ApiTestScreen = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>User API Tests</Text>
           <View style={styles.buttonGrid}>
-            {renderTestButton('Get Users', testGetUsers, '#007AFF')}
-            {renderTestButton('Get User by ID', testGetUserById, '#007AFF')}
-            {renderTestButton('Search Users', testSearchUsers, '#007AFF')}
-            {renderTestButton('Create User', testCreateUser, '#007AFF')}
-          </View>
-        </View>
-
-        {/* Product API Tests */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Product API Tests</Text>
-          <View style={styles.buttonGrid}>
-            {renderTestButton('Get Products', testGetProducts, '#34C759')}
-            {renderTestButton('Get Product by ID', testGetProductById, '#34C759')}
-            {renderTestButton('Get Categories', testGetCategories, '#34C759')}
-            {renderTestButton('Search Products', testSearchProducts, '#34C759')}
-            {renderTestButton('Get by Category', testGetProductsByCategory, '#34C759')}
-            {renderTestButton('Create Product', testCreateProduct, '#34C759')}
-          </View>
-        </View>
-
-        {/* Auth API Tests */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Auth API Tests (Mock)</Text>
-          <View style={styles.buttonGrid}>
-            {renderTestButton('Login', testAuthLogin, '#FF9500')}
-            {renderTestButton('Register', testAuthRegister, '#FF9500')}
-          </View>
-        </View>
-
-        {/* Item API Tests */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Item API Tests (Mock)</Text>
-          <View style={styles.buttonGrid}>
-            {renderTestButton('Get Items', testGetItems, '#AF52DE')}
-            {renderTestButton('Create Item', testCreateItem, '#AF52DE')}
+            {renderTestButton('Get All Users', testGetUsers, '#4CAF50')}
+            {renderTestButton('Get User by ID', testGetUserById, '#2196F3')}
+            {renderTestButton('Create User', testCreateUser, '#FF9800')}
+            {renderTestButton('Update User', testUpdateUser, '#9C27B0')}
+            {renderTestButton('Delete User', testDeleteUser, '#F44336')}
+            {renderTestButton('Search Users', testSearchUsers, '#795548')}
           </View>
         </View>
 
         {/* Results Section */}
         <View style={styles.section}>
           <View style={styles.resultsHeader}>
-            <Text style={styles.sectionTitle}>Test Results</Text>
-            <TouchableOpacity style={styles.clearButton} onPress={clearResults}>
+            <Text style={styles.sectionTitle}>API Results</Text>
+            <TouchableOpacity onPress={clearResults} style={styles.clearButton}>
               <Text style={styles.clearButtonText}>Clear</Text>
             </TouchableOpacity>
           </View>
           
           {Object.keys(results).length === 0 ? (
-            <Text style={styles.noResults}>No test results yet. Run some tests above!</Text>
+            <Text style={styles.noResults}>No API calls made yet</Text>
           ) : (
-            Object.entries(results).map(([operation, result]) => 
+            Object.entries(results).map(([operation, result]) =>
               renderResult(operation, result)
             )
           )}
@@ -359,7 +384,7 @@ const ApiTestScreen = () => {
         {loading && (
           <View style={styles.loadingOverlay}>
             <ActivityIndicator size="large" color="#007AFF" />
-            <Text style={styles.loadingText}>Processing API request...</Text>
+            <Text style={styles.loadingText}>Processing API call...</Text>
           </View>
         )}
       </ScrollView>
@@ -370,72 +395,46 @@ const ApiTestScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2F2F7',
+    backgroundColor: '#F5F5F5',
   },
   scrollView: {
     flex: 1,
     padding: 16,
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#1C1C1E',
     textAlign: 'center',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#8E8E93',
-    textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: 20,
+    color: '#333',
   },
   inputSection: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    backgroundColor: '#FFF',
     padding: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  inputLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1C1C1E',
-    width: 100,
-  },
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#C7C7CC',
     borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: '#FFFFFF',
+    marginBottom: 16,
+    elevation: 2,
   },
   section: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    backgroundColor: '#FFF',
     padding: 16,
+    borderRadius: 8,
     marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    elevation: 2,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#1C1C1E',
-    marginBottom: 16,
+    marginBottom: 12,
+    color: '#333',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#DDD',
+    borderRadius: 4,
+    padding: 12,
+    marginBottom: 8,
+    fontSize: 16,
   },
   buttonGrid: {
     flexDirection: 'row',
@@ -443,78 +442,71 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   button: {
-    width: '48%',
     padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
+    borderRadius: 6,
     marginBottom: 8,
+    minWidth: '48%',
+    alignItems: 'center',
   },
   buttonText: {
-    color: '#FFFFFF',
+    color: '#FFF',
+    fontWeight: 'bold',
     fontSize: 14,
-    fontWeight: '600',
   },
   resultsHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   clearButton: {
-    backgroundColor: '#FF3B30',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 6,
+    backgroundColor: '#F44336',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 4,
   },
   clearButtonText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '600',
+    color: '#FFF',
+    fontWeight: 'bold',
   },
   noResults: {
     textAlign: 'center',
-    color: '#8E8E93',
-    fontSize: 16,
+    color: '#999',
     fontStyle: 'italic',
     padding: 20,
   },
-  resultContainer: {
-    backgroundColor: '#F2F2F7',
-    borderRadius: 8,
+  resultCard: {
     padding: 12,
+    borderRadius: 6,
     marginBottom: 8,
+    borderLeftWidth: 4,
   },
   resultTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#1C1C1E',
     marginBottom: 4,
   },
   resultStatus: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  resultMessage: {
+    fontSize: 14,
+    marginBottom: 4,
+  },
+  resultData: {
+    fontSize: 12,
+    fontFamily: 'monospace',
+    backgroundColor: '#F5F5F5',
+    padding: 8,
+    borderRadius: 4,
     marginBottom: 4,
   },
   resultTimestamp: {
     fontSize: 12,
-    color: '#8E8E93',
-    marginBottom: 8,
-  },
-  resultData: {
-    fontSize: 12,
-    color: '#1C1C1E',
-    fontFamily: 'monospace',
-    backgroundColor: '#FFFFFF',
-    padding: 8,
-    borderRadius: 4,
-  },
-  resultError: {
-    fontSize: 12,
-    color: '#FF3B30',
-    fontFamily: 'monospace',
-    backgroundColor: '#FFE5E5',
-    padding: 8,
-    borderRadius: 4,
+    color: '#666',
+    textAlign: 'right',
   },
   loadingOverlay: {
     position: 'absolute',
@@ -527,9 +519,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    color: '#FFFFFF',
+    color: '#FFF',
+    marginTop: 8,
     fontSize: 16,
-    marginTop: 12,
   },
 });
 

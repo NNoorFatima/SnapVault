@@ -7,19 +7,19 @@
 // Environment-based configuration
 const ENV = {
   development: {
-    API_BASE_URL: 'https://dummyjson.com',
+    API_BASE_URL: 'http://localhost:8000',
     API_TIMEOUT: 10000,
     API_RETRY_ATTEMPTS: 3,
     API_RETRY_DELAY: 1000,
   },
   production: {
-    API_BASE_URL: 'https://dummyjson.com', // In real app, this would be your production API
+    API_BASE_URL: 'http://localhost:8000',
     API_TIMEOUT: 15000,
     API_RETRY_ATTEMPTS: 2,
     API_RETRY_DELAY: 2000,
   },
   test: {
-    API_BASE_URL: 'https://dummyjson.com',
+    API_BASE_URL: 'http://localhost:8000',
     API_TIMEOUT: 5000,
     API_RETRY_ATTEMPTS: 1,
     API_RETRY_DELAY: 500,

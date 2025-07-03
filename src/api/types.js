@@ -123,161 +123,32 @@ export class RequestConfig {
 export class User {
   constructor(userData) {
     this.id = userData.id;
-    this.firstName = userData.firstName;
-    this.lastName = userData.lastName;
-    this.maidenName = userData.maidenName;
-    this.age = userData.age;
-    this.gender = userData.gender;
-    this.email = userData.email;
-    this.phone = userData.phone;
     this.username = userData.username;
-    this.password = userData.password;
-    this.birthDate = userData.birthDate;
-    this.image = userData.image;
-    this.bloodGroup = userData.bloodGroup;
-    this.height = userData.height;
-    this.weight = userData.weight;
-    this.eyeColor = userData.eyeColor;
-    this.hair = userData.hair;
-    this.domain = userData.domain;
-    this.ip = userData.ip;
-    this.address = userData.address;
-    this.macAddress = userData.macAddress;
-    this.university = userData.university;
-    this.bank = userData.bank;
-    this.company = userData.company;
-    this.ein = userData.ein;
-    this.ssn = userData.ssn;
-    this.userAgent = userData.userAgent;
-  }
-
-  get fullName() {
-    return `${this.firstName} ${this.lastName}`;
+    this.email = userData.email;
+    this.first_name = userData.first_name;
+    this.last_name = userData.last_name;
+    this.created_at = userData.created_at;
+    this.updated_at = userData.updated_at;
   }
 
   get displayName() {
-    return this.username || this.fullName;
+    return this.username || `${this.first_name} ${this.last_name}`;
   }
 }
 
 /**
- * Product Data Structure
+ * Item Data Structure
  * Based on DummyJSON API response
  */
-export class Product {
-  constructor(productData) {
-    this.id = productData.id;
-    this.title = productData.title;
-    this.description = productData.description;
-    this.price = productData.price;
-    this.discountPercentage = productData.discountPercentage;
-    this.rating = productData.rating;
-    this.stock = productData.stock;
-    this.brand = productData.brand;
-    this.category = productData.category;
-    this.thumbnail = productData.thumbnail;
-    this.images = productData.images || [];
-  }
-
-  get discountedPrice() {
-    return this.price - (this.price * this.discountPercentage / 100);
-  }
-
-  get isInStock() {
-    return this.stock > 0;
-  }
-}
-
-/**
- * Post Data Structure
- * Based on DummyJSON API response
- */
-export class Post {
-  constructor(postData) {
-    this.id = postData.id;
-    this.title = postData.title;
-    this.body = postData.body;
-    this.userId = postData.userId;
-    this.tags = postData.tags || [];
-    this.reactions = postData.reactions || 0;
-  }
-}
-
-/**
- * Cart Data Structure
- * Based on DummyJSON API response
- */
-export class Cart {
-  constructor(cartData) {
-    this.id = cartData.id;
-    this.userId = cartData.userId;
-    this.products = cartData.products || [];
-    this.total = cartData.total;
-    this.discountedTotal = cartData.discountedTotal;
-    this.totalProducts = cartData.totalProducts;
-    this.totalQuantity = cartData.totalQuantity;
-  }
-}
-
-/**
- * Todo Data Structure
- * Based on DummyJSON API response
- */
-export class Todo {
-  constructor(todoData) {
-    this.id = todoData.id;
-    this.todo = todoData.todo;
-    this.completed = todoData.completed;
-    this.userId = todoData.userId;
-  }
-}
-
-/**
- * Quote Data Structure
- * Based on DummyJSON API response
- */
-export class Quote {
-  constructor(quoteData) {
-    this.id = quoteData.id;
-    this.quote = quoteData.quote;
-    this.author = quoteData.author;
-  }
-}
-
-/**
- * Recipe Data Structure
- * Based on DummyJSON API response
- */
-export class Recipe {
-  constructor(recipeData) {
-    this.id = recipeData.id;
-    this.name = recipeData.name;
-    this.ingredients = recipeData.ingredients || [];
-    this.instructions = recipeData.instructions || [];
-    this.prepTimeMinutes = recipeData.prepTimeMinutes;
-    this.cookTimeMinutes = recipeData.cookTimeMinutes;
-    this.servings = recipeData.servings;
-    this.difficulty = recipeData.difficulty;
-    this.cuisine = recipeData.cuisine;
-    this.caloriesPerServing = recipeData.caloriesPerServing;
-    this.tags = recipeData.tags || [];
-    this.userId = recipeData.userId;
-    this.image = recipeData.image;
-    this.rating = recipeData.rating;
-    this.reviewCount = recipeData.reviewCount;
-    this.mealType = recipeData.mealType;
-  }
-}
-
-/**
- * Comment Data Structure
- * Based on DummyJSON API response
- */
-export class Comment {
-  constructor(commentData) {
-    this.id = commentData.id;
-    this.body = commentData.body;
-    this.postId = commentData.postId;
-    this.user = commentData.user;
+export class Item {
+  constructor(itemData) {
+    this.id = itemData.id;
+    this.name = itemData.name;
+    this.description = itemData.description;
+    this.price = itemData.price;
+    this.category = itemData.category;
+    this.stock = itemData.stock;
+    this.created_at = itemData.created_at;
+    this.updated_at = itemData.updated_at;
   }
 } 
