@@ -1,5 +1,6 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import DashboardScreen from '../screens/DashBoard/DashboardScreen';
 import ContactUs from '../screens/ContactUs/ContactUs';
 import UserProfile from '../screens/UserProfile/UserProfile';
@@ -15,38 +16,69 @@ export type MainTabParamList = {
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
+const CustomTabBar = ({ state, descriptors, navigation }) => {
+  return (
+    <View style={styles.tabBarContainer}>
+      {/* Dashboard (left) */}
+      <TouchableOpacity
+        style={styles.tabButton}
+        onPress={() => navigation.navigate('Dashboard')}
+      >
+        <Icon
+          name={state.index === 0 ? 'home' : 'home-outline'}
+          size={32}
+          color={state.index === 0 ? '#6BDCE1' : '#fff'}
+        />
+      </TouchableOpacity>
+      {/* ContactUs (center) */}
+      <TouchableOpacity
+        style={[styles.tabButton, styles.centerTab]}
+        onPress={() => navigation.navigate('ContactUs')}
+      >
+        <Icon
+          name={state.index === 1 ? 'call' : 'call-outline'}
+          size={32}
+          color={state.index === 1 ? '#6BDCE1' : '#fff'}
+        />
+      </TouchableOpacity>
+      {/* Profile (right) */}
+      <TouchableOpacity
+        style={styles.tabButton}
+        onPress={() => navigation.navigate('Profile')}
+      >
+        <Icon
+          name={state.index === 2 ? 'person' : 'person-outline'}
+          size={32}
+          color={state.index === 2 ? '#6BDCE1' : '#fff'}
+        />
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  tabBarContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#1B1C41',
+    height: 65,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+  },
+  tabButton: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  centerTab: {
+    flex: 1.2,
+  },
+});
+
 const MainTabNavigator = () => (
   <Tab.Navigator
-    screenOptions={({ route }) => ({
-      headerShown: false,
-      tabBarShowLabel: false,
-      tabBarStyle: {
-        backgroundColor: '#1B1C41',
-        borderTopWidth: 0,
-        height: 65,
-        paddingBottom: 8,
-        paddingTop: 8,
-        justifyContent: 'center',
-        alignItems: 'center',
-      },
-      tabBarIcon: ({ focused, color, size }) => {
-        let iconName = '';
-        if (route.name === 'Dashboard') iconName = focused ? 'home' : 'home-outline';
-        else if (route.name === 'ContactUs') iconName = focused ? 'call' : 'call-outline';
-        else if (route.name === 'Profile') iconName = focused ? 'person' : 'person-outline';
-
-        return (
-          <Icon
-            name={iconName}
-            size={32}
-            color={focused ? '#6BDCE1' : '#fff'}
-            style={{ alignSelf: 'center' }}
-          />
-        );
-      },
-      tabBarActiveTintColor: '#6BDCE1',
-      tabBarInactiveTintColor: '#fff',
-    })}
+    tabBar={props => <CustomTabBar {...props} />}
+    screenOptions={{ headerShown: false }}
   >
     <Tab.Screen name="Dashboard" component={DashboardScreen} />
     <Tab.Screen name="ContactUs" component={ContactUs} />
