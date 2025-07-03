@@ -13,8 +13,8 @@ import ConfirmationPopUp from './ConfirmationPopUp';
 import NewPassword from './NewPassword';
 //for localization
 import { useTranslation } from 'react-i18next';
-
-
+import i18n from '../localization/i18n';
+import { changeAppLanguage } from '../localization/i18n';
 
 const Divider = () => <View style={styles.divider} />;
 const UserCard = ({name, phone, email,avatar}: any) => {
@@ -88,7 +88,13 @@ const UserCard = ({name, phone, email,avatar}: any) => {
                             // perform delete logic here
                             }}
                         />
-                        </Modal>    
+                        </Modal>  
+                {/*change language  */}
+                <ProfileOption icon={<Feather name="globe" size={20} color="grey" />} label= {t('profile.changeLanguage')}
+                    onPress={() => {
+                    const newLang = i18n.language === 'en' ? 'ur' : 'en';
+                    changeAppLanguage(newLang); //  calls RTL logic and restarts
+                }}/>
             </View>
         </View>
     );

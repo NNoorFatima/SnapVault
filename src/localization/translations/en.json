@@ -5,6 +5,7 @@
         "changePassword":"Change Password",
         "logout":"Logout",
         "deleteAccount":"Delete Account",
+        "changeLanguage":"Change Language",
         "contactUs": "Contact Us",
         "reviewApp": "Review App"
     },
