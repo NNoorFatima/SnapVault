@@ -10,6 +10,7 @@ import EditProfile from '../screens/UserProfile/EditProfile';
 // import Logout from '../screens/UserProfile/Logout';
 import ContactUs from '../screens/ContactUs/ContactUs';
 import DashboardScreen from '../screens/DashBoard/DashboardScreen';
+import GroupScreen from '../screens/GroupScreen/GroupScreen';
 
 // Define route names and their parameters
 export type RootStackParamList = {
@@ -17,6 +18,12 @@ export type RootStackParamList = {
   'Edit Profile': undefined;
   Logout: undefined;
   'Contact Us': undefined;
+  GroupScreen: {
+    groupId: number;
+    groupName: string;
+    groupDescription: string;
+    groupCode: string;
+  };
 };
 
 export type TabParamList = {
@@ -144,6 +151,14 @@ const AppNavigator: React.FC = () => (
           headerBackTitle: 'Back',
         }}
       /> */}
+      {/* /> */}
+      <Stack.Screen
+        name="GroupScreen"
+        component={GroupScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
     </Stack.Navigator>
   </NavigationContainer>
 );

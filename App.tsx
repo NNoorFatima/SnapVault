@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import AppNavigator from './src/navigation/AppNavigator';
 import { initLocalization } from './src/localization/i18n';
+import Toast from 'react-native-toast-message';
 
 export default function App() {
   const [isReady, setIsReady] = useState(false);
@@ -24,5 +25,20 @@ export default function App() {
   }
 
   console.log('App ready, rendering navigator...');
-  return <AppNavigator />;
+  return (
+    <>
+      <AppNavigator />
+      <Toast />
+    </>
+  );
 }
+
+
+// export default function App() {
+//   return (
+//     <>
+//       <AppNavigator />
+//       <Toast />
+//     </>
+//   );
+// }
