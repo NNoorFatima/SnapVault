@@ -44,38 +44,34 @@ const detectLanguage = async () => {
 };
 
 
-export const initLocalization = async () => {
-  // Find the language that the user prefers
-    const language = await detectLanguage();
-    // const language = 'en'; // just for now
-    const isRTL = language === 'ur';
-    
+/**
+ * Initializes localization settings for the app.
+ * 
+ * This function detects the user's preferred language and configures the app's
+ * internationalization settings accordingly. It adjusts the text direction 
+ * (RTL or LTR) based on the language and initializes the i18n library with 
+ * the appropriate translations. If the user's preferred language is not 
+ * supported, it defaults to English.
+ * 
+ * The function does not restart the app but sets the text direction before 
+ * the UI starts rendering to ensure proper layout.
+ */
 
-    // Apply RTL before rendering anything
+export const initLocalization = async () => {
+  const language = await detectLanguage();
+  const isRTL = language === 'ur';
+
   if (I18nManager.isRTL !== isRTL) {
     I18nManager.allowRTL(true);
     I18nManager.forceRTL(isRTL);
-    // Note: don't restart here — just set direction before UI starts
   }
-
-  // Initialize the i18n library with the translations and the preferred language
-  // If the preferred language is not supported, use English
   await i18n
     .use(initReactI18next)
     .init({
-      // The translations for all supported languages
       resources, //defined above 
-
-      // The language that the user prefers
       lng: language,
-
-      // The language to use if the user's preferred language is not supported
       fallbackLng: 'en',
-
-      // This is a special setting that is needed to make the i18n library workwith React Native
       compatibilityJSON: 'v3',
-
-      // This is a special setting that is needed to make the i18n library work with React Native
       interpolation: { escapeValue: false },
     });
 };
