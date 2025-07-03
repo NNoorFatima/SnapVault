@@ -147,65 +147,65 @@ const MainTabs: React.FC = () => (
   </Tab.Navigator>
 );
 
-// Main App Navigator
-const AppNavigator: React.FC = () => (
-  <NavigationContainer>
-    <Stack.Navigator
-      initialRouteName="MainTabs"
-      screenOptions={{
-        headerShown: false,
-        presentation: 'modal',
-        animationTypeForReplace: 'push',
-      }}
-    >
-      <Stack.Screen
-        name="MainTabs"
-        component={MainTabs}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Edit Profile"
-        component={EditProfile}
-        options={{
-          headerShown: true,
-          title: 'Edit Profile',
-          headerStyle: styles.modalHeader,
-          headerTitleStyle: styles.modalHeaderTitle,
-          headerBackTitle: 'Back',
-        }}
-      />
-      <Stack.Screen
-        name="Contact Us"
-        component={ContactUs}
-        options={{
-          headerShown: true,
-          title: 'Contact Us',
-          headerStyle: styles.modalHeader,
-          headerTitleStyle: styles.modalHeaderTitle,
-          headerBackTitle: 'Back',
-        }}
-      />
-      <Stack.Screen
-        name="Logout"
-        component={Logout}
-        options={{
-          headerShown: true,
-          title: 'Logout',
-          headerStyle: styles.modalHeader,
-          headerTitleStyle: styles.modalHeaderTitle,
-          headerBackTitle: 'Back',
-        }}
-      />
-      <Stack.Screen
-        name="GroupScreen"
-        component={GroupScreen}
-        options={{
-          headerShown: false,
-        }}
-      />
-    </Stack.Navigator>
-  </NavigationContainer>
-);
+// // Main App Navigator
+// const AppNavigator: React.FC = () => (
+//   <NavigationContainer>
+//     <Stack.Navigator
+//       initialRouteName="MainTabs"
+//       screenOptions={{
+//         headerShown: false,
+//         presentation: 'modal',
+//         animationTypeForReplace: 'push',
+//       }}
+//     >
+//       <Stack.Screen
+//         name="MainTabs"
+//         component={MainTabs}
+//         options={{ headerShown: false }}
+//       />
+//       <Stack.Screen
+//         name="Edit Profile"
+//         component={EditProfile}
+//         options={{
+//           headerShown: true,
+//           title: 'Edit Profile',
+//           headerStyle: styles.modalHeader,
+//           headerTitleStyle: styles.modalHeaderTitle,
+//           headerBackTitle: 'Back',
+//         }}
+//       />
+//       <Stack.Screen
+//         name="Contact Us" 
+//         component={ContactUs}
+//         options={{
+//           headerShown: true,
+//           title: 'Contact Us',
+//           headerStyle: styles.modalHeader,
+//           headerTitleStyle: styles.modalHeaderTitle,
+//           headerBackTitle: 'Back',
+//         }}
+//       />
+//       <Stack.Screen
+//         name="Logout"
+//         component={Logout}
+//         options={{
+//           headerShown: true,
+//           title: 'Logout',
+//           headerStyle: styles.modalHeader,
+//           headerTitleStyle: styles.modalHeaderTitle,
+//           headerBackTitle: 'Back',
+//         }}
+//       />
+//       <Stack.Screen
+//         name="GroupScreen"
+//         component={GroupScreen}
+//         options={{
+//           headerShown: false,
+//         }}
+//       />
+//     </Stack.Navigator>
+//   </NavigationContainer>
+// );
 
 const styles = StyleSheet.create({
   // Tab Bar Styles
