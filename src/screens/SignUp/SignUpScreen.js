@@ -16,7 +16,7 @@ import { ScrollView } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
-const SignUpScreen = ({ onBack, onSignIn }) => {
+const SignUpScreen = ({ navigation }) => {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   return (
@@ -110,7 +110,7 @@ const SignUpScreen = ({ onBack, onSignIn }) => {
               textColor="#1B1C41"
               fontSize={20}
               borderRadius={20}
-              onPress={() => {}}
+              onPress={() => navigation.navigate('SignIn')}
               style={{ marginTop: 16 }}
             />
           </CustomBox>
@@ -119,7 +119,7 @@ const SignUpScreen = ({ onBack, onSignIn }) => {
               text="Already have an account? Sign In"
               color="#73DBE5"
               fontSize={18}
-              onPress={onSignIn}
+              onPress={() => navigation.navigate('SignIn')}
             />
           </View>
         </View>

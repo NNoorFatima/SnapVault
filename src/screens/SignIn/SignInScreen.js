@@ -18,7 +18,7 @@ import CustomButton from '../../components/CustomButton';
 
 const { width, height } = Dimensions.get('window');
 
-const SignInScreen = ({ onForgotPassword, onSignUp }) => {
+const SignInScreen = ({ navigation, onSignIn }) => {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   return (
@@ -75,7 +75,7 @@ const SignInScreen = ({ onForgotPassword, onSignUp }) => {
                   text="Forgot Password?"
                   color="#73DBE5"
                   fontSize={16}
-                  onPress={onForgotPassword}
+                  onPress={() => navigation.navigate('ForgetPassword')}
                 />
               </View>
               <CustomButton
@@ -86,7 +86,7 @@ const SignInScreen = ({ onForgotPassword, onSignUp }) => {
                 textColor="#1B1C41"
                 fontSize={20}
                 borderRadius={20}
-                onPress={() => {}}
+                onPress={() => onSignIn && onSignIn()}
                 style={{ marginTop: 16 }}
               />
             </CustomBox>
@@ -95,7 +95,7 @@ const SignInScreen = ({ onForgotPassword, onSignUp }) => {
                   text="New to SnapVault? SignUp"
                   color="#73DBE5"
                   fontSize={18}
-                  onPress={onSignUp}
+                  onPress={() => navigation.navigate('SignUp')}
                 />
               </View>
           </View>

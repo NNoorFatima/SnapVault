@@ -14,7 +14,7 @@ import CustomBox from '../../components/CustomBox';
 
 const { width, height } = Dimensions.get('window');
 
-const OnboardingScreen = ({ onContinue }) => {
+const OnboardingScreen = ({ onFinish }) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -32,7 +32,7 @@ const OnboardingScreen = ({ onContinue }) => {
           <Text style={styles.onboardBoxText}>SnapVault is an AI-powered photo-sharing app that uses facial recognition to automatically detect and sort images.
 SnapVault simplifies sharing, protects privacy, and makes sure no memory gets lost.</Text>
           <View style={styles.bottomCircleWrapperAbsolute}>
-            <TouchableOpacity onPress={onContinue}>
+            <TouchableOpacity onPress={onFinish}>
               <View style={styles.bottomCircle}>
                 <Image
                   source={require('../../assets/Icons/continue.png')}
