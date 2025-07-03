@@ -6,7 +6,7 @@ import * as RNLocalize from 'react-native-localize';
 import en from './translations/en.json';
 import ur from './translations/ur.json';
 import { I18nManager } from 'react-native';
-// import RNRestart from 'react-native-restart'; //used to restart app 
+import RNRestart from 'react-native-restart'; //used to restart app 
 const LANG_KEY = 'user-language';
 
 // A dictionary where the keys are languages and the values are objects
@@ -46,8 +46,8 @@ const detectLanguage = async () => {
 
 export const initLocalization = async () => {
   // Find the language that the user prefers
-    // const language = await detectLanguage();
-    const language = 'ur'; // just for now
+    const language = await detectLanguage();
+    // const language = 'en'; // just for now
     const isRTL = language === 'ur';
     
 

@@ -11,7 +11,7 @@ export default function App() {
     initLocalization()
       .then(() => {
         console.log('Localization initialized');
-        i18n.changeLanguage('ur'); // or 'en'
+        // i18n.changeLanguage('en'); // or 'en'
         setIsReady(true);
       })
       .catch((err) => {
