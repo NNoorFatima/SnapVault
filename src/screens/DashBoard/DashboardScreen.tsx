@@ -86,7 +86,7 @@ const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
               </View>
               <View style={styles.greetingContainer}>
                 <Text style={styles.greetingSubtext}>Welcome back</Text>
-                <Text style={styles.greetingText}>Muhammad Waleed</Text>
+                <Text style={styles.greetingText}>Alaya Faruki</Text>
               </View>
             </View>
             <TouchableOpacity style={styles.notificationButton}>
@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   joinButton: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#DE6CED',
   },
   createButton: {
     backgroundColor: '#6366F1',
