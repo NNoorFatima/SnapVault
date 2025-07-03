@@ -16,7 +16,7 @@ import CustomTextField from '../../components/CustomTextField';
 
 const { width, height } = Dimensions.get('window');
 
-const ResetPasswordScreen = ({ onBack }) => {
+const ResetPasswordScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
 
   return (
@@ -28,7 +28,7 @@ const ResetPasswordScreen = ({ onBack }) => {
       >
         <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }} showsVerticalScrollIndicator={false}>
           <View style={styles.headerRow} pointerEvents="box-none">
-            <TouchableOpacity style={styles.backButtonWrapper} onPress={onBack}>
+            <TouchableOpacity style={styles.backButtonWrapper} onPress={() => navigation.navigate('SignIn')}>
               <Image
                 source={require('../../assets/Icons/backarrow.png')}
                 style={styles.backButtonIcon}
