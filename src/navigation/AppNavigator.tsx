@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+
 import AuthNavigator from './AuthNavigator';
 import MainTabNavigator from './MainTabNavigator';
 import SplashScreen from '../screens/Splash/SplashScreen';
@@ -44,7 +45,14 @@ export type TabParamList = {
 
 };
 
+// Define TabIconProps type
+interface TabIconProps {
+  icon: string;
+  focused: boolean;
+}
+
 const Stack = createNativeStackNavigator<RootStackParamList>();
+const Tab = createBottomTabNavigator<TabParamList>();
 
 
 const AppNavigator = () => {
@@ -80,7 +88,49 @@ const AppNavigator = () => {
             {props => <AuthNavigator {...props} onSignIn={() => setIsLoggedIn(true)} />} 
           </Stack.Screen>
         ) : (
-          <Stack.Screen name="MainApp" component={MainTabNavigator} />
+          <>
+            <Stack.Screen name="MainApp" component={MainTabNavigator} />
+            <Stack.Screen
+              name="Edit Profile"
+              component={EditProfile}
+              options={{
+                headerShown: true,
+                title: 'Edit Profile',
+                headerStyle: styles.modalHeader,
+                headerTitleStyle: styles.modalHeaderTitle,
+                headerBackTitle: 'Back',
+              }}
+            />
+            <Stack.Screen
+              name="Contact Us"
+              component={ContactUs}
+              options={{
+                headerShown: true,
+                title: 'Contact Us',
+                headerStyle: styles.modalHeader,
+                headerTitleStyle: styles.modalHeaderTitle,
+                headerBackTitle: 'Back',
+              }}
+            />
+            <Stack.Screen
+              name="Logout"
+              component={Logout}
+              options={{
+                headerShown: true,
+                title: 'Logout',
+                headerStyle: styles.modalHeader,
+                headerTitleStyle: styles.modalHeaderTitle,
+                headerBackTitle: 'Back',
+              }}
+            />
+            <Stack.Screen
+              name="GroupScreen"
+              component={GroupScreen}
+              options={{
+                headerShown: false,
+              }}
+            />
+          </>
         )}
       </Stack.Navigator>
     </NavigationContainer>
