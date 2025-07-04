@@ -8,10 +8,11 @@ const UserProfile = () => (
     <ScrollView style={styles.container}>
       <BackgroundImage />
       <UserCard 
-      name="John Doe"
-      phone="123-456-7890" 
-      email="vD2Ej@example.com" 
-      avatar="https://randomuser.me/api/portraits/men/1.jpg" 
+        name="Muhammad Waleed"
+        phone="123-456-7890" 
+        email="waleed@example.com" 
+        // avatar="https://randomuser.me/api/portraits/men/1.jpg" 
+        avatar={require('./img/person-icon.png')}
       />
     
       <ProfileBottomOptions />

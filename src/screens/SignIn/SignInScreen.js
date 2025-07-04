@@ -15,10 +15,18 @@ import CustomBox from '../../components/CustomBox';
 import CustomTextField from '../../components/CustomTextField';
 import ClickableText from '../../components/ClickableText';
 import CustomButton from '../../components/CustomButton';
+// import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
+import i18n from '../../localization/i18n';
+import { changeAppLanguage } from '../../localization/i18n';
+import ProfileOption from '../../components/ProfileOption';
+// @ts-ignore
+import Feather from 'react-native-vector-icons/Feather';
 
 const { width, height } = Dimensions.get('window');
 
 const SignInScreen = ({ navigation, onSignIn }) => {
+  const {t} = useTranslation();
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   return (
@@ -30,22 +38,22 @@ const SignInScreen = ({ navigation, onSignIn }) => {
       >
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
           <View style={styles.container}>
-            <Text style={styles.titleTopLeft}>Sign In</Text>
+            <Text style={styles.titleTopLeft}>{t('SignIn.log')}</Text>
             <Image
               source={require('../../assets/Images/logo.png')}
               style={styles.centerLogo}
               resizeMode="contain"
             />
-            <Text style={styles.centerText}>Welcome to SnapVault</Text>
+            <Text style={styles.centerText}>{t('SignIn.welcome')}</Text>
 
             <CustomBox
-               style={styles.customBox}
+              style={styles.customBox}
               backgroundColor="rgba(162, 207, 216, 0.45)" // transparent background
               borderRadius={20}
             >
               <CustomTextField
-                label="Email"
-                placeholder="Enter your email"
+                label={t('SignIn.email')}
+                placeholder={t('SignIn.emailPlaceholder')}
                 value={email}
                 onChangeText={setEmail}
                 iconSource={require('../../assets/Icons/email.png')}
@@ -57,8 +65,8 @@ const SignInScreen = ({ navigation, onSignIn }) => {
                 style={{ marginBottom: 16, borderRadius: 10 }}
               />
               <CustomTextField
-                label="Password"
-                placeholder="Enter your password"
+                label={t('SignIn.password')}
+                placeholder={t('SignIn.passwordPlaceholder')}
                 value={password}
                 onChangeText={setPassword}
                 iconSource={require('../../assets/Icons/lock.png')}
@@ -72,14 +80,14 @@ const SignInScreen = ({ navigation, onSignIn }) => {
               />
               <View style={styles.forgotWrapperBox}>
                 <ClickableText
-                  text="Forgot Password?"
+                  text={t('SignIn.forgot')}
                   color="#73DBE5"
                   fontSize={16}
                   onPress={() => navigation.navigate('ForgetPassword')}
                 />
               </View>
               <CustomButton
-                buttonText="Sign In"
+                buttonText={t('Button.signIn')}
                 backgroundColor="#73DBE5"
                 width="100%"
                 height={50}
@@ -89,15 +97,34 @@ const SignInScreen = ({ navigation, onSignIn }) => {
                 onPress={() => onSignIn && onSignIn()}
                 style={{ marginTop: 16 }}
               />
+              {/*change language  */}
+              {/* <ProfileOption icon={<Feather name="globe" size={20} color="grey" />} label= {t('profile.changeLanguage')}
+                  onPress={() => {
+                  const newLang = i18n.language === 'en' ? 'ur' : 'en';
+                  changeAppLanguage(newLang); //  calls RTL logic and restarts
+              }}/> */}
+              
             </CustomBox>
             <View style={styles.signUpWrapperBox}>
                 <ClickableText
-                  text="New to SnapVault? SignUp"
+                  text={t('SignIn.newUser')}
                   color="#73DBE5"
                   fontSize={18}
                   onPress={() => navigation.navigate('SignUp')}
                 />
+                {/* <View style={styles.signUpWrapperBox}> */}
+                <ClickableText
+                  text={t('profile.changeLanguage')} // localized label
+                  color="#73DBE5"
+                  fontSize={18}
+                  onPress={() => {
+                    const newLang = i18n.language === 'en' ? 'ur' : 'en';
+                    changeAppLanguage(newLang); // switch language and apply RTL changes
+                  }}
+                />
+              {/* </View> */}
               </View>
+
           </View>
         </ScrollView>
       </ImageBackground>
