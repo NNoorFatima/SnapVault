@@ -17,6 +17,11 @@ import ClickableText from '../../components/ClickableText';
 import CustomButton from '../../components/CustomButton';
 // import { t } from 'i18next';
 import { useTranslation } from 'react-i18next';
+import i18n from '../../localization/i18n';
+import { changeAppLanguage } from '../../localization/i18n';
+import ProfileOption from '../../components/ProfileOption';
+// @ts-ignore
+import Feather from 'react-native-vector-icons/Feather';
 
 const { width, height } = Dimensions.get('window');
 
@@ -92,6 +97,13 @@ const SignInScreen = ({ navigation, onSignIn }) => {
                 onPress={() => onSignIn && onSignIn()}
                 style={{ marginTop: 16 }}
               />
+              {/*change language  */}
+              {/* <ProfileOption icon={<Feather name="globe" size={20} color="grey" />} label= {t('profile.changeLanguage')}
+                  onPress={() => {
+                  const newLang = i18n.language === 'en' ? 'ur' : 'en';
+                  changeAppLanguage(newLang); //  calls RTL logic and restarts
+              }}/> */}
+              
             </CustomBox>
             <View style={styles.signUpWrapperBox}>
                 <ClickableText
@@ -100,7 +112,19 @@ const SignInScreen = ({ navigation, onSignIn }) => {
                   fontSize={18}
                   onPress={() => navigation.navigate('SignUp')}
                 />
+                {/* <View style={styles.signUpWrapperBox}> */}
+                <ClickableText
+                  text={t('profile.changeLanguage')} // localized label
+                  color="#73DBE5"
+                  fontSize={18}
+                  onPress={() => {
+                    const newLang = i18n.language === 'en' ? 'ur' : 'en';
+                    changeAppLanguage(newLang); // switch language and apply RTL changes
+                  }}
+                />
+              {/* </View> */}
               </View>
+
           </View>
         </ScrollView>
       </ImageBackground>

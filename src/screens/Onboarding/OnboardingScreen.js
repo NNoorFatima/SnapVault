@@ -99,6 +99,7 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     textAlign: 'left',
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   bottomCircleWrapperAbsolute: {
     position: 'absolute',
