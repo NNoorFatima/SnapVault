@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   View,
   Text,
@@ -35,7 +36,7 @@ const JoinGroupPopup = ({ visible, onClose, onGroupJoined }) => {
   };
 
   const isFormValid = groupCode.trim();
-
+  const {t} = useTranslation();
   return (
     <Modal
       visible={visible}
@@ -46,7 +47,7 @@ const JoinGroupPopup = ({ visible, onClose, onGroupJoined }) => {
       <View style={styles.overlay}>
         <View style={styles.popupContainer}>
           <View style={styles.header}>
-            <Text style={styles.title}>Join Group</Text>
+            <Text style={styles.title}>{t('JoinGroup.heading')}</Text>
             <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
               <Text style={styles.closeButtonText}>✕</Text>
             </TouchableOpacity>
@@ -54,12 +55,12 @@ const JoinGroupPopup = ({ visible, onClose, onGroupJoined }) => {
 
           <View style={styles.content}>
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Group Code</Text>
+              <Text style={styles.label}>{t('JoinGroup.code')}</Text>
               <TextInput
                 style={styles.input}
                 value={groupCode}
                 onChangeText={setGroupCode}
-                placeholder="Enter group code"
+                placeholder={t('JoinGroup.desc')}
                 placeholderTextColor="#9CA3AF"
                 maxLength={10}
                 autoCapitalize="characters"
@@ -67,7 +68,7 @@ const JoinGroupPopup = ({ visible, onClose, onGroupJoined }) => {
             </View>
             
             <Text style={styles.helperText}>
-              Ask the group admin for the group code to join
+              {t('JoinGroup.helperText')}
             </Text>
           </View>
 
@@ -76,7 +77,7 @@ const JoinGroupPopup = ({ visible, onClose, onGroupJoined }) => {
               style={[styles.button, styles.cancelButton]}
               onPress={handleClose}
             >
-              <Text style={styles.cancelButtonText}>Cancel</Text>
+              <Text style={styles.cancelButtonText}>{t('Button.cancel')}</Text>
             </TouchableOpacity>
             
             {isFormValid && (
@@ -84,7 +85,7 @@ const JoinGroupPopup = ({ visible, onClose, onGroupJoined }) => {
                 style={[styles.button, styles.joinButton]}
                 onPress={handleJoin}
               >
-                <Text style={styles.joinButtonText}>Join</Text>
+                <Text style={styles.joinButtonText}>{t('Button.join')}</Text>
               </TouchableOpacity>
             )}
           </View>

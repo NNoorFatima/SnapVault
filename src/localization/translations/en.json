@@ -1,0 +1,134 @@
+{
+    "profile":
+    {
+        "editProfile":"Edit Profile",
+        "changePassword":"Change Password",
+        "logout":"Logout",
+        "deleteAccount":"Delete Account",
+        "changeLanguage":"Change Language",
+        "contactUs": "Contact Us",
+        "reviewApp": "Review App"
+    },
+    "editProfile":
+    {
+        "email":"Email",
+        "password":"Password",
+        "userName":"Username",
+        "phone":"Phone",
+        "bio":"Bio",
+        "update":"Update"
+    },
+    "Logout":
+    {
+        "message":"Are you sure you want to logout?"
+    },
+    "DeleteAccount":
+    {
+        "message":"Are you sure you want to delete your account?"
+    },
+    "NewPassword":
+    {
+        "message":"Set New Password",
+        "label1":"New Password",
+        "label2":"Confirm New Password"
+    },
+    "Button":
+    {
+        "cancel":"Cancel",
+        "confirm":"Confirm",
+        "create":"Create",
+        "join":"Join",
+        "signIn":"Sign In"
+    },
+    "ContactUs":
+    {
+        "title":"Contact Us",
+        "call":"Contact Us",
+        "chat":"Chat with Us",
+        "email":"Email us and share your concerns",
+        "social":"Our social media",
+        "chatMsg":"'Opening chat support...",
+        "callMsg":"'Calling support team...",
+        "emailMsg":"'Opening email client...",
+        "socialMsg": "Opening {{platform}}...",
+        "chatDes":"Need help with SnapVault? Contact our expert team for help",
+        "callDes":"Need help with SnapVault? Call our team for help and get your queries solved",
+        "emailDes":"Email our team for assistance"
+
+    },
+    "platforms":
+    {
+        "twitter":"Twitter",
+        "facebook":"Facebook",
+        "instagram":"Instagram"
+    },
+    "Dashboard":
+    {
+        "welcome":"Welcome back",
+        "introText":"Simplify sharing, protect privacy, and ensure no memory gets lost.Join groups and get your pictures filtered out automatically!",
+        "joinGrps":"Join Groups",
+        "createGrps":"Create Groups",
+        "groups":"Groups",
+        "storage":"Storage",
+        "photos":"Photos",
+        "myGroups":"My Groups",
+        "view":"View All"
+
+    },
+    "CreateGroup":
+    {
+        "heading":"Create New Group",
+        "title":"Create Group",
+        "name":"Group Name",
+        "desc":"Enter group name",
+        "grpDesc":"Group Description"
+        
+    },
+    "JoinGroup":
+    {
+        "heading":"Join Group",
+        "code":"Group Code",
+        "desc":"Enter group code",
+        "helperText":"Ask the group admin for the group code to join"
+        
+    },
+    "GroupScreen":
+    {
+        "details":"Group Details",
+        "myPics":"My Pictures",
+        "allPics":"All Pictures",
+        "uploadImage":"Upload Image",
+        "desc":"Upload your first picture to get started!",
+        "noPics":"No Pictures Yet",
+        "code":"Group Code:",
+        "sampleName": "Sample Group",
+        "sampleDescription": "This is a sample group description for demonstration purposes."
+        
+    },
+    "SignIn":
+    {
+        "log":"Sign In",
+        "welcome":"Welcome to SnapVault",
+        "email":"Email",
+        "emailPlaceholder":"Enter your email",
+        "password":"Password",
+        "passwordPlaceholder":"Enter your password",
+        "forgot":"Forgot Password?",
+        "newUser":"New to SnapVault? SignUp"
+    },
+    "SignUp":
+    {
+        "signUp":"Sign Up",
+        "newAcct":"Create a new account",
+        "name":"Username",
+        "namePlaceholder":"Enter your username",
+        "email":"Email",
+        "emailPlaceholder":"Enter your email",
+        "password":"Password",
+        "passwordPlaceholder":"Enter your password",
+        "confirmPassword":"Confirm Password",
+        "confirmPasswordPlaceholder":"Confirm your password",
+        "alreadyUser":"Already have an account? SignIn"
+    }
+
+}

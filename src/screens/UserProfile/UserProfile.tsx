@@ -1,25 +1,18 @@
 import React from 'react';
-import { ScrollView, View, Image} from 'react-native';
+import { ScrollView, StyleSheet, I18nManager} from 'react-native';
 import UserCard from '../../components/UserCard';
 import ProfileBottomOptions from '../../components/ProfileBottomOptions';
-// import LinearGradient from 'react-native-linear-gradient';
 import BackgroundImage from '../../assets/UserProfileBackground';
 const UserProfile = () => (
 
-//   <LinearGradient
-//   colors={['#000000', '#3b0049', '#8e007c', '#a0008d', '#00a5b5']}
-//   locations={[0, 0.3, 0.5, 0.7, 1]}
-//   start={{ x: 0.1, y: 0 }}
-//   end={{ x: 1, y: 1 }}
-//   style={{ flex: 1 }}
-// >
-    <ScrollView style={{flex: 1, backgroundColor: 'transparent',}}>
+    <ScrollView style={styles.container}>
       <BackgroundImage />
       <UserCard 
-      name="John Doe"
-      phone="123-456-7890" 
-      email="vD2Ej@example.com" 
-      avatar="https://randomuser.me/api/portraits/men/1.jpg" 
+        name="Muhammad Waleed"
+        phone="123-456-7890" 
+        email="waleed@example.com" 
+        // avatar="https://randomuser.me/api/portraits/men/1.jpg" 
+        avatar={require('./img/person-icon.png')}
       />
     
       <ProfileBottomOptions />
@@ -30,3 +23,12 @@ const UserProfile = () => (
 
 
 export default UserProfile; 
+
+const styles = StyleSheet.create({
+  container: 
+  {
+    flex: 1,
+    backgroundColor: 'transparent',
+  }
+
+});
