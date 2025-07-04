@@ -25,10 +25,14 @@ const OnboardingScreen = ({ onFinish }) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ImageBackground
-        source={require('../../assets/Images/onboarding.jpg')}
+        source={require('../../assets/Images/onboard.jpg')}
         style={styles.background}
         resizeMode="cover"
       >
+        {/* Title above the transparent info box */}
+        <View style={[styles.topTitleWrapper, { top: undefined, bottom: boxBottom + boxHeight - 16, position: 'absolute', left: 20, right: 20, alignItems: 'flex-start', zIndex: 10 }]}> 
+          <Text style={styles.topTitle}>Best Free Photo Detector and Distributor</Text>
+        </View>
         {/* Main overlay/title can go here if needed */}
         <CustomBox
           style={[
@@ -173,6 +177,27 @@ const styles = StyleSheet.create({
     width: '100%',
     marginTop: 25,
     fontWeight: 'bold'
+  },
+  topTitleWrapper: {
+    // position, left, right, and bottom set dynamically above
+    alignItems: 'flex-start',
+    zIndex: 10,
+  },
+  topTitle: {
+    fontSize: 36, // was 30, now bigger
+    fontWeight: 'bold',
+    color: '#fff',
+    textAlign: 'left',
+    backgroundColor: 'rgba(24, 33, 76, 0.55)',
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 16,
+    marginBottom: 18,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.18,
+    shadowRadius: 4,
   },
 });
 
