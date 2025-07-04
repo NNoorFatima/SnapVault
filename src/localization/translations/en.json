@@ -36,7 +36,8 @@
     {
         "cancel":"Cancel",
         "confirm":"Confirm",
-        "create":"Create"
+        "create":"Create",
+        "join":"Join"
     },
     "ContactUs":
     {
@@ -80,6 +81,14 @@
         "name":"Group Name",
         "desc":"Enter group name",
         "grpDesc":"Group Description"
+        
+    },
+    "JoinGroup":
+    {
+        "heading":"Join Group",
+        "code":"Group Code",
+        "desc":"Enter group code",
+        "helperText":"Ask the group admin for the group code to join"
         
     }
 
