@@ -15,6 +15,12 @@ import CustomBox from '../../components/CustomBox';
 const { width, height } = Dimensions.get('window');
 
 const OnboardingScreen = ({ onFinish }) => {
+  // Responsive vertical position for the info box
+  // Place the box a bit further down (increase bottom value)
+  const boxBottom = height * 0.07; // 7% from bottom
+  const boxHeight = height * 0.28; // 28% of screen height
+  // Place the button at the bottom of the info box, with a slightly larger margin
+  const buttonOffset = boxHeight * 0.20; // 20% of box height below the box (was 16%)
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -25,13 +31,21 @@ const OnboardingScreen = ({ onFinish }) => {
       >
         {/* Main overlay/title can go here if needed */}
         <CustomBox
-          style={styles.onboardBoxBottom}
+          style={[
+            styles.onboardBoxBottom,
+            {
+              bottom: boxBottom,
+              height: boxHeight,
+              left: 20,
+              right: 20,
+            },
+          ]}
           backgroundColor="rgba(255,255,255,0.85)"
           borderRadius={20}
         >
           <Text style={styles.onboardBoxText}>SnapVault is an AI-powered photo-sharing app that uses facial recognition to automatically detect and sort images.
 SnapVault simplifies sharing, protects privacy, and makes sure no memory gets lost.</Text>
-          <View style={styles.bottomCircleWrapperAbsolute}>
+          <View style={[styles.bottomCircleWrapperAbsolute, { bottom: -buttonOffset }]}> 
             <TouchableOpacity onPress={onFinish}>
               <View style={styles.bottomCircle}>
                 <Image
@@ -73,14 +87,12 @@ const styles = StyleSheet.create({
   },
   onboardBoxBottom: {
     position: 'absolute',
-    left: 20,
-    right: 20,
-    bottom: 60, // Move the box above by increasing the bottom value
-    padding: 24,
     alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.61)',
     borderRadius: 20,
-    height: 220,
+    padding: 24,
+    // left, right, bottom, height set dynamically
+    // Remove static bottom and height
   },
   onboardBoxText: {
     fontSize: 20,
@@ -95,6 +107,7 @@ const styles = StyleSheet.create({
     bottom: -20, // Move the circle and icon a bit down by decreasing the bottom value
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 20,
     zIndex: 2,
   },
   bottomCircle: {
