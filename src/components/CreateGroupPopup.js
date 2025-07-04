@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import {
   View,
   Text,
@@ -45,7 +47,7 @@ const CreateGroupPopup = ({ visible, onClose, onGroupCreated }) => {
   };
 
   const isFormValid = groupName.trim() && groupDescription.trim();
-
+  const {t} = useTranslation();
   return (
     <Modal
       visible={visible}
@@ -56,7 +58,7 @@ const CreateGroupPopup = ({ visible, onClose, onGroupCreated }) => {
       <View style={styles.overlay}>
         <View style={styles.popupContainer}>
           <View style={styles.header}>
-            <Text style={styles.title}>Create New Group</Text>
+            <Text style={styles.title}>{t('CreateGroup.heading')}</Text>
             <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
               <Text style={styles.closeButtonText}>✕</Text>
             </TouchableOpacity>
@@ -64,24 +66,24 @@ const CreateGroupPopup = ({ visible, onClose, onGroupCreated }) => {
 
           <View style={styles.content}>
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Group Name</Text>
+              <Text style={styles.label}>{t('CreateGroup.name')}</Text>
               <TextInput
                 style={styles.input}
                 value={groupName}
                 onChangeText={setGroupName}
-                placeholder="Enter group name"
+                placeholder={t('CreateGroup.desc')}
                 placeholderTextColor="#9CA3AF"
                 maxLength={50}
               />
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Group Description</Text>
+              <Text style={styles.label}>{t('CreateGroup.grpDesc')}</Text>
               <TextInput
                 style={[styles.input, styles.textArea]}
                 value={groupDescription}
                 onChangeText={setGroupDescription}
-                placeholder="Enter group description"
+                placeholder={t('CreateGroup.desc')}
                 placeholderTextColor="#9CA3AF"
                 multiline
                 numberOfLines={3}
@@ -95,7 +97,7 @@ const CreateGroupPopup = ({ visible, onClose, onGroupCreated }) => {
               style={[styles.button, styles.cancelButton]}
               onPress={handleClose}
             >
-              <Text style={styles.cancelButtonText}>Cancel</Text>
+              <Text style={styles.cancelButtonText}>{t('Button.cancel')}</Text>
             </TouchableOpacity>
             
             {isFormValid && (
@@ -103,7 +105,7 @@ const CreateGroupPopup = ({ visible, onClose, onGroupCreated }) => {
                 style={[styles.button, styles.createButton]}
                 onPress={handleCreate}
               >
-                <Text style={styles.createButtonText}>Create</Text>
+                <Text style={styles.createButtonText}>{t('Button.create')}</Text>
               </TouchableOpacity>
             )}
           </View>

@@ -3,9 +3,13 @@ import { View, Text, TextInput,Modal  } from 'react-native';
 import Button from './Button';
 import styles from './NewPassword.styles';
 import Logo from '../assets/Logo';
+//for localization  
+import { useTranslation } from 'react-i18next';
 
 
 const NewPassword = ({ visible, onClose }: any) => {
+    //for localization
+    const { t } = useTranslation();
     return (
         <Modal visible={visible} transparent animationType="fade">
             
@@ -16,20 +20,20 @@ const NewPassword = ({ visible, onClose }: any) => {
                         source={{ uri: 'https://codia-f2c.s3.us-west-1.amazonaws.com/image/2025-06-27/q89N1k9dDd.png' }}
                     />
 
-                    <Text style={styles.title}>Set New Password</Text>
-                    <Text style={styles.label}>New Password</Text>
+                    <Text style={styles.title}>{t('NewPassword.message')}</Text>
+                    <Text style={styles.label}>{t('NewPassword.label1')}</Text>
                     <TextInput style={styles.input} secureTextEntry />
-                    <Text style={styles.label}>Confirm New Password</Text>
+                    <Text style={styles.label}>{t('NewPassword.label2')}</Text>
                     <TextInput style={styles.input} secureTextEntry />
                     <View style={styles.buttonContainer}>
                         <Button
-                            title="Cancel"
+                            title={t('Button.cancel')}
                             onPress={onClose}//should go back to the current screen 
                             textColor="black"
                             style={styles.cancelButton}
                         />
                         <Button
-                            title="Confirm"
+                            title={t('Button.confirm')}
                             onPress={() => console.log('Button Pressed')} //should go to splash screen 
                             textColor="black"
                             style={styles.updateButton}

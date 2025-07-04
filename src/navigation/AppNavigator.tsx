@@ -13,7 +13,7 @@ import { View, Text, StyleSheet, StyleProp, ViewStyle, TextStyle } from 'react-n
 // Import your screens
 import UserProfile from '../screens/UserProfile/UserProfile';
 import EditProfile from '../screens/UserProfile/EditProfile';
-import Logout from '../screens/UserProfile/Logout';
+// import Logout from '../screens/UserProfile/Logout';
 import ContactUs from '../screens/ContactUs/ContactUs';
 import DashboardScreen from '../screens/DashBoard/DashboardScreen';
 import GroupScreen from '../screens/GroupScreen/GroupScreen';
@@ -112,7 +112,7 @@ const AppNavigator = () => {
                 headerBackTitle: 'Back',
               }}
             />
-            <Stack.Screen
+            {/* <Stack.Screen
               name="Logout"
               component={Logout}
               options={{
@@ -122,7 +122,7 @@ const AppNavigator = () => {
                 headerTitleStyle: styles.modalHeaderTitle,
                 headerBackTitle: 'Back',
               }}
-            />
+            /> */}
             <Stack.Screen
               name="GroupScreen"
               component={GroupScreen}
