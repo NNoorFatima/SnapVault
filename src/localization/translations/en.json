@@ -90,6 +90,19 @@
         "desc":"Enter group code",
         "helperText":"Ask the group admin for the group code to join"
         
+    },
+    "GroupScreen":
+    {
+        "details":"Group Details",
+        "myPics":"My Pictures",
+        "allPics":"All Pictures",
+        "uploadImage":"Upload Image",
+        "desc":"Upload your first picture to get started!",
+        "noPics":"No Pictures Yet",
+        "code":"Group Code:",
+        "sampleName": "Sample Group",
+        "sampleDescription": "This is a sample group description for demonstration purposes."
+        
     }
 
 }

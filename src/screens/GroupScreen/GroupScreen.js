@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   View,
   Text,
@@ -43,13 +44,13 @@ try {
 }
 
 const GroupScreen = ({ route, navigation }) => {
+  const { t } = useTranslation();
   const { groupId, groupName, groupDescription, groupCode } = route.params || {
     groupId: 1,
-    groupName: 'Sample Group',
-    groupDescription: 'This is a sample group description for demonstration purposes.',
+    groupName: t('GroupScreen.sampleName'),
+    groupDescription: t('GroupScreen.sampleDescription'),
     groupCode: 'ABC123'
   };
-
   const [activeTab, setActiveTab] = useState('myPictures');
   const [myPictures, setMyPictures] = useState([]);
   const [allPictures, setAllPictures] = useState([
@@ -110,7 +111,7 @@ const GroupScreen = ({ route, navigation }) => {
       </View>
     );
   };
-
+  
   return (
     <View style={styles.container}>
       <ScrollView
@@ -130,7 +131,7 @@ const GroupScreen = ({ route, navigation }) => {
             >
               <Text style={styles.backButtonText}>←</Text>
             </TouchableOpacity>
-            <Text style={styles.headerTitle}>Group Details</Text>
+            <Text style={styles.headerTitle}>{t('GroupScreen.details')}</Text>
             <View style={styles.placeholder} />
           </View>
 
@@ -148,13 +149,13 @@ const GroupScreen = ({ route, navigation }) => {
                   style={styles.groupImage}
                 />
                 <View style={styles.groupTextContainer}>
-                  <Text style={styles.groupName}>{groupName}</Text>
-                  <Text style={styles.groupDescription}>{groupDescription}</Text>
+                  <Text style={styles.groupName}>{t('GroupScreen.sampleName')}</Text>
+                  <Text style={styles.groupDescription}>{t('GroupScreen.sampleDescription')}</Text>
                 </View>
               </View>
               
               <View style={styles.groupCodeContainer}>
-                <Text style={styles.groupCodeLabel}>Group Code:</Text>
+                <Text style={styles.groupCodeLabel}>{t('GroupScreen.code')}</Text>
                 <View style={styles.groupCodeBox}>
                   <Text style={styles.groupCodeText}>{groupCode}</Text>
                   <TouchableOpacity style={styles.copyButton} onPress={handleCopyGroupCode}>
@@ -168,7 +169,7 @@ const GroupScreen = ({ route, navigation }) => {
                 onPress={handleImageUpload}
               >
                 <Text style={styles.uploadButtonIcon}>📷</Text>
-                <Text style={styles.uploadButtonText}>Upload Image</Text>
+                <Text style={styles.uploadButtonText}>{t('GroupScreen.uploadImage')}</Text>
               </TouchableOpacity>
             </View>
           </ImageBackground>
@@ -180,7 +181,7 @@ const GroupScreen = ({ route, navigation }) => {
               onPress={() => setActiveTab('myPictures')}
             >
               <Text style={[styles.tabText, activeTab === 'myPictures' && styles.activeTabText]}>
-                My Pictures
+                {t('GroupScreen.myPics')}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -188,7 +189,7 @@ const GroupScreen = ({ route, navigation }) => {
               onPress={() => setActiveTab('allPictures')}
             >
               <Text style={[styles.tabText, activeTab === 'allPictures' && styles.activeTabText]}>
-                All Pictures
+                {t('GroupScreen.allPics')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -201,9 +202,9 @@ const GroupScreen = ({ route, navigation }) => {
               ) : (
                 <View style={styles.emptyState}>
                   <Text style={styles.emptyStateIcon}>📸</Text>
-                  <Text style={styles.emptyStateTitle}>No Pictures Yet</Text>
+                  <Text style={styles.emptyStateTitle}>{t('GroupScreen.noPics')}</Text>
                   <Text style={styles.emptyStateText}>
-                    Upload your first picture to get started!
+                    {t('GroupScreen.desc')}
                   </Text>
                 </View>
               )
