@@ -35,7 +35,8 @@
     "Button":
     {
         "cancel":"Cancel",
-        "confirm":"Confirm"
+        "confirm":"Confirm",
+        "create":"Create"
     },
     "ContactUs":
     {
@@ -71,6 +72,15 @@
         "myGroups":"My Groups",
         "view":"View All"
 
+    },
+    "CreateGroup":
+    {
+        "heading":"Create New Group",
+        "title":"Create Group",
+        "name":"Group Name",
+        "desc":"Enter group name",
+        "grpDesc":"Group Description"
+        
     }
 
 }
