@@ -4,8 +4,16 @@ import LinearGradient from 'react-native-linear-gradient'; // Keep if used elsew
 import Toast from 'react-native-toast-message';
 import CreateGroupPopup from '../../components/CreateGroupPopup';
 import JoinGroupPopup from '../../components/JoinGroupPopup';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../navigation/AppNavigator';
 
-const DashboardScreen = () => {
+type DashboardScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
+interface DashboardScreenProps {
+  navigation: DashboardScreenNavigationProp;
+}
+
+const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
   // State for popups
   const [showCreateGroupPopup, setShowCreateGroupPopup] = useState(false);
   const [showJoinGroupPopup, setShowJoinGroupPopup] = useState(false);
@@ -78,7 +86,7 @@ const DashboardScreen = () => {
               </View>
               <View style={styles.greetingContainer}>
                 <Text style={styles.greetingSubtext}>Welcome back</Text>
-                <Text style={styles.greetingText}>Muhammad Waleed</Text>
+                <Text style={styles.greetingText}>Alaya Faruki</Text>
               </View>
             </View>
             <TouchableOpacity style={styles.notificationButton}>
@@ -173,7 +181,19 @@ const DashboardScreen = () => {
             {/* Image Grid */}
             <View style={styles.imageGrid}>
               {groupImageUrls.map((src, index) => (
-                <TouchableOpacity key={index} style={styles.imageWrapper} activeOpacity={0.8}>
+                <TouchableOpacity 
+                  key={index} 
+                  style={styles.imageWrapper} 
+                  activeOpacity={0.8}
+                  onPress={() => {
+                    navigation.navigate('GroupScreen', {
+                      groupId: index + 1,
+                      groupName: `Group ${index + 1}`,
+                      groupDescription: `This is the description for Group ${index + 1}. A wonderful group for sharing memories and photos.`,
+                      groupCode: `GRP${String(index + 1).padStart(3, '0')}`
+                    });
+                  }}
+                >
                   <Image
                     source={require('./img/group1.png')}
                     style={styles.groupImage}
@@ -372,7 +392,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   joinButton: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#DE6CED',
   },
   createButton: {
     backgroundColor: '#6366F1',

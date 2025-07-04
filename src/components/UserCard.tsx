@@ -31,7 +31,7 @@ const UserCard = ({name, phone, email,avatar}: any) => {
             <View style={styles.leftSection}>
                 {/* Edit Profile */}
                 <ProfileOption icon={<Feather name="edit-3" size={20} color="grey" />} label="Edit Profile" 
-                    onPress={() =>navigation.navigate('Edit Profile')} />
+                    onPress={() =>navigation.navigate('EditProfile')} />
                 {/* Change Password */}
                 <ProfileOption icon={<Feather name="lock" size={20}  color="grey"/>} label="Change Password" 
                     onPress={() => setShowPasswordPopup(true)}/>
