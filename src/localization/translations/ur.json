@@ -116,6 +116,20 @@
         "passwordPlaceholder":"اپنا پاس ورڈ درج کریں",
         "forgot":"پاس ورڈ بھول گئے؟",
         "newUser":"اگر آپ نیا صارف ہیں تو رجسٹر کریں"
+    },
+    "SignUp":
+    {
+        "signUp": "رجسٹر کریں",
+        "newAcct": "نئے اکاؤنٹ کا بنائیں",
+        "name": "یوزر نیم",
+        "namePlaceholder": "اپنا یوزر نیم درج کریں",
+        "email": "ای میل",
+        "emailPlaceholder": "اپنا ای میل درج کریں",
+        "password": "پاس ورڈ",
+        "passwordPlaceholder": "اپنا پاس ورڈ درج کریں",
+        "confirmPassword": "پاس ورڈ کی تصدیق کریں",
+        "confirmPasswordPlaceholder": "اپنا پاس ورڈ کی تصدیق کریں",
+        "alreadyUser": "پہلے سے اکاؤنٹ ہے؟ لاگ ان کریں"
     }
 
 

@@ -13,21 +13,22 @@ import CustomTextField from '../../components/CustomTextField';
 import ClickableText from '../../components/ClickableText';
 import CustomButton from '../../components/CustomButton';
 import { ScrollView } from 'react-native';
-
+import { useTranslation } from 'react-i18next';
 const { width, height } = Dimensions.get('window');
 
 const SignUpScreen = ({ navigation }) => {
+  const {t} = useTranslation();
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   return (
-   
+  
     <SafeAreaView style={styles.safeArea}>
       <ImageBackground
         source={require('../../assets/Images/signUp.jpg')}
         style={styles.background}
         resizeMode="cover"
       >
-         <ScrollView>
+        <ScrollView>
         <View style={styles.container}>
           <View style={styles.topRow}>
             <Image
@@ -35,9 +36,9 @@ const SignUpScreen = ({ navigation }) => {
               style={styles.leftLogo}
               resizeMode="contain"
             />
-            <Text style={styles.signupTextLeft}>Sign Up</Text>
+            <Text style={styles.signupTextLeft}>{t('SignUp.signUp')}</Text>
           </View>
-          <Text style={styles.createAccountTextLeft}>Create a new account</Text>
+          <Text style={styles.createAccountTextLeft}>{t('SignUp.newAcct')}</Text>
 
           <CustomBox
             style={styles.customBox}
@@ -45,8 +46,8 @@ const SignUpScreen = ({ navigation }) => {
             borderRadius={20}
           >
             <CustomTextField
-              label="Username"
-              placeholder="Enter your username"
+              label={t('SignUp.name')}
+              placeholder={t('SignUp.namePlaceholder')}
               value={email}
               onChangeText={setEmail}
               iconSource={require('../../assets/Icons/email.png')}
@@ -58,8 +59,8 @@ const SignUpScreen = ({ navigation }) => {
               style={{ marginBottom: 16, borderRadius: 10 }}
             />
             <CustomTextField
-              label="Email"
-              placeholder="Enter your email"
+              label={t('SignUp.email')}
+              placeholder={t('SignUp.emailPlaceholder')}
               value={password}
               onChangeText={setPassword}
               iconSource={require('../../assets/Icons/lock.png')}
@@ -73,8 +74,8 @@ const SignUpScreen = ({ navigation }) => {
             />
 
             <CustomTextField
-              label="Password"
-              placeholder="Enter your password"
+              label={t('SignUp.password')}
+              placeholder={t('SignUp.passwordPlaceholder')}
               value={password}
               onChangeText={setPassword}
               iconSource={require('../../assets/Icons/lock.png')}
@@ -88,8 +89,8 @@ const SignUpScreen = ({ navigation }) => {
             />
 
             <CustomTextField
-              label="Confirm Password"
-              placeholder="Confirm your password"
+              label={t('SignUp.confirmPassword')}
+              placeholder={t('SignUp.confirmPasswordPlaceholder')}
               value={password}
               onChangeText={setPassword}
               iconSource={require('../../assets/Icons/lock.png')}
@@ -103,7 +104,7 @@ const SignUpScreen = ({ navigation }) => {
             />
 
             <CustomButton
-              buttonText="Sign Up"
+              buttonText={t('SignUp.signUp')}
               backgroundColor="#73DBE5"
               width="100%"
               height={50}
@@ -116,7 +117,7 @@ const SignUpScreen = ({ navigation }) => {
           </CustomBox>
           <View style={styles.signInWrapperBox}>
             <ClickableText
-              text="Already have an account? Sign In"
+              text={t('SignUp.alreadyUser')}
               color="#73DBE5"
               fontSize={18}
               onPress={() => navigation.navigate('SignIn')}

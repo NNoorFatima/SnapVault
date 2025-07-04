@@ -115,6 +115,20 @@
         "passwordPlaceholder":"Enter your password",
         "forgot":"Forgot Password?",
         "newUser":"New to SnapVault? SignUp"
+    },
+    "SignUp":
+    {
+        "signUp":"Sign Up",
+        "newAcct":"Create a new account",
+        "name":"Username",
+        "namePlaceholder":"Enter your username",
+        "email":"Email",
+        "emailPlaceholder":"Enter your email",
+        "password":"Password",
+        "passwordPlaceholder":"Enter your password",
+        "confirmPassword":"Confirm Password",
+        "confirmPasswordPlaceholder":"Confirm your password",
+        "alreadyUser":"Already have an account? SignIn"
     }
 
 }
