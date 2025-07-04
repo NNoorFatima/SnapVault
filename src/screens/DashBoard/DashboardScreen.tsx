@@ -393,7 +393,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   joinButton: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#DE6CED',
   },
   createButton: {
     backgroundColor: '#6366F1',

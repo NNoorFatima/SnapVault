@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import ProfileOption from './ProfileOption';
 // import styles from './UserCard.styles';
 //for localization
