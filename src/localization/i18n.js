@@ -35,12 +35,15 @@ const detectLanguage = async () => {
   const savedLang = await AsyncStorage.getItem(LANG_KEY);
   if (savedLang) return savedLang;
 
-  const bestLang = RNLocalize.findBestAvailableLanguage(Object.keys(resources));
-  if (bestLang && resources[bestLang.languageTag]) {
-    return bestLang.languageTag;
-  } else {
-    return 'en';
+  // Use getLocales() instead of findBestAvailableLanguage
+  const locales = RNLocalize.getLocales();
+  if (locales && locales.length > 0) {
+    const deviceLang = locales[0].languageTag;
+    if (resources[deviceLang]) {
+      return deviceLang;
+    }
   }
+  return 'en';
 };
 
 

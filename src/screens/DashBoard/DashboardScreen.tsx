@@ -234,8 +234,8 @@ const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000', // Main background is black
-    paddingBottom: 10,
+    backgroundColor: '#000',
+    // Removed paddingBottom to prevent black bar above navbar
   },
   scrollContainer: {
     flex: 1,
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   statusBarSpacer: {
-    height: 50,
+    height: 0, // Remove extra space at the top
   },
 
   // Header Styles

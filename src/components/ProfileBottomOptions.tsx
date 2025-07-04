@@ -8,14 +8,19 @@ import { I18nManager } from 'react-native';
 
 // @ts-ignore
 import Feather from 'react-native-vector-icons/Feather';
+import { useNavigation } from '@react-navigation/native';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { TabParamList } from '../navigation/AppNavigator';
+
 const ProfileBottomOptions = () => { 
+  const navigation = useNavigation<BottomTabNavigationProp<TabParamList>>();
   //for localization 
   const { t } = useTranslation();
   return(
   
       <View style={styles.card}>
           <View style={styles.leftSection}>
-              <ProfileOption icon={<Feather name="phone-call" size={20} color="grey" />} label={t('profile.contactUs')} onPress={() => {}} />
+              <ProfileOption icon={<Feather name="phone-call" size={20} color="grey" />} label={t('profile.contactUs')} onPress={() => navigation.navigate('ContactUs')} />
               <ProfileOption icon={<Feather name="alert-circle" size={20}  color="grey"/>} label={t('profile.reviewApp')} onPress={() => {}} />
           </View>
       </View>
