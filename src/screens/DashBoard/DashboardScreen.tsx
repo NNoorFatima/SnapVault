@@ -87,7 +87,7 @@ const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
                 <View style={styles.onlineIndicator} />
               </View>
               <View style={styles.greetingContainer}>
-                <Text style={styles.greetingSubtext}>{t('Dashboard.welcome')}</Text>
+                {/* <Text style={styles.greetingSubtext}>{t('Dashboard.welcome')}</Text> */}
                 <Text style={styles.greetingText}>Muhammad Waleed</Text>
               </View>
             </View>
