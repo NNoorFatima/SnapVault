@@ -39,7 +39,8 @@
         "cancel":"کنسل",
         "confirm":"تصدیق",
         "create":"بنائیں",
-        "join":"جون"
+        "join":"جون",
+        "signIn":"سائن ان"
     },
     "ContactUs":
     {
@@ -104,7 +105,19 @@
         "sampleName": "نمونہ گروپ",
         "sampleDescription": "ڈیمو کے مقاصد کے لیے یہ ایک نمونہ گروپ کی وضاحت ہے۔"
         
+    },
+    "SignIn":
+    {
+        "log":"لاگ ان",
+        "welcome":"خوش آمدید",
+        "email":"ای میل",
+        "emailPlaceholder":"اپنا ای میل درج کریں",
+        "password":"پاس ورڈ",
+        "passwordPlaceholder":"اپنا پاس ورڈ درج کریں",
+        "forgot":"پاس ورڈ بھول گئے؟",
+        "newUser":"اگر آپ نیا صارف ہیں تو رجسٹر کریں"
     }
+
 
 
 

@@ -37,7 +37,8 @@
         "cancel":"Cancel",
         "confirm":"Confirm",
         "create":"Create",
-        "join":"Join"
+        "join":"Join",
+        "signIn":"Sign In"
     },
     "ContactUs":
     {
@@ -103,6 +104,17 @@
         "sampleName": "Sample Group",
         "sampleDescription": "This is a sample group description for demonstration purposes."
         
+    },
+    "SignIn":
+    {
+        "log":"Sign In",
+        "welcome":"Welcome to SnapVault",
+        "email":"Email",
+        "emailPlaceholder":"Enter your email",
+        "password":"Password",
+        "passwordPlaceholder":"Enter your password",
+        "forgot":"Forgot Password?",
+        "newUser":"New to SnapVault? SignUp"
     }
 
 }
