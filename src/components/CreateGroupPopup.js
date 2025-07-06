@@ -8,8 +8,8 @@ import {
   TouchableOpacity,
   Modal,
   StyleSheet,
-  Dimensions,
   Alert,
+  ImageBackground,
 } from 'react-native';
 
 const CreateGroupPopup = ({ visible, onClose, onGroupCreated }) => {
@@ -56,6 +56,17 @@ const CreateGroupPopup = ({ visible, onClose, onGroupCreated }) => {
       onRequestClose={handleClose}
     >
       <View style={styles.overlay}>
+        
+        <View style={{borderRadius: 20,
+          overflow: 'hidden', // Ensures the background image respects the border radius
+          width: '100%',
+          maxWidth: 400, // Optional: limit the width of the popup
+          padding: 0, // Remove padding to let the background image fill the container
+        }}>
+          <ImageBackground
+          source={require('../assets/Images/popup-bg.png')}   
+        >
+          
         <View style={styles.popupContainer}>
           <View style={styles.header}>
             <Text style={styles.title}>{t('CreateGroup.heading')}</Text>
@@ -110,6 +121,8 @@ const CreateGroupPopup = ({ visible, onClose, onGroupCreated }) => {
             )}
           </View>
         </View>
+        </ImageBackground>
+        </View>
       </View>
     </Modal>
   );
@@ -124,19 +137,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   popupContainer: {
-    backgroundColor: '#1F2937',
-    borderRadius: 20,
+    //backgroundColor: '#1F2937',
+    
     padding: 24,
     width: '100%',
     maxWidth: 400,
     borderWidth: 2,
     borderColor: '#374151',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 10,
-  },
+    borderRadius: 20, 
+  }, 
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -174,11 +183,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#374151',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    color: '#FFFFFF',
+    color: '#000000',
     fontSize: 16,
     borderWidth: 1,
     borderColor: '#4B5563',
@@ -199,22 +208,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  cancelButton: {
-    backgroundColor: '#374151',
+  cancelButton: {  
+    backgroundColor: 'rgba(0, 0, 0, 1)', 
   },
   cancelButtonText: {
-    color: '#9CA3AF',
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
   },
   createButton: {
-    backgroundColor: '#6366F1',
+    backgroundColor: 'rgb(255, 255, 255)', // White background like Join button
   },
   createButtonText: {
-    color: '#FFFFFF',
+    color: '#000000',
     fontSize: 16,
     fontWeight: '600',
   },
 });
 
-export default CreateGroupPopup; 
+export default CreateGroupPopup;

@@ -234,8 +234,7 @@ const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000', // Main background is black
-    paddingBottom: 10,
+    backgroundColor: '#000000', 
   },
   scrollContainer: {
     flex: 1,
@@ -248,7 +247,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   statusBarSpacer: {
-    height: 50,
+    height: 10,
   },
 
   // Header Styles
@@ -539,7 +538,7 @@ imageWrapper: {
   },
 
   bottomSpacer: {
-    height: 40,
+    height: 0,
   },
 });
 
