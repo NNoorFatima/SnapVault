@@ -86,7 +86,7 @@ const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
                 />
                 <View style={styles.onlineIndicator} />
               </View>
-              <View style={styles.greetingContainer}>
+              <View>
                 {/* <Text style={styles.greetingSubtext}>{t('Dashboard.welcome')}</Text> */}
                 <Text style={styles.greetingText}>Muhammad Waleed</Text>
               </View>
@@ -101,7 +101,7 @@ const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
           <ImageBackground
             // === PLACE YOUR IMAGE SOURCE HERE ===
             // For a remote image: 
-            source={require('./img/background.png')}
+            source={require('./img/background2.png')}
             // For a local image (assuming it's in an 'assets' folder at the project root, e.g., assets/intro_bg.png):
             // source={require('../../assets/intro_bg.png')}
             // You might need to adjust the path based on your project structure.
@@ -285,16 +285,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#10B981',
     borderWidth: 2,
     borderColor: '#0F0F23',
-  },
-  greetingContainer: {
-    flex: 1,
-  },
-  greetingSubtext: {
-    color: '#9CA3AF',
-    fontSize: 14,
-    fontWeight: '400',
-    marginBottom: 2,
-  },
+  }, 
   greetingText: {
     color: '#FFFFFF',
     fontSize: 20,
@@ -306,7 +297,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#1F2937',
+    backgroundColor: '#1c1c42',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -362,7 +353,7 @@ const styles = StyleSheet.create({
     color: '#CBD5E1',
     fontSize: 12,
     fontWeight: '600',
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    backgroundColor: '#1c1c42',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
@@ -414,7 +405,7 @@ const styles = StyleSheet.create({
   // Stats Styles (unchanged)
   statsContainer: {
     flexDirection: 'row',
-    backgroundColor: '#1F2937',
+    backgroundColor: '#1c1c42',
     borderRadius: 20,
     padding: 20,
     marginBottom: 24,
@@ -475,7 +466,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 6,
     paddingHorizontal: 12,
-    backgroundColor: '#374151',
+    backgroundColor: '#1c1c42',
     borderRadius: 12,
   },
   viewAllText: {
