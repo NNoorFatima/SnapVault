@@ -20,26 +20,26 @@
     },
     "Logout":
     {
-        "message": "آپ کو لاگ آوٹ کرنا چاہتے ہیں؟"
+        "message": "آپ لاگ آوٹ کرنا چاہتے ہیں؟"
     },
     "DeleteAccount":
     {
-        "message": "آپ کو اکاؤنٹ حذف کرنا چاہتے ہیں؟"
+        "message": "آپ اکاؤنٹ حذف کرنا چاہتے ہیں؟"
     },
     "NewPassword":
     {
         "message": "پاس ورڈ تبدیل کریں",
         "label1":"نیا پاس ورڈ",
-        "label2": "نیا پاس ورڈ کی تصدیق",
-        "cancel":"کنسل",
+        "label2": "نئے پاس ورڈ کی تصدیق",
+        "cancel":"کینسل",
         "confirm":"تصدیق"
     },
     "Button":
     {
-        "cancel":"کنسل",
+        "cancel":"کینسل",
         "confirm":"تصدیق",
         "create":"بنائیں",
-        "join":"جون",
+        "join":"جوائن",
         "signIn":"سائن ان"
     },
     "ContactUs":
@@ -59,9 +59,9 @@
     "platforms":
     {
         
-        "twitter":"تویٹر",
-        "facebook":"فیس بوک",
-        "instagram":"اینسٹاگرام"
+        "twitter":"ٹویٹر",
+        "facebook":"فیس بک",
+        "instagram":"انسٹاگرام"
     },
     "Dashboard":
     {
@@ -96,7 +96,7 @@
     "GroupScreen":
     {
         "details":"گروپ کی تفصیل",
-        "myPics":"میرے تصاویر",
+        "myPics":"میری تصاویر",
         "allPics":"تمام تصاویر",
         "uploadImage":"تصویر اپ لوڈ کریں",
         "desc":"اپنی پہلی تصویر اپ لوڈ کریں اور شروع کریں!",
@@ -115,12 +115,12 @@
         "password":"پاس ورڈ",
         "passwordPlaceholder":"اپنا پاس ورڈ درج کریں",
         "forgot":"پاس ورڈ بھول گئے؟",
-        "newUser":"اگر آپ نیا صارف ہیں تو رجسٹر کریں"
+        "newUser":"اگر آپ نئے صارف ہیں تو رجسٹر کریں"
     },
     "SignUp":
     {
         "signUp": "رجسٹر کریں",
-        "newAcct": "نئے اکاؤنٹ کا بنائیں",
+        "newAcct": "نیا اکاؤنٹ بنائیں",
         "name": "یوزر نیم",
         "namePlaceholder": "اپنا یوزر نیم درج کریں",
         "email": "ای میل",
@@ -128,7 +128,7 @@
         "password": "پاس ورڈ",
         "passwordPlaceholder": "اپنا پاس ورڈ درج کریں",
         "confirmPassword": "پاس ورڈ کی تصدیق کریں",
-        "confirmPasswordPlaceholder": "اپنا پاس ورڈ کی تصدیق کریں",
+        "confirmPasswordPlaceholder": "اپنے پاس ورڈ کی تصدیق کریں",
         "alreadyUser": "پہلے سے اکاؤنٹ ہے؟ لاگ ان کریں"
     }
 
