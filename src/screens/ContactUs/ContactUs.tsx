@@ -61,7 +61,8 @@ const ContactUs: React.FC = () => {
     <View style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.phoneContainer}> 
-          
+
+          <ContactHeader/>
           {/* Action Cards */}
           <View style={styles.actionCardsContainer}>
             <ContactCard
