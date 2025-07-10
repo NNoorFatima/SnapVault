@@ -129,6 +129,15 @@
         "confirmPassword":"Confirm Password",
         "confirmPasswordPlaceholder":"Confirm your password",
         "alreadyUser":"Already have an account? SignIn"
+    },
+    "ResetPassword":
+    {
+        "message":"Reset your password",
+        "emailMsg":"Enter your email address and we'll send you instructions to reset your password.",
+        "emailAddress":"Email Address",
+        "emailPlaceholder":"Enter your email",
+        "instructions":"Send Instructions"
+
     }
 
 }

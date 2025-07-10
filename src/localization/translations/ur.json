@@ -130,7 +130,16 @@
         "confirmPassword": "پاس ورڈ کی تصدیق کریں",
         "confirmPasswordPlaceholder": "اپنے پاس ورڈ کی تصدیق کریں",
         "alreadyUser": "پہلے سے اکاؤنٹ ہے؟ لاگ ان کریں"
+    },
+    "ResetPassword":
+    {
+        "message":"اپنا پاس ورڈ تبدیل کریں",
+        "emailMsg":"اپنا ای میل درج کریں اور ہم آپ کو پاس ورڈ تبدیل کرنے کے لئے ہدایات بھیجیں گے",
+        "emailAddress":"ای میل ایڈریس",
+        "emailPlaceholder":"اپنا ای میل درج کریں",
+        "instructions":"ہدایات بھیجیں"
     }
+
 
 
 
