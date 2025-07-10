@@ -11,9 +11,9 @@ const UserProfile = () => (
 >
       <BackgroundImage />
       <UserCard 
-        name="Muhammad Waleed"
+        name="Alia Farooq"
         phone="123-456-7890" 
-        email="waleed@example.com" 
+        email="alia@example.com" 
         // avatar="https://randomuser.me/api/portraits/men/1.jpg" 
         avatar={require('./img/image.png')}
       />

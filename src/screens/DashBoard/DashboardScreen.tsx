@@ -81,14 +81,14 @@ const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
             <View style={styles.profileSection}>
               <View style={styles.profilePicContainer}>
                 <Image
-                  source={require('./img/person-icon.png')}
+                  source={require('./img/image.png')}
                   style={styles.profilePic}
                 />
                 <View style={styles.onlineIndicator} />
               </View>
               <View>
                 {/* <Text style={styles.greetingSubtext}>{t('Dashboard.welcome')}</Text> */}
-                <Text style={styles.greetingText}>Muhammad Waleed</Text>
+                <Text style={styles.greetingText}>Alia Farooq</Text>
               </View>
             </View>
             <TouchableOpacity style={styles.notificationButton}>

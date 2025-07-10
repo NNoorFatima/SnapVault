@@ -53,7 +53,8 @@
         "socialMsg": "Opening {{platform}}...",
         "chatDes":"Need help with SnapVault? Contact our expert team for help",
         "callDes":"Need help with SnapVault? Call our team for help and get your queries solved",
-        "emailDes":"Email our team for assistance"
+        "emailDes":"Email our team for assistance",
+        "des":"Let us know how we can support your backup and archiving needs!"
 
     },
     "platforms":
@@ -129,6 +130,15 @@
         "confirmPassword":"Confirm Password",
         "confirmPasswordPlaceholder":"Confirm your password",
         "alreadyUser":"Already have an account? SignIn"
+    },
+    "ResetPassword":
+    {
+        "message":"Reset your password",
+        "emailMsg":"Enter your email address and we'll send you instructions to reset your password.",
+        "emailAddress":"Email Address",
+        "emailPlaceholder":"Enter your email",
+        "instructions":"Send Instructions"
+
     }
 
 }
