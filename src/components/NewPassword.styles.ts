@@ -9,11 +9,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     container: {
-        padding: 30,
+        padding: 20, // reduced padding
         backgroundColor: '#1F1F51',
         borderRadius: 20,
-        marginTop: '50%', // vertical center approx
-        width: '80%',
+        marginTop: 50, // add space below SnapVault text
+        width: '70%', // reduce width
     },
     title: {
         fontSize: 18,
@@ -53,6 +53,13 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         marginLeft: 10,
         backgroundColor: '#D7EDEF',
+    },
+    snapVaultText: {
+        fontSize: 22,
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginBottom: 4,
     },
 
 });
