@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     paddingVertical: 13,
     paddingHorizontal: 20,
     justifyContent: 'flex-start',
-    backgroundColor: 'white',
+    // backgroundColor: 'white',
   },
   optionRTL: {
     flexDirection: 'row-reverse',
@@ -53,12 +53,12 @@ const styles = StyleSheet.create({
     paddingVertical: 13,
     paddingHorizontal: 20,
     justifyContent: 'flex-start',
-    backgroundColor: 'white',
+    // backgroundColor: 'white',
   },
   label: {
     marginStart: 20,
     fontSize: 16,
-    color: 'grey',
+    color: '#222831',
     // textAlign: I18nManager.isRTL ? 'right' : 'left',
   },
 });

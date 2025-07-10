@@ -2,8 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import ProfileOption from './ProfileOption';
 // import styles from './UserCard.styles';
-//for localization
-import { useTranslation } from 'react-i18next';
+
 // import { I18nManager } from 'react-native';  
 import { useNavigation } from '@react-navigation/native';
 import type {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
@@ -13,6 +12,10 @@ import Feather from 'react-native-vector-icons/Feather';
 // import { useNavigation } from '@react-navigation/native';
 // import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 // import { TabParamList } from '../navigation/AppNavigator';
+//for localization
+import { useTranslation } from 'react-i18next';
+import i18n from '../localization/i18n';
+import { changeAppLanguage } from '../localization/i18n';
 
 const ProfileBottomOptions = () => { 
   const navigation = useNavigation<BottomTabNavigationProp<TabParamList>>();
@@ -23,8 +26,14 @@ const ProfileBottomOptions = () => {
   
       <View style={styles.card}>
           <View style={styles.leftSection}>
-              <ProfileOption icon={<Feather name="phone-call" size={20} color="grey" />} label={t('profile.contactUs')} onPress={() => navigation.navigate('Contact Us')} />
-              <ProfileOption icon={<Feather name="alert-circle" size={20}  color="grey"/>} label={t('profile.reviewApp')} onPress={() => {}} />
+              <ProfileOption icon={<Feather name="phone-call" size={20} color='#222831' />} label={t('profile.contactUs')} onPress={() => navigation.navigate('Contact Us')} />
+              {/* <ProfileOption icon={<Feather name="alert-circle" size={20}  color="grey"/>} label={t('profile.reviewApp')} onPress={() => {}} /> */}
+              {/*change language  */}
+                              <ProfileOption icon={<Feather name="globe" size={20} color='#222831' />} label= {t('profile.changeLanguage')}
+                                  onPress={() => {
+                                  const newLang = i18n.language === 'en' ? 'ur' : 'en';
+                                  changeAppLanguage(newLang); //  calls RTL logic and restarts
+                              }}/>
           </View>
       </View>
   );
@@ -37,13 +46,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    // backgroundColor: '#fff',
     borderRadius: 20,
     padding: 20,
     marginBottom: 20,
     elevation: 3,
-    marginStart:12,
-    marginEnd:12,
+    marginStart:20,
+    marginEnd:20,
+    width: '90%',
   },
 });
 
