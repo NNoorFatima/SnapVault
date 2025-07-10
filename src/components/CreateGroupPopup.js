@@ -64,7 +64,7 @@ const CreateGroupPopup = ({ visible, onClose, onGroupCreated }) => {
           padding: 0, // Remove padding to let the background image fill the container
         }}>
           <ImageBackground
-          source={require('../assets/Images/popup-bg.png')}   
+          source={require('../assets/Images/popup-background-img.png')}   
         >
           
         <View style={styles.popupContainer}>
@@ -141,10 +141,7 @@ const styles = StyleSheet.create({
     
     padding: 24,
     width: '100%',
-    maxWidth: 400,
-    borderWidth: 2,
-    borderColor: '#374151',
-    borderRadius: 20, 
+    maxWidth: 400, 
   }, 
   header: {
     flexDirection: 'row',

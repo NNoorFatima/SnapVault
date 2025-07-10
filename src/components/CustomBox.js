@@ -8,7 +8,7 @@ const CustomBox = ({
   height = 200,
   backgroundColor = '#B3E5FC',
   borderRadius = 15,
-  opacity = 0.6,              // ✅ NEW: default semi-transparent
+  opacity = 1,              // ✅ NEW: default semi-transparent
   style = {},
   children,
 }) => {

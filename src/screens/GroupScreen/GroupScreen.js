@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   statusBarSpacer: {
-    height: 50,
+    height: 5,
   },
 
   // Header Styles
@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
   groupCodeBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1F2937',
+    backgroundColor: '#000000',
     borderRadius: 12,
     padding: 12,
     borderWidth: 1,
@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
   // Tabs Styles
   tabsContainer: {
     flexDirection: 'row',
-    backgroundColor: '#1F2937',
+    backgroundColor: '#000000',
     borderRadius: 16,
     padding: 4,
     marginBottom: 24,
@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#6366F1',
   },
   tabText: {
-    color: '#9CA3AF',
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
   },
