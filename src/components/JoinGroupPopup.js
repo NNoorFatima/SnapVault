@@ -8,6 +8,7 @@ import {
   Modal,
   StyleSheet,
   Alert,
+  ImageBackground,
 } from 'react-native';
 
 const JoinGroupPopup = ({ visible, onClose, onGroupJoined }) => {
@@ -45,6 +46,17 @@ const JoinGroupPopup = ({ visible, onClose, onGroupJoined }) => {
       onRequestClose={handleClose}
     >
       <View style={styles.overlay}>
+        
+        <View style={{borderRadius: 20,
+          overflow: 'hidden', // Ensures the background image respects the border radius
+          width: '100%',
+          maxWidth: 400, // Optional: limit the width of the popup
+          padding: 0, // Remove padding to let the background image fill the container
+        }}>
+          <ImageBackground
+          source={require('../assets/Images/popup-background-img.png')}   
+        >
+          
         <View style={styles.popupContainer}>
           <View style={styles.header}>
             <Text style={styles.title}>{t('JoinGroup.heading')}</Text>
@@ -90,6 +102,8 @@ const JoinGroupPopup = ({ visible, onClose, onGroupJoined }) => {
             )}
           </View>
         </View>
+        </ImageBackground>
+        </View>
       </View>
     </Modal>
   );
@@ -104,19 +118,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   popupContainer: {
-    backgroundColor: '#1F2937',
-    borderRadius: 20,
+    //backgroundColor: '#1F2937',
+    
     padding: 24,
     width: '100%',
-    maxWidth: 400,
-    borderWidth: 2,
-    borderColor: '#374151',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 10,
-  },
+    maxWidth: 400,  
+  }, 
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -154,11 +161,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#374151',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    color: '#FFFFFF',
+    color: '#000000',
     fontSize: 16,
     borderWidth: 1,
     borderColor: '#4B5563',
@@ -183,19 +190,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  cancelButton: {
-    backgroundColor: '#374151',
+  cancelButton: {  
+    backgroundColor: 'rgba(0, 0, 0, 1)', 
   },
   cancelButtonText: {
-    color: '#9CA3AF',
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
   },
   joinButton: {
-    backgroundColor: '#10B981',
+    backgroundColor: 'rgb(255, 255, 255)', // Blue-500 with opacity
   },
   joinButtonText: {
-    color: '#FFFFFF',
+    color: '#000000',
     fontSize: 16,
     fontWeight: '600',
   },

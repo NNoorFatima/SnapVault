@@ -10,10 +10,15 @@ import type {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import { TabParamList } from '../navigation/AppNavigator';
 // @ts-ignore
 import Feather from 'react-native-vector-icons/Feather';
+// import { useNavigation } from '@react-navigation/native';
+// import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+// import { TabParamList } from '../navigation/AppNavigator';
+
 const ProfileBottomOptions = () => { 
+  const navigation = useNavigation<BottomTabNavigationProp<TabParamList>>();
   //for localization 
   const { t } = useTranslation();
-  const navigation = useNavigation<BottomTabNavigationProp<TabParamList>>();
+  // const navigation = useNavigation<BottomTabNavigationProp<TabParamList>>();
   return(
   
       <View style={styles.card}>
