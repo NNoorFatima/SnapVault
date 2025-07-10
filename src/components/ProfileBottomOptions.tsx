@@ -46,8 +46,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   card: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    // backgroundColor: '#fff',
+    backgroundColor: 'rgba(141, 184, 188, 0.9)', // match UserCard color and opacity
     borderRadius: 20,
     padding: 20,
     marginBottom: 20,
