@@ -5,14 +5,17 @@ import ProfileBottomOptions from '../../components/ProfileBottomOptions';
 import BackgroundImage from '../../assets/UserProfileBackground';
 const UserProfile = () => (
 
-    <ScrollView style={styles.container}>
+   <ScrollView
+  style={styles.container}
+  contentContainerStyle={styles.contentContainer}
+>
       <BackgroundImage />
       <UserCard 
         name="Muhammad Waleed"
         phone="123-456-7890" 
         email="waleed@example.com" 
         // avatar="https://randomuser.me/api/portraits/men/1.jpg" 
-        avatar={require('./img/person-icon.png')}
+        avatar={require('./img/image.png')}
       />
     
       <ProfileBottomOptions />
@@ -25,10 +28,15 @@ const UserProfile = () => (
 export default UserProfile; 
 
 const styles = StyleSheet.create({
-  container: 
-  {
+  container: {
     flex: 1,
     backgroundColor: 'transparent',
-  }
+  },
+  contentContainer: {
+    flexGrow: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    // paddingVertical: 40,
+  },
 
 });

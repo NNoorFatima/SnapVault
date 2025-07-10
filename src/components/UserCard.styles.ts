@@ -3,15 +3,20 @@ import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#fff',
+    // backgroundColor: '#B7E2FF',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    // backgroundColor: 'rgba(186, 226, 255, 1.4)',
+    // opacity: 0.6,
     borderRadius: 30,
     padding: 20,
     marginBottom: 20,
     elevation: 3,
-    marginTop: 50,
+    marginTop: 65,
     //replacing left/right with start end to handle rtl
-    marginStart:12,
-    marginEnd:12,
+    marginStart:20,
+    marginEnd:20,
+    width: '90%',
+    // alignItems: 'center',
   },
   centeredSection: {
     alignItems: 'center',
@@ -22,24 +27,44 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   divider: {
-    height: 1,
+    height: 2,
     backgroundColor: '#ccc',
     marginVertical: 12,
     alignSelf: 'stretch',
     opacity: 0.8,
   },
+  // avatar: {
+  //   // width: 100,
+  //   // height: 100,
+  //   borderRadius: 30,
+  //   marginBottom: 10,
+    
+  //   //added to handle rtl 
+  //   marginStart: 10,
+  //   marginEnd: 10
+  // },
   avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginBottom: 10,
-    //added to handle rtl 
-    marginStart: 10,
-    marginEnd: 10
-  },
+  width: '28%',            // Percent-based for flexibility
+  aspectRatio: 4 / 4,      // Makes it rectangular (taller than wide)
+  borderRadius: 16,        // Slightly rounded corners
+  marginBottom: 13,
+  marginStart: 10,
+  marginEnd: 10,
+
+  // Optional: border and shadow for polish
+  borderWidth: 1,
+  borderColor: '#ddd',
+
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.1,
+  shadowRadius: 4,
+  elevation: 3,
+},
+
   name: { fontSize: 18, fontWeight: 'bold', textAlign: I18nManager.isRTL ? 'right' : 'left' },
-  phone: { fontSize: 14, color: '#999', textAlign: I18nManager.isRTL ? 'right' : 'left' },
-  email: { fontSize: 14, color: '#999' , textAlign: I18nManager.isRTL ? 'right' : 'left'},
+  phone: { fontSize: 14, color: '#222831', textAlign: I18nManager.isRTL ? 'right' : 'left' },
+  email: { fontSize: 14, color: '#222831' , textAlign: I18nManager.isRTL ? 'right' : 'left'},
 });
 
 export default styles;

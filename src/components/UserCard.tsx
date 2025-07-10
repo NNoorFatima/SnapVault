@@ -36,10 +36,10 @@ const UserCard = ({name, phone, email,avatar}: any) => {
             <Divider />
             <View style={styles.leftSection}>
                 {/* Edit Profile */}
-                <ProfileOption icon={<Feather name="edit-3" size={20} color="grey" />} label={t('profile.editProfile')} 
+                <ProfileOption icon={<Feather name="edit-3" size={20} color='#222831' />} label={t('profile.editProfile')} 
                     onPress={() =>navigation.navigate('Edit Profile') } shouldFlip={true}/>
                 {/* Change Password */}
-                <ProfileOption icon={<Feather name="lock" size={20}  color="grey"/>} label={t('profile.changePassword')} 
+                <ProfileOption icon={<Feather name="lock" size={20}  color='#222831'/>} label={t('profile.changePassword')} 
                     onPress={() => setShowPasswordPopup(true)}/>
                     <Modal
                         visible={showPasswordPopup}
@@ -58,7 +58,7 @@ const UserCard = ({name, phone, email,avatar}: any) => {
                     </Modal>
 
                 {/* Logout */}
-                <ProfileOption icon={<Feather name="log-out" size={20} color="grey" />} label={t('profile.logout')} 
+                <ProfileOption icon={<Feather name="log-out" size={20} color='#222831' />} label={t('profile.logout')} 
                     onPress={() => setShowLogoutPopup(true)} />
                     <Modal
                         visible={showLogoutPopup}
@@ -74,7 +74,7 @@ const UserCard = ({name, phone, email,avatar}: any) => {
                         />
                         </Modal>    
                 {/* Delete Acccount */}
-                <ProfileOption icon={<Feather name="trash-2" size={20} color="grey"/>} label={t('profile.deleteAccount')} 
+                <ProfileOption icon={<Feather name="trash-2" size={20} color='#222831'/>} label={t('profile.deleteAccount')} 
                     onPress={() => setShowDeletePopup(true)} />
                     <Modal
                         visible={showDeletePopup}
@@ -89,12 +89,12 @@ const UserCard = ({name, phone, email,avatar}: any) => {
                             }}
                         />
                         </Modal>  
-                {/*change language  */}
+                {/* change language 
                 <ProfileOption icon={<Feather name="globe" size={20} color="grey" />} label= {t('profile.changeLanguage')}
                     onPress={() => {
                     const newLang = i18n.language === 'en' ? 'ur' : 'en';
                     changeAppLanguage(newLang); //  calls RTL logic and restarts
-                }}/>
+                }}/> */}
             </View>
         </View>
     );
