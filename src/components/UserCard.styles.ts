@@ -4,9 +4,7 @@ import { StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
   card: {
     // backgroundColor: '#B7E2FF',
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    // backgroundColor: 'rgba(186, 226, 255, 1.4)',
-    // opacity: 0.6,
+    backgroundColor: 'rgba(141, 184, 188, 0.9)', // same blue as sign in/up button with soft opacity
     borderRadius: 30,
     padding: 20,
     marginBottom: 20,
