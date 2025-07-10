@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { View, Text, StyleSheet } from 'react-native'; // Removed TouchableOpacity
 
 interface ContactHeaderProps {
@@ -7,13 +8,14 @@ interface ContactHeaderProps {
 }
 
 const ContactHeader: React.FC<ContactHeaderProps> = (/* { onBackPress } */) => {
+  const {t} = useTranslation();
   return (
     // Main container with black background and rounded bottom corners
     <View style={styles.container}>
       {/* Top row: Now only contains the main title, centered */}
       <View style={styles.headerRow}>
         {/* Main Title: "Contact Us" - now simply centered within its parent */}
-        <Text style={styles.title}>Contact Us</Text>
+        <Text style={styles.title}>{t('ContactUs.call')}</Text>
       </View>
 
       {/* Content section: Contains icon and description, "settled down" below the header */}
@@ -23,7 +25,7 @@ const ContactHeader: React.FC<ContactHeaderProps> = (/* { onBackPress } */) => {
         </View>
         <View style={styles.textContainer}>
           <Text style={styles.description}>
-            Let us know how we can support your backup and archiving needs!
+            {t('ContactUs.des')}
           </Text>
         </View>
       </View>
