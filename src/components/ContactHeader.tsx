@@ -1,7 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { View, Text, StyleSheet } from 'react-native'; // Removed TouchableOpacity
-
+// @ts-ignore
+import Feather from 'react-native-vector-icons/Feather'; //for icons
 interface ContactHeaderProps {
   // onBackPress is no longer needed as the back button is removed
   // onBackPress: () => void;
@@ -21,7 +22,7 @@ const ContactHeader: React.FC<ContactHeaderProps> = (/* { onBackPress } */) => {
       {/* Content section: Contains icon and description, "settled down" below the header */}
       <View style={styles.content}>
         <View style={styles.iconContainer}>
-          <Text style={styles.iconText}>💎</Text>
+          <Feather name="help-circle" size={25} color="white" style={styles.iconText} />
         </View>
         <View style={styles.textContainer}>
           <Text style={styles.description}>
