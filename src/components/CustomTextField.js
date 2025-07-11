@@ -24,7 +24,11 @@ const CustomTextField = ({
   iconSize = 20,
   onChangeText = () => {},
   value = '',
-  style = {}
+  style = {},
+  showVisibilityIcon = false,
+  onToggleVisibility = () => {},
+  isPassword = false,
+  isPasswordVisible = false,
 }) => {
   return (
     <View
@@ -65,7 +69,18 @@ const CustomTextField = ({
           placeholderTextColor={placeholderColor}
           onChangeText={onChangeText}
           value={value}
+          secureTextEntry={isPassword && !isPasswordVisible}
         />
+        {showVisibilityIcon && (
+          <Image
+            source={isPasswordVisible
+              ? require('../assets/Icons/unlocked.png')
+              : require('../assets/Icons/locked.png')}
+            style={{ width: 22, height: 22, marginLeft: 8, tintColor: '#6BDCE1' }}
+            resizeMode="contain"
+            onTouchEnd={onToggleVisibility}
+          />
+        )}
       </View>
     </View>
   );
