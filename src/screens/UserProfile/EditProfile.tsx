@@ -20,18 +20,19 @@ const EditProfile = () => {
     return(
         <ScrollView>
             <BackgroundImage />
-                <View style={{ marginTop:40, backgroundColor: 'white', borderRadius: 30,margin:10 }}>
-                        <Field label={t('editProfile.email')} icon={<Feather name="mail" size={20} color="purple" />} value={email} onChangeText={setEmail} placeholder="sample@gmail.com" />
-                        <Field label={t('editProfile.password')} icon={<Feather name="lock" size={20} color="purple" />} value={password} onChangeText={setPassword} placeholder="Password" secureTextEntry />
-                        <Field label={t('editProfile.userName')} icon={<Feather name="user" size={20} color="purple" />} value={username} onChangeText={setUsername} placeholder="Username" />
-                        <Field label={t('editProfile.phone')} icon={<Feather name="phone" size={20} color="purple" />} value={phone} onChangeText={setPhone} placeholder="Phone number" />
-                        <Field label={t('editProfile.bio')} icon={<Feather name="edit-2" size={20} color="purple" />} value={bio} onChangeText={setBio} placeholder="Description" />
+                <View style={{  backgroundColor: 'rgba(141, 184, 188, 0.9)', borderRadius: 30, marginStart: '5%', marginEnd: '5%', marginVertical: '5%', marginHorizontal: '5%', padding: '2%'}}>
+                        <Field label={t('editProfile.email')} icon={<Feather name="mail" size={20} color='#222831' />} value={email} onChangeText={setEmail} placeholder="sample@gmail.com" />
+                        <Field label={t('editProfile.password')} icon={<Feather name="lock" size={20} color='#222831' />} value={password} onChangeText={setPassword} placeholder="Password" secureTextEntry />
+                        <Field label={t('editProfile.userName')} icon={<Feather name="user" size={20} color='#222831' />} value={username} onChangeText={setUsername} placeholder="Username" />
+                        <Field label={t('editProfile.phone')} icon={<Feather name="phone" size={20} color='#222831' />} value={phone} onChangeText={setPhone} placeholderTextColor='#000' placeholder="Phone number" />
+                        <Field label={t('editProfile.bio')} icon={<Feather name="edit-2" size={20} color='#222831' />} value={bio} onChangeText={setBio} placeholderTextColor='#000' placeholder="Description" />
                 </View>
                 <Button
                     title={t('editProfile.update')}
                     onPress={() => console.log('Button Pressed')}
                     backgroundColor="#73DBE5"
                     textColor="black"
+                    style={{ marginStart: '6%', marginEnd: '6%', marginVertical: '5%', marginHorizontal: '5%', padding: '2%' }}
                 />
         </ScrollView>
 

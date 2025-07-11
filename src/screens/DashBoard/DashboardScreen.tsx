@@ -7,6 +7,8 @@ import CreateGroupPopup from '../../components/CreateGroupPopup';
 import JoinGroupPopup from '../../components/JoinGroupPopup';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
+// @ts-ignore
+import Feather from 'react-native-vector-icons/Feather'; //for icons
 
 type DashboardScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -92,7 +94,7 @@ const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
               </View>
             </View>
             <TouchableOpacity style={styles.notificationButton}>
-              <Text style={styles.notificationIcon}>🔔</Text>
+              <Feather name="bell" size={30} color="white" />
               <View style={styles.notificationBadge} />
             </TouchableOpacity>
           </View>
@@ -124,7 +126,7 @@ const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
                   onPress={() => setShowJoinGroupPopup(true)}
                 >
                   <View style={styles.buttonIconContainer}>
-                    <Text style={styles.buttonIcon}>👥</Text>
+                    <Feather name="users" size={23} color="white"/>
                   </View>
                   <Text style={styles.buttonText}>{t('Dashboard.joinGrps')}</Text>
                 </TouchableOpacity>
@@ -133,7 +135,7 @@ const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
                   onPress={() => setShowCreateGroupPopup(true)}
                 >
                   <View style={styles.buttonIconContainer}>
-                    <Text style={styles.buttonIcon}>➕</Text>
+                    <Feather name="plus-circle" size={23} color="white"  />
                   </View>
                   <Text style={styles.buttonText}>{t('Dashboard.createGrps')}</Text>
                 </TouchableOpacity>
@@ -162,7 +164,7 @@ const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
             <Text style={styles.myGroupsTitle}>{t('Dashboard.myGroups')}</Text>
             <TouchableOpacity style={styles.viewAllButton}>
               <Text style={styles.viewAllText}>{t('Dashboard.view')}</Text>
-              <Text style={styles.viewAllArrow}>→</Text>
+              <Feather name="arrow-right" size={23} color="white"  />
             </TouchableOpacity>
           </View>
  
@@ -301,9 +303,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  notificationIcon: {
-    fontSize: 20,
-  },
+  // notificationIcon: {
+  //   fontSize: 20,
+  // },
   notificationBadge: {
     position: 'absolute',
     top: 8,
@@ -392,9 +394,9 @@ const styles = StyleSheet.create({
   buttonIconContainer: {
     marginRight: 8,
   },
-  buttonIcon: {
-    fontSize: 18,
-  },
+  // buttonIcon: {
+  //   fontSize: 18,
+  // },
   buttonText: {
     color: '#FFFFFF',
     fontSize: 16,
@@ -475,11 +477,11 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     marginRight: 4,
   },
-  viewAllArrow: {
-    color: '#6366F1',
-    fontSize: 14,
-    fontWeight: '600',
-  },
+  // viewAllArrow: {
+  //   color: '#6366F1',
+  //   fontSize: 14,
+  //   fontWeight: '600',
+  // },
 
   imageGrid: {
   flexDirection: 'row',

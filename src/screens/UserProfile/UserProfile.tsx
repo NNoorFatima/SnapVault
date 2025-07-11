@@ -19,9 +19,7 @@ const UserProfile = () => (
       />
     
       <ProfileBottomOptions />
-    {/* Add <BottomActions /> and modal later */}
     </ScrollView>
-  // </LinearGradient>
 )
 
 
