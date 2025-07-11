@@ -19,7 +19,11 @@ const { width, height } = Dimensions.get('window');
 const SignUpScreen = ({ navigation }) => {
   const {t} = useTranslation();
   const [email, setEmail] = React.useState('');
+  const [userEmail, setUserEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [confirmPassword, setConfirmPassword] = React.useState('');
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
   return (
   
     <SafeAreaView style={styles.safeArea}>
@@ -53,7 +57,7 @@ const SignUpScreen = ({ navigation }) => {
               iconSource={require('../../assets/Icons/email.png')}
               inputTextColor="#fff"
               labelColor="#FFFFFF"
-              placeholderColor="#6BDCE1"
+              placeholderColor="#FFFFFF"
               height={55}
               fontSize={20}
               style={{ marginBottom: 16, borderRadius: 10 }}
@@ -61,13 +65,12 @@ const SignUpScreen = ({ navigation }) => {
             <CustomTextField
               label={t('SignUp.email')}
               placeholder={t('SignUp.emailPlaceholder')}
-              value={password}
-              onChangeText={setPassword}
-              iconSource={require('../../assets/Icons/lock.png')}
+              value={userEmail}
+              onChangeText={setUserEmail}
+              iconSource={require('../../assets/Icons/email.png')}
               inputTextColor="#fff"
               labelColor="#FFFFFF"
-              placeholderColor="#6BDCE1"
-              secureTextEntry
+              placeholderColor="#FFFFFF"
               height={55}
               fontSize={20}
               style={{ marginBottom: 8, borderRadius: 10 }}
@@ -81,31 +84,38 @@ const SignUpScreen = ({ navigation }) => {
               iconSource={require('../../assets/Icons/lock.png')}
               inputTextColor="#fff"
               labelColor="#FFFFFF"
-              placeholderColor="#6BDCE1"
+              placeholderColor="#ffffff"
               secureTextEntry
               height={55}
               fontSize={20}
               style={{ marginBottom: 8, borderRadius: 10 }}
+              showVisibilityIcon={true}
+              isPassword={true}
+              isPasswordVisible={showPassword}
+              onToggleVisibility={() => setShowPassword(!showPassword)}
             />
-
             <CustomTextField
               label={t('SignUp.confirmPassword')}
               placeholder={t('SignUp.confirmPasswordPlaceholder')}
-              value={password}
-              onChangeText={setPassword}
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
               iconSource={require('../../assets/Icons/lock.png')}
               inputTextColor="#fff"
               labelColor="#FFFFFF"
-              placeholderColor="#6BDCE1"
+              placeholderColor="#ffffff"
               secureTextEntry
               height={55}
               fontSize={20}
               style={{ marginBottom: 8, borderRadius: 10 }}
+              showVisibilityIcon={true}
+              isPassword={true}
+              isPasswordVisible={showConfirmPassword}
+              onToggleVisibility={() => setShowConfirmPassword(!showConfirmPassword)}
             />
 
             <CustomButton
               buttonText={t('SignUp.signUp')}
-              backgroundColor="#73DBE5"
+              backgroundColor="#bee2e6ff"
               width="100%"
               height={50}
               textColor="#1B1C41"
