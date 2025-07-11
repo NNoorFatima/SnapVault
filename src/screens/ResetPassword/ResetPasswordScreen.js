@@ -44,7 +44,6 @@ const ResetPasswordScreen = ({ navigation }) => {
               style={styles.logo}
               resizeMode="contain"
             />
-            <Text style={styles.snapvaultTitle}>SnapVault</Text>
           </View>
 
           <CustomBox
@@ -63,7 +62,7 @@ const ResetPasswordScreen = ({ navigation }) => {
               height={60}
               fontSize={18}
               labelColor="#1A1A4E"
-              placeholderColor="#6BDCE1"
+              placeholderColor="#ffffff"
               inputTextColor="#000"
               iconSource={require('../../assets/Icons/email.png')}
               iconSize={26}
