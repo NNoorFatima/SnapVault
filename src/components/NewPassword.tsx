@@ -13,12 +13,17 @@ const NewPassword = ({ visible, onClose }: any) => {
     return (
         <Modal visible={visible} transparent animationType="fade">
             <View style={styles.overlay}>
-                <Logo
+                {/* <Logo
                     source={{ uri: 'https://codia-f2c.s3.us-west-1.amazonaws.com/image/2025-06-27/q89N1k9dDd.png' }}
                     style={{ marginBottom: 8, marginTop: -16, alignSelf: 'center' }}
                 />
-                <Text style={[styles.snapVaultText, { alignSelf: 'center', marginBottom: 12 }]}>SnapVault</Text>
+                <Text style={[styles.snapVaultText, { alignSelf: 'center', marginBottom: 12 }]}>SnapVault</Text> */}
                 <View style={styles.container}>
+                    <Logo
+                    source={{ uri: 'https://codia-f2c.s3.us-west-1.amazonaws.com/image/2025-06-27/q89N1k9dDd.png' }}
+                    style={{ marginBottom: 8, marginTop: -10, alignSelf: 'center' }}
+                    />
+                    <Text style={[styles.snapVaultText, { alignSelf: 'center', marginBottom: 12 }]}>SnapVault</Text>
                     <Text style={styles.title}>{t('NewPassword.message')}</Text>
                     <Text style={styles.label}>{t('NewPassword.label1')}</Text>
                     <TextInput style={styles.input} secureTextEntry />
