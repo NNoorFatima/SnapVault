@@ -1,17 +1,11 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-  ScrollView,
-  ImageBackground,
-  Alert,
-  Platform,
-} from 'react-native';
+import {View, Text, Image, TouchableOpacity, StyleSheet,
+  Dimensions, ScrollView, ImageBackground, Alert, Platform, } from 'react-native';
+// @ts-ignore
+import Feather from 'react-native-vector-icons/Feather'; //for icons
+
+
 // Import clipboard with fallback
 let Clipboard;
 try {
@@ -129,7 +123,7 @@ const GroupScreen = ({ route, navigation }) => {
               style={styles.backButton}
               onPress={() => navigation.goBack()}
             >
-              <Text style={styles.backButtonText}>←</Text>
+              <Feather name="chevron-left" size={24} color="white" />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>{t('GroupScreen.details')}</Text>
             <View style={styles.placeholder} />
@@ -159,7 +153,7 @@ const GroupScreen = ({ route, navigation }) => {
                 <View style={styles.groupCodeBox}>
                   <Text style={styles.groupCodeText}>{groupCode}</Text>
                   <TouchableOpacity style={styles.copyButton} onPress={handleCopyGroupCode}>
-                    <Text style={styles.copyButtonText}>📋</Text>
+                    <Feather name="copy" size={24} color="white" style={styles.copyButtonText} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -168,7 +162,7 @@ const GroupScreen = ({ route, navigation }) => {
                 style={styles.uploadButton}
                 onPress={handleImageUpload}
               >
-                <Text style={styles.uploadButtonIcon}>📷</Text>
+                <Feather name="camera" size={24} color="white" style={styles.uploadButtonIcon} />
                 <Text style={styles.uploadButtonText}>{t('GroupScreen.uploadImage')}</Text>
               </TouchableOpacity>
             </View>
