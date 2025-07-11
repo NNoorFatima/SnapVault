@@ -81,13 +81,13 @@ const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
           {/* Header Section */}
           <View style={styles.header}>
             <View style={styles.profileSection}>
-              <View style={styles.profilePicContainer}>
+              <TouchableOpacity onPress={() => navigation.navigate('MainApp', { screen: 'Profile' })} style={styles.profilePicContainer}>
                 <Image
                   source={require('./img/image.png')}
                   style={styles.profilePic}
                 />
                 <View style={styles.onlineIndicator} />
-              </View>
+              </TouchableOpacity>
               <View>
                 {/* <Text style={styles.greetingSubtext}>{t('Dashboard.welcome')}</Text> */}
                 <Text style={styles.greetingText}>Alia Farooq</Text>
