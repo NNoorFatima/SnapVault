@@ -114,7 +114,7 @@ const GroupScreen = ({ route, navigation }) => {
   
   return (
     <View style={styles.container}>
-      <ScrollView
+      <ScrollView /*flat list - difference w/ scroll view*/
         style={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
