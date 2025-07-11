@@ -195,7 +195,7 @@ const GroupScreen = ({ route, navigation }) => {
                 renderImageGrid(myPictures)
               ) : (
                 <View style={styles.emptyState}>
-                  <Text style={styles.emptyStateIcon}>📸</Text>
+                  <Feather name="camera" size={48} color="#9CA3AF" style={styles.emptyStateIcon} />
                   <Text style={styles.emptyStateTitle}>{t('GroupScreen.noPics')}</Text>
                   <Text style={styles.emptyStateText}>
                     {t('GroupScreen.desc')}
