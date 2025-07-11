@@ -3,7 +3,7 @@ import { View, Text, Image,Modal } from 'react-native';
 import ProfileOption from './ProfileOption';
 import styles from './UserCard.styles';
 // @ts-ignore
-import Feather from 'react-native-vector-icons/Feather';
+import Feather from 'react-native-vector-icons/Feather'; //for icons
 //used for navigation among pages 
 import { useNavigation } from '@react-navigation/native'; 
 import { RootStackParamList } from '../navigation/AppNavigator';
@@ -13,8 +13,7 @@ import ConfirmationPopUp from './ConfirmationPopUp';
 import NewPassword from './NewPassword';
 //for localization
 import { useTranslation } from 'react-i18next';
-import i18n from '../localization/i18n';
-import { changeAppLanguage } from '../localization/i18n';
+
 
 const Divider = () => <View style={styles.divider} />;
 const UserCard = ({name, phone, email,avatar}: any) => {
@@ -89,12 +88,6 @@ const UserCard = ({name, phone, email,avatar}: any) => {
                             }}
                         />
                         </Modal>  
-                {/* change language 
-                <ProfileOption icon={<Feather name="globe" size={20} color="grey" />} label= {t('profile.changeLanguage')}
-                    onPress={() => {
-                    const newLang = i18n.language === 'en' ? 'ur' : 'en';
-                    changeAppLanguage(newLang); //  calls RTL logic and restarts
-                }}/> */}
             </View>
         </View>
     );
