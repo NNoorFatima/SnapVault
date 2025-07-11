@@ -13,8 +13,7 @@ import ConfirmationPopUp from './ConfirmationPopUp';
 import NewPassword from './NewPassword';
 //for localization
 import { useTranslation } from 'react-i18next';
-import i18n from '../localization/i18n';
-import { changeAppLanguage } from '../localization/i18n';
+
 
 const Divider = () => <View style={styles.divider} />;
 const UserCard = ({name, phone, email,avatar}: any) => {
