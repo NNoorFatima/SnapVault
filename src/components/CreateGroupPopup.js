@@ -111,14 +111,20 @@ const CreateGroupPopup = ({ visible, onClose, onGroupCreated }) => {
               <Text style={styles.cancelButtonText}>{t('Button.cancel')}</Text>
             </TouchableOpacity>
             
-            {isFormValid && (
-              <TouchableOpacity
-                style={[styles.button, styles.createButton]}
-                onPress={handleCreate}
-              >
-                <Text style={styles.createButtonText}>{t('Button.create')}</Text>
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity
+              style={[
+                styles.button, 
+                isFormValid ? styles.createButton : styles.createButtonDisabled
+              ]}
+              onPress={isFormValid ? handleCreate : undefined}
+              disabled={!isFormValid}
+            >
+              <Text style={[
+                isFormValid ? styles.createButtonText : styles.createButtonTextDisabled
+              ]}>
+                {t('Button.create')}
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
         </ImageBackground>
@@ -216,8 +222,16 @@ const styles = StyleSheet.create({
   createButton: {
     backgroundColor: 'rgb(255, 255, 255)', // White background like Join button
   },
+  createButtonDisabled: {
+    backgroundColor: 'rgba(255, 255, 255, 0.3)', // Disabled white background
+  },
   createButtonText: {
     color: '#000000',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  createButtonTextDisabled: {
+    color: 'rgba(0, 0, 0, 0.5)', // Disabled text color
     fontSize: 16,
     fontWeight: '600',
   },
