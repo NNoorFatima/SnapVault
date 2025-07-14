@@ -56,22 +56,7 @@ const UserCard = ({name, phone, email,avatar}: any) => {
                         />
                     </Modal>
 
-                {/* Logout */}
-                <ProfileOption icon={<Feather name="log-out" size={20} color='#222831' />} label={t('profile.logout')} 
-                    onPress={() => setShowLogoutPopup(true)} />
-                    <Modal
-                        visible={showLogoutPopup}
-                        transparent
-                        animationType="fade"
-                        >
-                        <ConfirmationPopUp
-                            message={t('Logout.message')}
-                            onCancel={() => setShowLogoutPopup(false)}  // just hide modal
-                            onConfirm={() => {setShowLogoutPopup(false);
-                            // perform logout logic here
-                            }}
-                        />
-                        </Modal>    
+                   
                 {/* Delete Acccount */}
                 <ProfileOption icon={<Feather name="trash-2" size={20} color='#222831'/>} label={t('profile.deleteAccount')} 
                     onPress={() => setShowDeletePopup(true)} />
@@ -88,6 +73,22 @@ const UserCard = ({name, phone, email,avatar}: any) => {
                             }}
                         />
                         </Modal>  
+                {/* Logout */}
+                <ProfileOption icon={<Feather name="log-out" size={20} color='#222831' />} label={t('profile.logout')} 
+                    onPress={() => setShowLogoutPopup(true)} />
+                    <Modal
+                        visible={showLogoutPopup}
+                        transparent
+                        animationType="fade"
+                        >
+                        <ConfirmationPopUp
+                            message={t('Logout.message')}
+                            onCancel={() => setShowLogoutPopup(false)}  // just hide modal
+                            onConfirm={() => {setShowLogoutPopup(false);
+                            // perform logout logic here
+                            }}
+                        />
+                        </Modal> 
             </View>
         </View>
     );
