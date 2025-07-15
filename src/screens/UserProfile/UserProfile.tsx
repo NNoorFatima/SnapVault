@@ -11,11 +11,11 @@ const UserProfile = () => (
 >
       <BackgroundImage />
       <UserCard 
-        name="Alia Farooq"
+        name="Monkey D. Luffy"
         phone="123-456-7890" 
-        email="alia@example.com" 
+        email="luffy@strawhat.com" 
         // avatar="https://randomuser.me/api/portraits/men/1.jpg" 
-        avatar={require('./img/image.png')}
+        avatar={require('../../assets/temp-pfp.jpg')}
       />
     
       <ProfileBottomOptions />

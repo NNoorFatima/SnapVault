@@ -5,6 +5,8 @@ import DashboardScreen from '../screens/DashBoard/DashboardScreen';
 import ContactUs from '../screens/ContactUs/ContactUs';
 import UserProfile from '../screens/UserProfile/UserProfile';
 import EditProfile from '../screens/UserProfile/EditProfile';
+import GroupScreen from '../screens/GroupScreen/GroupScreen';
+import AllGroupsScreen from '../screens/AllGroups/AllGroupsScreen';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 export type MainTabParamList = {
@@ -12,6 +14,22 @@ export type MainTabParamList = {
   ContactUs: undefined;
   Profile: undefined;
   EditProfile: undefined;
+  GroupScreen: {
+    groupId: number;
+    groupName: string;
+    groupDescription: string;
+    groupCode: string;
+  };
+  AllGroups: {
+    groups: Array<{
+      id: number;
+      name: string;
+      description: string;
+      code: string;
+      memberCount: number;
+      image: any;
+    }>;
+  };
 };
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
@@ -84,6 +102,8 @@ const MainTabNavigator = () => (
     <Tab.Screen name="ContactUs" component={ContactUs} />
     <Tab.Screen name="Profile" component={UserProfile} />
     <Tab.Screen name="EditProfile" component={EditProfile} options={{ tabBarButton: () => null }} />
+    <Tab.Screen name="GroupScreen" component={GroupScreen} options={{ tabBarButton: () => null }} />
+    <Tab.Screen name="AllGroups" component={AllGroupsScreen} options={{ tabBarButton: () => null }} />
   </Tab.Navigator>
 );
 
