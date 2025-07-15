@@ -19,6 +19,8 @@ import DashboardScreen from '../screens/DashBoard/DashboardScreen';
 import GroupScreen from '../screens/GroupScreen/GroupScreen';
 import AllGroupsScreen from '../screens/AllGroups/AllGroupsScreen';
 
+import ImageDetailScreen from '../screens/GroupScreen/ImageDetailScreen'; // Adjust the path if needed
+
 
 export type RootStackParamList = {
 
@@ -85,6 +87,21 @@ const AppNavigator = () => {
         ) : (
           <>
             <Stack.Screen name="MainApp" component={MainTabNavigator} />
+              <Stack.Screen
+                name="ImageDetail"
+                component={ImageDetailScreen}
+                options={{
+                  headerShown: true,
+                  title: 'Image Preview',
+                  headerStyle: styles.modalHeader,
+                  headerTitleStyle: styles.modalHeaderTitle,
+                  headerBackTitle: 'Back',
+                }}
+              />
+
+
+
+
             <Stack.Screen
               name="Edit Profile"
               component={EditProfile}

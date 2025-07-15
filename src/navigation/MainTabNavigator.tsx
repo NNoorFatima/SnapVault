@@ -1,12 +1,13 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import DashboardScreen from '../screens/DashBoard/DashboardScreen';
 // import ContactUs from '../screens/ContactUs/ContactUs';
 import UserProfile from '../screens/UserProfile/UserProfile';
 import EditProfile from '../screens/UserProfile/EditProfile';
 import GroupScreen from '../screens/GroupScreen/GroupScreen';
 import AllGroupsScreen from '../screens/AllGroups/AllGroupsScreen';
+import ImageDetailScreen from '../screens/GroupScreen/ImageDetailScreen';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 export type MainTabParamList = {
@@ -14,6 +15,7 @@ export type MainTabParamList = {
   ContactUs: undefined;
   Profile: undefined;
   EditProfile: undefined;
+  ImageDetail:undefined;
   GroupScreen: {
     groupId: number;
     groupName: string;
@@ -101,6 +103,7 @@ const MainTabNavigator = () => (
     <Tab.Screen name="Dashboard" component={DashboardScreen} />
     <Tab.Screen name="AllGroups" component={AllGroupsScreen} initialParams={{}} />
     <Tab.Screen name="Profile" component={UserProfile} />
+    <Tab.Screen name="ImageDetail" component={ImageDetailScreen} />
     <Tab.Screen name="EditProfile" component={EditProfile} options={{ tabBarButton: () => null }} />
     <Tab.Screen name="GroupScreen" component={GroupScreen} options={{ tabBarButton: () => null }} />
   </Tab.Navigator>
