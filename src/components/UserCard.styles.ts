@@ -42,23 +42,23 @@ const styles = StyleSheet.create({
   //   marginEnd: 10
   // },
   avatar: {
-  width: '28%',            // Percent-based for flexibility
-  aspectRatio: 4 / 4,      // Makes it rectangular (taller than wide)
-  borderRadius: 16,        // Slightly rounded corners
-  marginBottom: 13,
-  marginStart: 10,
-  marginEnd: 10,
+    width: 100,              // Fixed width for consistency
+    height: 100,             // Fixed height for consistency
+    borderRadius: 50,        // Makes it circular
+    marginBottom: 13,
+    marginStart: 10,
+    marginEnd: 10,
 
-  // Optional: border and shadow for polish
-  borderWidth: 1,
-  borderColor: '#ddd',
+    // Optional: border and shadow for polish
+    borderWidth: 1,
+    borderColor: '#ddd',
 
-  shadowColor: '#000',
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.1,
-  shadowRadius: 4,
-  elevation: 3,
-},
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
 
   name: { fontSize: 18, fontWeight: 'bold', textAlign: I18nManager.isRTL ? 'right' : 'left' },
   phone: { fontSize: 14, color: '#222831', textAlign: I18nManager.isRTL ? 'right' : 'left' },

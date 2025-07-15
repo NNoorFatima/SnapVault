@@ -2,9 +2,11 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import DashboardScreen from '../screens/DashBoard/DashboardScreen';
-import ContactUs from '../screens/ContactUs/ContactUs';
+// import ContactUs from '../screens/ContactUs/ContactUs';
 import UserProfile from '../screens/UserProfile/UserProfile';
 import EditProfile from '../screens/UserProfile/EditProfile';
+import GroupScreen from '../screens/GroupScreen/GroupScreen';
+import AllGroupsScreen from '../screens/AllGroups/AllGroupsScreen';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 export type MainTabParamList = {
@@ -12,6 +14,22 @@ export type MainTabParamList = {
   ContactUs: undefined;
   Profile: undefined;
   EditProfile: undefined;
+  GroupScreen: {
+    groupId: number;
+    groupName: string;
+    groupDescription: string;
+    groupCode: string;
+  };
+  AllGroups: {
+    groups: Array<{
+      id: number;
+      name: string;
+      description: string;
+      code: string;
+      memberCount: number;
+      image: any;
+    }>;
+  };
 };
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
@@ -30,13 +48,13 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
           color={state.index === 0 ? '#6BDCE1' : '#fff'}
         />
       </TouchableOpacity>
-      {/* ContactUs (center) */}
+      {/* Search (center) */}
       <TouchableOpacity
         style={[styles.tabButton, styles.centerTab]}
-        onPress={() => navigation.navigate('ContactUs')}
+        onPress={() => navigation.navigate('AllGroups')}
       >
         <Icon
-          name={state.index === 1 ? 'call' : 'call-outline'}
+          name={state.index === 1 ? 'search' : 'search-outline'}
           size={32}
           color={state.index === 1 ? '#6BDCE1' : '#fff'}
         />
@@ -81,9 +99,10 @@ const MainTabNavigator = () => (
     screenOptions={{ headerShown: false }}
   >
     <Tab.Screen name="Dashboard" component={DashboardScreen} />
-    <Tab.Screen name="ContactUs" component={ContactUs} />
+    <Tab.Screen name="AllGroups" component={AllGroupsScreen} initialParams={{}} />
     <Tab.Screen name="Profile" component={UserProfile} />
     <Tab.Screen name="EditProfile" component={EditProfile} options={{ tabBarButton: () => null }} />
+    <Tab.Screen name="GroupScreen" component={GroupScreen} options={{ tabBarButton: () => null }} />
   </Tab.Navigator>
 );
 

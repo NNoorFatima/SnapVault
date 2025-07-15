@@ -30,7 +30,7 @@ const UserCard = ({name, phone, email,avatar}: any) => {
     return (
         <View style={styles.card}>
             <View style={styles.centeredSection}>
-                <Image source={avatar} style ={styles.avatar} />
+                <Image source={avatar} style={styles.avatar} resizeMode="cover" />
                 <Text style={styles.name}>{name}</Text>
                 <Text style={styles.phone}>{phone}</Text>
                 <Text style={styles.email}>{email}</Text>
