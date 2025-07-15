@@ -14,6 +14,8 @@ import NewPassword from './NewPassword';
 //for localization
 import { useTranslation } from 'react-i18next';
 
+import { CommonActions } from '@react-navigation/native';
+
 
 const Divider = () => <View style={styles.divider} />;
 const UserCard = ({name, phone, email,avatar}: any) => {
@@ -23,6 +25,7 @@ const UserCard = ({name, phone, email,avatar}: any) => {
     const [showPasswordPopup, setShowPasswordPopup] = useState(false);
     //for localization 
     const { t } = useTranslation();
+    
     
     return (
         <View style={styles.card}>
@@ -84,9 +87,12 @@ const UserCard = ({name, phone, email,avatar}: any) => {
                         <ConfirmationPopUp
                             message={t('Logout.message')}
                             onCancel={() => setShowLogoutPopup(false)}  // just hide modal
-                            onConfirm={() => {setShowLogoutPopup(false);
-                            // perform logout logic here
+                            onConfirm={() => {
+                                setShowLogoutPopup(false);
+                                // navigation.navigate('SignIn');
                             }}
+                            // perform logout logic here
+                            // }}
                         />
                         </Modal> 
             </View>

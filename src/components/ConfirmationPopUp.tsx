@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text } from "react-native";
 import Button from "./Button";
 import styles from './ConfirmationPopup.styles';
 import { useNavigation } from '@react-navigation/native'; //used for navigation among pages 
@@ -9,14 +9,14 @@ import Logo from '../assets/Logo';
 //for localization
 import { useTranslation } from 'react-i18next';
 interface Props {
-  message: string;
-  onCancel: () => void;
-  onConfirm: () => void;
+    message: string;
+    onCancel: () => void;
+    onConfirm: () => void;
 }
 
 
 const ConfirmationPopUp: React.FC<Props> = ({  message, onCancel, onConfirm}) => {
-    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    // const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     //for localization 
     const { t } = useTranslation();
     return (
@@ -37,7 +37,7 @@ const ConfirmationPopUp: React.FC<Props> = ({  message, onCancel, onConfirm}) =>
                 />
                 <Button
                     title={t('Button.confirm')}
-                    onPress={() => console.log('Button Pressed')} //should go to splash screen 
+                    onPress= {onConfirm} //should go to splash screen 
                     backgroundColor="#73DBE5"
                     textColor="black"
                     style={{ width: '50%' }}
