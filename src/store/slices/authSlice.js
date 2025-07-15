@@ -1,94 +1,58 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from '../../api/axiosInstance';
 
-// Thunk to initialize auth state from AsyncStorage
-export const initializeAuth = createAsyncThunk(
-  'auth/initializeAuth',
-  async (_, { rejectWithValue }) => {
-    try {
-      const token = await AsyncStorage.getItem('authToken');
-      if (token) {
-        return token;
-      }
-      return null;
-    } catch (error) {
-      return rejectWithValue('Failed to initialize auth');
-    }
+export const loginUser = createAsyncThunk('auth/login', async (credentials, thunkAPI) => {
+  try {
+    const res = await axios.post('/auth/login', credentials);
+    return res.data;
+  } catch (err) {
+    return thunkAPI.rejectWithValue(err.response.data);
   }
-);
+});
 
-// Login thunk
-export const loginUser = createAsyncThunk(
-  'auth/loginUser',
-  async (credentials, { rejectWithValue }) => {
-    try {
-      const response = await axios.post('http://your-backend-ip:port/api/login', credentials);
-      const data = response.data;
-
-      if (!data.user || !data.access_token) {
-        return rejectWithValue('Invalid response: user or access_token missing');
-      }
-
-      await AsyncStorage.setItem('authToken', data.access_token);
-      return data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.detail || 'Login failed');
-    }
+export const registerUser = createAsyncThunk('auth/register', async (userData, thunkAPI) => {
+  try {
+    const res = await axios.post('/auth/register', userData);
+    return res.data;
+  } catch (err) {
+    return thunkAPI.rejectWithValue(err.response.data);
   }
-);
+});
 
-const initialState = {
-  user: null,
-  token: null,
-  loading: false,
-  error: null,
-};
+export const getCurrentUser = createAsyncThunk('auth/getCurrentUser', async (_, thunkAPI) => {
+  try {
+    const res = await axios.get('/auth/me');
+    return res.data;
+  } catch (err) {
+    return thunkAPI.rejectWithValue(err.response.data);
+  }
+});
 
 const authSlice = createSlice({
   name: 'auth',
-  initialState,
+  initialState: { user: null, isLoading: false, error: null },
   reducers: {
-    logout: (state) => {
-      state.user = null;
-      state.token = null;
-      state.loading = false;
-      state.error = null;
-      AsyncStorage.removeItem('authToken');
-    },
-    setUser: (state, action) => {
-      state.user = action.payload;
-    },
+    logout: (state) => { state.user = null; },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(initializeAuth.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(initializeAuth.fulfilled, (state, action) => {
-        state.loading = false;
-        state.token = action.payload;
-      })
-      .addCase(initializeAuth.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      .addCase(loginUser.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      .addCase(loginUser.pending, (state) => { state.isLoading = true; })
       .addCase(loginUser.fulfilled, (state, action) => {
-        state.loading = false;
-        state.token = action.payload.access_token;
-        state.user = action.payload.user;
+        state.isLoading = false;
+        state.user = action.payload;
       })
       .addCase(loginUser.rejected, (state, action) => {
-        state.loading = false;
+        state.isLoading = false;
         state.error = action.payload;
+      })
+      .addCase(registerUser.fulfilled, (state, action) => {
+        state.user = action.payload;
+      })
+      .addCase(getCurrentUser.fulfilled, (state, action) => {
+        state.user = action.payload;
       });
   },
 });
 
-export const { logout, setUser } = authSlice.actions;
+export const { logout } = authSlice.actions;
 export default authSlice.reducer;
