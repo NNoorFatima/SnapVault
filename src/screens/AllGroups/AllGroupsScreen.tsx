@@ -25,7 +25,26 @@ interface AllGroupsScreenProps {
 }
 
 const AllGroupsScreen: React.FC<AllGroupsScreenProps> = ({ navigation, route }) => {
-  const { groups } = route.params;
+  // Fallback to mock data if no params provided
+  const groups = route.params?.groups ?? [
+    {
+      id: 1,
+      name: 'Group 1',
+      description: 'This is the description for Group 1. A wonderful group for sharing memories and photos.',
+      code: 'GRP001',
+      memberCount: 5,
+      image: require('../DashBoard/img/group1.png'),
+    },
+    {
+      id: 2,
+      name: 'Group 2',
+      description: 'This is the description for Group 2. A wonderful group for sharing memories and photos.',
+      code: 'GRP002',
+      memberCount: 8,
+      image: require('../DashBoard/img/group1.png'),
+    },
+    // ...add more mock groups as needed
+  ];
   const [searchQuery, setSearchQuery] = useState('');
 
   // Filter groups based on search query
