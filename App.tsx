@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import AppNavigator from './src/navigation/AppNavigator';
 import { initLocalization } from './src/localization/i18n';
 import Toast from 'react-native-toast-message';
+import { Provider } from 'react-redux';
+import store from './src/store/store';
+
 export default function App() {
   const [isReady, setIsReady] = useState(false);
 
@@ -25,19 +28,9 @@ export default function App() {
 
   console.log('App ready, rendering navigator...');
   return (
-    <>
+    <Provider store={store}>
       <AppNavigator />
       <Toast />
-    </>
+    </Provider>
   );
 }
-
-
-// export default function App() {
-//   return (
-//     <>
-//       <AppNavigator />
-//       <Toast />
-//     </>
-//   );
-// }
