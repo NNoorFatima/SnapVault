@@ -7,12 +7,12 @@ import {
   View,
   Text
 } from 'react-native';
-
+import { useTranslation } from 'react-i18next';
 
 const { width, height } = Dimensions.get('window');
 
 const SplashScreen = () => {
-
+  const {t}=useTranslation();
   return (
     <SafeAreaView style={styles.safeArea}>
       <ImageBackground
@@ -22,7 +22,7 @@ const SplashScreen = () => {
       >
         <View style={styles.centeredContent}>
           <Text style={styles.title}>SnapVault</Text>
-          <Text style={styles.subtitle}>AI-powered photo sharing, privacy, and memories—simplified.</Text>
+          <Text style={styles.subtitle}>{t('Splash.subtitle')}</Text>
         </View>
       </ImageBackground>
     </SafeAreaView>

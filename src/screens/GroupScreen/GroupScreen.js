@@ -4,6 +4,9 @@ import {View, Text, Image, TouchableOpacity, StyleSheet,
   Dimensions, ScrollView, ImageBackground, Alert, Platform, } from 'react-native';
 // @ts-ignore
 import Feather from 'react-native-vector-icons/Feather'; //for icons
+import { I18nManager } from 'react-native';
+
+
 
 
 // Import clipboard with fallback
@@ -120,6 +123,7 @@ const GroupScreen = ({ route, navigation }) => {
       </View>
     );
   };
+  const isRTL = I18nManager.isRTL;
   
   return (
     <View style={styles.container}>
@@ -138,7 +142,7 @@ const GroupScreen = ({ route, navigation }) => {
               style={styles.backButton}
               onPress={() => navigation.goBack()}
             >
-              <Feather name="chevron-left" size={24} color="white" />
+              <Feather name={isRTL ? 'chevron-right' : 'chevron-left'} size={24} color="white" />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>{t('GroupScreen.details')}</Text>
             <View style={styles.placeholder} />

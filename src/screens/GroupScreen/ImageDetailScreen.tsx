@@ -5,9 +5,13 @@ import Feather from 'react-native-vector-icons/Feather';
 import ImageZoom from 'react-native-image-pan-zoom';
 import { styles } from './ImageDetailScreen.styles';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
+import { I18nManager } from 'react-native';
+
+
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
-
+const isRTL = I18nManager.isRTL;
 export default function ImageDetailScreen() {
 const scale = useRef(new Animated.Value(1)).current;
 
@@ -27,6 +31,9 @@ Animated.timing(scale, {
 }).start();
 };
     const navigation = useNavigation();
+    const { t } = useTranslation();
+    
+
     return (
         <View style={styles.mainContainer}>
             {/* Header */}
@@ -34,9 +41,9 @@ Animated.timing(scale, {
 
                 <View style={ styles.tabBar}>
                     <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                        <Feather name="chevron-left" size={28} color="white" />
+                        <Feather name={isRTL ? 'chevron-right' : 'chevron-left'} size={28} color="white" />
                     </TouchableOpacity>
-                    <Text style={styles.pictures}>Pictures</Text>
+                    <Text style={styles.pictures}>{t('ImageDetailScreen.title')}</Text>
                 </View>
 
                 <View style={styles.flexRowDd}>
