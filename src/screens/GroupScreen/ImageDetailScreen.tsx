@@ -31,20 +31,23 @@ Animated.timing(scale, {
         <View style={styles.mainContainer}>
             {/* Header */}
             <View style={styles.rectangle}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Feather name="chevron-left" size={28} color="white" />
-                </TouchableOpacity>
-                <Text style={styles.pictures}>Pictures</Text>
+
+                <View style={ styles.tabBar}>
+                    <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                        <Feather name="chevron-left" size={28} color="white" />
+                    </TouchableOpacity>
+                    <Text style={styles.pictures}>Pictures</Text>
+                </View>
 
                 <View style={styles.flexRowDd}>
-                    <View style={styles.group1}>
+                    <View style={styles.iconBackground}>
                         <Feather name="more-horizontal" size={28} color="white" />
                     </View>
                 <View style={styles.regroup}>
-                    <View style={styles.group1}>
+                    <View style={styles.iconBackground}>
                         <Feather name="download" size={28} color="white"  />
                     </View>
-                    <View style={styles.group1}>
+                    <View style={styles.iconBackground}>
                         <Feather name="share" size={28} color="white" />
                     </View>
                 </View>
@@ -76,12 +79,12 @@ Animated.timing(scale, {
 
             {/* Zoom Buttons */}
             <View style={styles.buttonContainer}>
-            <TouchableOpacity onPress={zoomOut}>
-                <Feather name="minus-circle" size={32} color="white" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={zoomIn}>
-                <Feather name="plus-circle" size={32} color="white" />
-            </TouchableOpacity>
+                <TouchableOpacity onPress={zoomOut}>
+                    <Feather name="minus" size={28} color="white" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={zoomIn}>
+                    <Feather name="plus" size={28} color="white" />
+                </TouchableOpacity>
             </View>
         </View>
         );
