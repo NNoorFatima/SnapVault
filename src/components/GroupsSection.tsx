@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, ImageBackground, StyleSheet, ImageSourcePropType } from 'react-native';
 // @ts-ignore
 import Feather from 'react-native-vector-icons/Feather';
+import { I18nManager } from 'react-native';
 import GroupCard from './GroupCard';
 
 interface GroupData {
@@ -28,20 +29,17 @@ interface GroupsSectionProps {
 }
 
 const GroupsSection: React.FC<GroupsSectionProps> = ({
-  title,
-  viewAllText,
-  groups,
-  backgroundImage,
-  onViewAll,
-  onGroupPress,
-}) => {
+  title, viewAllText, groups, backgroundImage,
+  onViewAll, onGroupPress,}) => {
+  const isRTL = I18nManager.isRTL;
+
   return (
     <>
       <View style={styles.myGroupsHeader}>
         <Text style={styles.myGroupsTitle}>{title}</Text>
-        <TouchableOpacity style={styles.viewAllButton} onPress={onViewAll}>
+        <TouchableOpacity style={styles.viewAllButton} onPress={onViewAll}>          
+          <Feather name="list" size={20} color="white" />
           <Text style={styles.viewAllText}>{viewAllText}</Text>
-          <Feather name="arrow-right" size={23} color="white" />
         </TouchableOpacity>
       </View>
 
@@ -95,7 +93,8 @@ const styles = StyleSheet.create({
     color: '#D1D5DB',
     fontSize: 14,
     fontWeight: '500',
-    marginRight: 4,
+    margin: 2,
+    padding:1
   },
   groupsSectionBackground: {
     borderRadius: 24,

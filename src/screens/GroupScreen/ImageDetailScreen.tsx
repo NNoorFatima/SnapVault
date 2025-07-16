@@ -6,7 +6,6 @@ import ImageZoom from 'react-native-image-pan-zoom';
 import { styles } from './ImageDetailScreen.styles';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
-// import { isRTL } from '../../localization/i18n';
 import { I18nManager } from 'react-native';
 
 

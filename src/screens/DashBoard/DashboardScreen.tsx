@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import Toast from 'react-native-toast-message';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { MainTabParamList } from '../../navigation/MainTabNavigator';
-
 // Import new components
 import DashboardHeader from '../../components/DashboardHeader';
 import IntroCard from '../../components/IntroCard';
@@ -29,7 +28,7 @@ const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
   // State for popups
   const [showCreateGroupPopup, setShowCreateGroupPopup] = useState(false);
   const [showJoinGroupPopup, setShowJoinGroupPopup] = useState(false);
-
+  //for localization
   const { t } = useTranslation();
 
   // Mock data - in a real app, this would come from state management or API
