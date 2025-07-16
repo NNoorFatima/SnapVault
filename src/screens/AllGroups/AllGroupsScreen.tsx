@@ -67,7 +67,7 @@ const AllGroupsScreen: React.FC<AllGroupsScreenProps> = ({ navigation, route }) 
   };
 
   const screenWidth = Dimensions.get('window').width;
-  const contentWrapperWidth = Math.min(screenWidth - 32, 420);
+  const contentWrapperWidth = Math.min(screenWidth - 1, 420);
 
   const renderGroupItem = ({ item }: { item: GroupData }) => (
     <GroupListItem
@@ -111,11 +111,11 @@ const AllGroupsScreen: React.FC<AllGroupsScreenProps> = ({ navigation, route }) 
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Feather name="arrow-left" size={24} color="#FFFFFF" />
+          <Feather name="chevron-left" size={24} color="#FFFFFF" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>All Groups</Text>
-        <View style={styles.headerSpacer} />
-      </View>
+      <View style={styles.headerSpacer} />
+    </View>
 
       {/* Search Card */}
       <ImageBackground
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#1c1c42',
+    backgroundColor: '#1F2937',
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -14,7 +14,6 @@ import NewPassword from './NewPassword';
 //for localization
 import { useTranslation } from 'react-i18next';
 
-import { CommonActions } from '@react-navigation/native';
 
 
 const Divider = () => <View style={styles.divider} />;
