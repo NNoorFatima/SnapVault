@@ -139,6 +139,10 @@
         "emailAddress":"ای میل ایڈریس",
         "emailPlaceholder":"اپنا ای میل درج کریں",
         "instructions":"ہدایات بھیجیں"
+    },
+    "ImageDetailScreen":
+    {
+        "title":"تصاویر"
     }
 
 

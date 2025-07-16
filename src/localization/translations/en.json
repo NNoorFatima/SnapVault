@@ -139,6 +139,14 @@
         "emailPlaceholder":"Enter your email",
         "instructions":"Send Instructions"
 
-    }
+    },
+    "ImageDetailScreen":
+    {
+        "title":"Pictures"
+    },
+    "AllGroupsScreen":
+    {
 
+        
+    }
 }
