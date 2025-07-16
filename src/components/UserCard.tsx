@@ -15,6 +15,7 @@ import NewPassword from './NewPassword';
 import { useTranslation } from 'react-i18next';
 
 
+
 const Divider = () => <View style={styles.divider} />;
 const UserCard = ({name, phone, email,avatar}: any) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -23,6 +24,7 @@ const UserCard = ({name, phone, email,avatar}: any) => {
     const [showPasswordPopup, setShowPasswordPopup] = useState(false);
     //for localization 
     const { t } = useTranslation();
+    
     
     return (
         <View style={styles.card}>
@@ -56,22 +58,7 @@ const UserCard = ({name, phone, email,avatar}: any) => {
                         />
                     </Modal>
 
-                {/* Logout */}
-                <ProfileOption icon={<Feather name="log-out" size={20} color='#222831' />} label={t('profile.logout')} 
-                    onPress={() => setShowLogoutPopup(true)} />
-                    <Modal
-                        visible={showLogoutPopup}
-                        transparent
-                        animationType="fade"
-                        >
-                        <ConfirmationPopUp
-                            message={t('Logout.message')}
-                            onCancel={() => setShowLogoutPopup(false)}  // just hide modal
-                            onConfirm={() => {setShowLogoutPopup(false);
-                            // perform logout logic here
-                            }}
-                        />
-                        </Modal>    
+                   
                 {/* Delete Acccount */}
                 <ProfileOption icon={<Feather name="trash-2" size={20} color='#222831'/>} label={t('profile.deleteAccount')} 
                     onPress={() => setShowDeletePopup(true)} />
@@ -88,6 +75,25 @@ const UserCard = ({name, phone, email,avatar}: any) => {
                             }}
                         />
                         </Modal>  
+                {/* Logout */}
+                <ProfileOption icon={<Feather name="log-out" size={20} color='#222831' />} label={t('profile.logout')} 
+                    onPress={() => setShowLogoutPopup(true)} />
+                    <Modal
+                        visible={showLogoutPopup}
+                        transparent
+                        animationType="fade"
+                        >
+                        <ConfirmationPopUp
+                            message={t('Logout.message')}
+                            onCancel={() => setShowLogoutPopup(false)}  // just hide modal
+                            onConfirm={() => {
+                                setShowLogoutPopup(false);
+                                // navigation.navigate('SignIn');
+                            }}
+                            // perform logout logic here
+                            // }}
+                        />
+                        </Modal> 
             </View>
         </View>
     );

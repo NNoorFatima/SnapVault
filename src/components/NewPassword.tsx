@@ -29,7 +29,9 @@ const NewPassword = ({ visible, onClose }: any) => {
                     <TextInput style={styles.input} secureTextEntry />
                     <Text style={styles.label}>{t('NewPassword.label2')}</Text>
                     <TextInput style={styles.input} secureTextEntry />
+                {/* </View> */}
                     <View style={styles.buttonContainer}>
+                
                         <Button
                             title={t('Button.cancel')}
                             onPress={onClose}//should go back to the current screen 

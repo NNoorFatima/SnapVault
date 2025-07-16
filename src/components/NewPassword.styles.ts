@@ -39,10 +39,11 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row',
-        justifyContent: 'flex-end',
-       
+        // justifyContent: 'flex-end',
+        justifyContent: 'space-evenly',
         marginTop: 10,
-        gap: '10%'
+        
+        // gap: '10%'
     },
     updateButton: {
         backgroundColor: '#73DBE5',
