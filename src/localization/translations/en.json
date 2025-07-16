@@ -157,5 +157,16 @@
         "noGroups":"No Groups Found",
         "noGroupsMatch": "No groups match {{searchQuery}}. Try a different search term.",
         "noGroupsJoined": "You haven't joined any groups yet. Create or join a group to get started!"
+    },
+    "Splash":
+    {
+        "title":"Splash Screen",
+        "subtitle":"AI-powered photo sharing, privacy, and memories—simplified."
+    },
+    "Onboarding":
+    {
+        "description":"Best Free Photo Detector and Distributor",
+        "details":"SnapVault is an AI-powered photo-sharing app that uses facial recognition to automatically detect and sort images. SnapVault simplifies sharing, protects privacy, and makes sure no memory gets lost."
     }
+
 }

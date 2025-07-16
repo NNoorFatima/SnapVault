@@ -1,17 +1,9 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-  ImageBackground,
-  SafeAreaView,
-  Image,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet,Dimensions, ImageBackground, 
+  SafeAreaView, Image, TouchableOpacity} from 'react-native';
 import CustomBox from '../../components/CustomBox';
-
-
+import { useTranslation } from 'react-i18next';
+import { I18nManager } from 'react-native';
 const { width, height } = Dimensions.get('window');
 
 const OnboardingScreen = ({ onFinish }) => {
@@ -21,7 +13,7 @@ const OnboardingScreen = ({ onFinish }) => {
   const boxHeight = height * 0.28; // 28% of screen height
   // Position the continue button so it's half inside and half outside the box (touching the box)
   const buttonOffset = -34; // Half of button height (54/2), so it sits half in/half out
-
+  const { t } = useTranslation();
   return (
     <SafeAreaView style={styles.safeArea}>
       <ImageBackground
@@ -31,7 +23,7 @@ const OnboardingScreen = ({ onFinish }) => {
       >
         {/* Centered title heading */}
         <View style={styles.centerTitleWrapper}>
-          <Text style={styles.centerTitle}>Best Free Photo Detector and Distributor</Text>
+          <Text style={styles.centerTitle}>{t('Onboarding.description')}</Text>
         </View>
         {/* Main overlay/title can go here if needed */}
         <CustomBox
@@ -47,8 +39,7 @@ const OnboardingScreen = ({ onFinish }) => {
           backgroundColor="rgba(255,255,255,0.85)"
           borderRadius={20}
         >
-          <Text style={styles.onboardBoxText}>SnapVault is an AI-powered photo-sharing app that uses facial recognition to automatically detect and sort images.
-SnapVault simplifies sharing, protects privacy, and makes sure no memory gets lost.</Text>
+          <Text style={styles.onboardBoxText}>{t('Onboarding.details')}</Text>
           <View style={[styles.bottomCircleWrapperAbsolute, { bottom: buttonOffset }]}> 
             <TouchableOpacity onPress={onFinish}>
               <View style={styles.bottomCircle}>
@@ -129,6 +120,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   circleIcon: {
+    transform: [{ scaleX: I18nManager.isRTL ? -1 : 1 }],
     width: 54, // was 70
     height: 54, // was 70
     tintColor: '#fff',
