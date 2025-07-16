@@ -6,6 +6,7 @@ import { MainTabParamList } from '../../navigation/MainTabNavigator';
 // @ts-ignore
 import Feather from 'react-native-vector-icons/Feather';
 import GroupListItem from '../../components/GroupListItem';
+import { useTranslation } from 'react-i18next';
 
 interface GroupData {
   id: number;
@@ -68,7 +69,7 @@ const AllGroupsScreen: React.FC<AllGroupsScreenProps> = ({ navigation, route }) 
 
   const screenWidth = Dimensions.get('window').width;
   const contentWrapperWidth = Math.min(screenWidth - 1, 420);
-
+  const {t} = useTranslation();
   const renderGroupItem = ({ item }: { item: GroupData }) => (
     <GroupListItem
       groupId={item.id}
@@ -91,11 +92,11 @@ const AllGroupsScreen: React.FC<AllGroupsScreenProps> = ({ navigation, route }) 
       >
         <View style={styles.emptyStateContent}>
           <Feather name="search" size={64} color="rgba(255, 255, 255, 0.7)" />
-          <Text style={styles.emptyStateTitle}>No Groups Found</Text>
+          <Text style={styles.emptyStateTitle}>{t('AllGroupsScreen.noGroups')}</Text>
           <Text style={styles.emptyStateText}>
             {searchQuery.trim() 
-              ? `No groups match "${searchQuery}". Try a different search term.`
-              : "You haven't joined any groups yet. Create or join a group to get started!"
+              ? t('AllGroupsScreen.noGroupsMatch', { searchQuery })
+              : t('AllGroupsScreen.noGroupsJoined')
             }
           </Text>
         </View>
@@ -127,16 +128,16 @@ const AllGroupsScreen: React.FC<AllGroupsScreenProps> = ({ navigation, route }) 
         <View style={styles.searchContentWrapper}>
           <View style={styles.searchHeader}>
             <Feather name="search" size={24} color="#FFFFFF" />
-            <Text style={styles.searchTitle}>Find Your Groups</Text>
+            <Text style={styles.searchTitle}>{t('AllGroupsScreen.searchTitle')}</Text>
           </View>
           <Text style={styles.searchSubtitle}>
-            Search through your joined groups by name
+            {t('AllGroupsScreen.searchDes')}
           </Text>
           <View style={styles.searchInputContainer}>
             <Feather name="search" size={20} color="#6B7280" style={styles.searchIcon} />
             <TextInput
               style={styles.searchInput}
-              placeholder="Search groups by name..."
+              placeholder={t('AllGroupsScreen.searchBarPlaceholder')}
               placeholderTextColor="#6B7280"
               value={searchQuery}
               onChangeText={setSearchQuery}
@@ -158,15 +159,19 @@ const AllGroupsScreen: React.FC<AllGroupsScreenProps> = ({ navigation, route }) 
       <View style={styles.resultsContainer}>
         <View style={styles.resultsHeader}>
           <Text style={styles.resultsTitle}>
-            {searchQuery.trim() ? 'Search Results' : 'My Groups'}
+            {searchQuery.trim() ? t('AllGroupsScreen.searchResults') : t('AllGroupsScreen.groups')}
           </Text>
-          <View style={styles.resultsStats}>
-            <Text style={styles.resultsText}>
-              {searchQuery.trim() 
-                ? `${filteredGroups.length} of ${groups.length} groups`
-                : `${groups.length} group${groups.length !== 1 ? 's' : ''}`
-              }
-            </Text>
+              <View style={styles.resultsStats}>
+              <Text style={styles.resultsText}>
+                {searchQuery.trim()
+                  ? t('AllGroupsScreen.filtered', {
+                      filtered: filteredGroups.length,
+                      total: groups.length
+                    })
+                  : t('AllGroupsScreen.count', {
+                      count: groups.length
+                    })}
+              </Text>
           </View>
         </View>
       </View>

@@ -146,7 +146,16 @@
     },
     "AllGroupsScreen":
     {
-
-        
+        "searchTitle":"Find Your Groups",
+        "searchDes":"Search through your joined groups by name",
+        "searchBarPlaceholder":"Search groups by name...",
+        "groups":"My Groups",
+        "searchResults":"Search Results",
+        "count": "{{count}} group",
+        "count_plural": "{{count}} groups",
+        "filtered": "{{filtered}} of {{total}} groups",
+        "noGroups":"No Groups Found",
+        "noGroupsMatch": "No groups match {{searchQuery}}. Try a different search term.",
+        "noGroupsJoined": "You haven't joined any groups yet. Create or join a group to get started!"
     }
 }

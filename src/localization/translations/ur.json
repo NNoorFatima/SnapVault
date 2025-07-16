@@ -143,6 +143,21 @@
     "ImageDetailScreen":
     {
         "title":"تصاویر"
+    },
+    "AllGroupsScreen":
+    {
+        "searchTitle":"اپنے گروپس تلاش کریں",
+        "searchDes":"اپنے شامل کردہ گروپس کو نام سے تلاش کریں",
+        "searchBarPlaceholder":"گروپس کو نام سے تلاش کریں...",
+        "groups":"میرے گروپس",
+        "searchResults":"تلاش نتیجہ",
+        "count": "{{count}} گروپ",
+        "count_plural": "{{count}} گروپس",
+        "filtered": "{{total}} میں سے {{filtered}} گروپس",
+        "noGroups":"کوئی گروپ نہیں ملی",
+        "noGroupsMatch": "کوئی گروپ {{searchQuery}} سے مماثل نہیں ہے. مختلف سرچ ٹرم آزمائیں",
+        "noGroupsJoined": "آپ نے ابھی تک کوئی گروپ جوائن نہیں کیا. گروپ بنائیں یا کوئی گروپ جوائن کریں اور شروع کریں!"
+        
     }
 
 
