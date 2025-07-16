@@ -40,9 +40,9 @@ const SignUpScreen = ({ navigation }) => {
               style={styles.leftLogo}
               resizeMode="contain"
             />
-            <Text style={styles.signupTextLeft}>{t('SignUp.signUp')}</Text>
+            <Text style={styles.signupTextLeft}>Create an Account</Text>
           </View>
-          <Text style={styles.createAccountTextLeft}>{t('SignUp.newAcct')}</Text>
+          {/* Removed blue 'Create a new account' text as requested */}
 
           <CustomBox
             style={styles.customBox}
@@ -96,7 +96,7 @@ const SignUpScreen = ({ navigation }) => {
             />
             <CustomTextField
               label={t('SignUp.confirmPassword')}
-              placeholder={t('SignUp.confirmPasswordPlaceholder')}
+              placeholder="Confirm Password"
               value={confirmPassword}
               onChangeText={setConfirmPassword}
               iconSource={require('../../assets/Icons/lock.png')}
