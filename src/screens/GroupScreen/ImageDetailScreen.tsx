@@ -4,7 +4,7 @@ import {View,Text,Dimensions,Animated,TouchableOpacity,} from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import ImageZoom from 'react-native-image-pan-zoom';
 import { styles } from './ImageDetailScreen.styles';
-
+import { useNavigation } from '@react-navigation/native';
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 
@@ -26,12 +26,14 @@ Animated.timing(scale, {
     useNativeDriver: true,
 }).start();
 };
-
+    const navigation = useNavigation();
     return (
         <View style={styles.mainContainer}>
             {/* Header */}
             <View style={styles.rectangle}>
-                <Feather name="chevron-left" size={28} color="white" />
+                <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <Feather name="chevron-left" size={28} color="white" />
+                </TouchableOpacity>
                 <Text style={styles.pictures}>Pictures</Text>
 
                 <View style={styles.flexRowDd}>

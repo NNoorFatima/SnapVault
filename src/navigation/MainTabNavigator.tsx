@@ -7,15 +7,20 @@ import UserProfile from '../screens/UserProfile/UserProfile';
 import EditProfile from '../screens/UserProfile/EditProfile';
 import GroupScreen from '../screens/GroupScreen/GroupScreen';
 import AllGroupsScreen from '../screens/AllGroups/AllGroupsScreen';
-import ImageDetailScreen from '../screens/GroupScreen/ImageDetailScreen';
+// import ImageDetailScreen from '../screens/GroupScreen/ImageDetailScreen';
 import Icon from 'react-native-vector-icons/Ionicons';
+
+
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import ImageDetailScreen from '../screens/GroupScreen/ImageDetailScreen'; // Adjust the path if needed
+const Stack = createNativeStackNavigator();
+
 
 export type MainTabParamList = {
   Dashboard: undefined;
   ContactUs: undefined;
   Profile: undefined;
   EditProfile: undefined;
-  ImageDetail:undefined;
   GroupScreen: {
     groupId: number;
     groupName: string;
@@ -103,10 +108,34 @@ const MainTabNavigator = () => (
     <Tab.Screen name="Dashboard" component={DashboardScreen} />
     <Tab.Screen name="AllGroups" component={AllGroupsScreen} initialParams={{}} />
     <Tab.Screen name="Profile" component={UserProfile} />
-    <Tab.Screen name="ImageDetail" component={ImageDetailScreen} />
     <Tab.Screen name="EditProfile" component={EditProfile} options={{ tabBarButton: () => null }} />
-    <Tab.Screen name="GroupScreen" component={GroupScreen} options={{ tabBarButton: () => null }} />
+    <Tab.Screen name="GroupScreen" component={GroupScreenStack} options={{ tabBarButton: () => null }} />
   </Tab.Navigator>
 );
 
 export default MainTabNavigator;
+
+
+//creating stack for Group screen
+const GroupScreenStack = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="GroupScreen"
+        component={GroupScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ImageDetail"
+        component={ImageDetailScreen}
+        options={{
+          headerShown: false,
+          // title: 'Image Preview',
+          // headerStyle: styles.modalHeader,
+          // headerTitleStyle: styles.modalHeaderTitle,
+          headerBackTitle: 'Back',
+        }}
+      />
+    </Stack.Navigator>
+  );
+};
