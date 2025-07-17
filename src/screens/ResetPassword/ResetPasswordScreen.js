@@ -13,12 +13,13 @@ import {
 import CustomBox from '../../components/CustomBox';
 import CustomButton from '../../components/CustomButton';
 import CustomTextField from '../../components/CustomTextField';
+import { useTranslation } from 'react-i18next';
 
 const { width, height } = Dimensions.get('window');
 
 const ResetPasswordScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
-
+  const {t} = useTranslation();
   return (
     <SafeAreaView style={styles.safeArea}>
       <ImageBackground
@@ -51,13 +52,13 @@ const ResetPasswordScreen = ({ navigation }) => {
             backgroundColor="rgba(255,255,255,0.85)"
             borderRadius={20}
           >
-            <Text style={styles.resetTitle}>Reset your password</Text>
+            <Text style={styles.resetTitle}>{t('ResetPassword.message')}</Text>
             <Text style={styles.resetDescription}>
-              Enter your email address and we'll send you instructions to reset your password.
+              {t('ResetPassword.emailMsg')}
             </Text>
             <CustomTextField
-              label="Email Address"
-              placeholder="Enter your email"
+              label={t('ResetPassword.emailAddress')}
+              placeholder={t('ResetPassword.emailPlaceholder')}
               width={"100%"}
               height={60}
               fontSize={18}
@@ -73,7 +74,7 @@ const ResetPasswordScreen = ({ navigation }) => {
 
             
           <CustomButton
-              buttonText="Send Instructions"
+              buttonText={t('ResetPassword.instructions')}
               backgroundColor="#6BDCE1"
               width={80}
               height={45}

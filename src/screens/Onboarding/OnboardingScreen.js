@@ -1,34 +1,30 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-  ImageBackground,
-  SafeAreaView,
-  Image,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet,Dimensions, ImageBackground, 
+  SafeAreaView, Image, TouchableOpacity} from 'react-native';
 import CustomBox from '../../components/CustomBox';
-
-
+import { useTranslation } from 'react-i18next';
+import { I18nManager } from 'react-native';
 const { width, height } = Dimensions.get('window');
 
 const OnboardingScreen = ({ onFinish }) => {
   // Responsive vertical position for the info box
-  // Place the box a bit further down (increase bottom value)
-  const boxBottom = height * 0.07; // 7% from bottom
+  // Keep the box a bit down
+  const boxBottom = height * 0.05; // 5% from bottom
   const boxHeight = height * 0.28; // 28% of screen height
-  // Place the button at the bottom of the info box, with a slightly larger margin
-  const buttonOffset = boxHeight * 0.20; // 20% of box height below the box (was 16%)
-
+  // Position the continue button so it's half inside and half outside the box (touching the box)
+  const buttonOffset = -34; // Half of button height (54/2), so it sits half in/half out
+  const { t } = useTranslation();
   return (
     <SafeAreaView style={styles.safeArea}>
       <ImageBackground
-        source={require('../../assets/Images/onboarding.jpg')}
+        source={require('../../assets/Images/onboard.jpg')}
         style={styles.background}
         resizeMode="cover"
       >
+        {/* Centered title heading */}
+        <View style={styles.centerTitleWrapper}>
+          <Text style={styles.centerTitle}>{t('Onboarding.description')}</Text>
+        </View>
         {/* Main overlay/title can go here if needed */}
         <CustomBox
           style={[
@@ -43,9 +39,8 @@ const OnboardingScreen = ({ onFinish }) => {
           backgroundColor="rgba(255,255,255,0.85)"
           borderRadius={20}
         >
-          <Text style={styles.onboardBoxText}>SnapVault is an AI-powered photo-sharing app that uses facial recognition to automatically detect and sort images.
-SnapVault simplifies sharing, protects privacy, and makes sure no memory gets lost.</Text>
-          <View style={[styles.bottomCircleWrapperAbsolute, { bottom: -buttonOffset }]}> 
+          <Text style={styles.onboardBoxText}>{t('Onboarding.details')}</Text>
+          <View style={[styles.bottomCircleWrapperAbsolute, { bottom: buttonOffset }]}> 
             <TouchableOpacity onPress={onFinish}>
               <View style={styles.bottomCircle}>
                 <Image
@@ -112,9 +107,9 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   bottomCircle: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
+    width: 54, // was 70
+    height: 54, // was 70
+    borderRadius: 27, // was 35
     backgroundColor: '#18214C',
     alignItems: 'center',
     justifyContent: 'center',
@@ -125,8 +120,9 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   circleIcon: {
-    width: 70,
-    height: 70,
+    transform: [{ scaleX: I18nManager.isRTL ? -1 : 1 }],
+    width: 54, // was 70
+    height: 54, // was 70
     tintColor: '#fff',
   },
   container: {
@@ -174,6 +170,27 @@ const styles = StyleSheet.create({
     width: '100%',
     marginTop: 25,
     fontWeight: 'bold'
+  },
+  // Add styles for the centered title
+  centerTitleWrapper: {
+    position: 'absolute',
+    top: height * 0.5 - 30, // Vertically center the title (subtract half the font size for better centering)
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  centerTitle: {
+    fontSize: 40,
+    color: '#fff',
+    fontWeight: 'bold',
+    textAlign: 'left', // Left align the text
+    alignSelf: 'flex-start', // Ensure left alignment within the wrapper
+    width: '90%', // Prevent overflow and keep it visually balanced
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+    paddingHorizontal: 20,
   },
 });
 

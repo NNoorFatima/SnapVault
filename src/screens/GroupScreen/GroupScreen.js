@@ -1,17 +1,14 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-  ScrollView,
-  ImageBackground,
-  Alert,
-  Platform,
-} from 'react-native';
+import {View, Text, Image, TouchableOpacity, StyleSheet,
+  Dimensions, ScrollView, ImageBackground, Alert, Platform, } from 'react-native';
+// @ts-ignore
+import Feather from 'react-native-vector-icons/Feather'; //for icons
+import { I18nManager } from 'react-native';
+
+
+
+
 // Import clipboard with fallback
 let Clipboard;
 try {
@@ -100,17 +97,33 @@ const GroupScreen = ({ route, navigation }) => {
     return (
       <View style={styles.imageGrid}>
         {images.map((image) => (
-          <View key={image.id} style={styles.imageWrapper}>
+          // <View key={image.id} style={styles.imageWrapper}>
+            <TouchableOpacity
+                      key={image.id}
+                      style={styles.imageWrapper}
+                      onPress={() =>
+                        navigation.navigate('ImageDetail', {
+                          imageUri: image.uri,
+                          uploadedBy: image.uploadedBy,
+                          date: image.date,
+                          id: image.id,
+                        })
+                      }
+                    >
+
             <Image source={{ uri: image.uri }} style={styles.gridImage} />
             <View style={styles.imageInfo}>
               <Text style={styles.imageUploader}>{image.uploadedBy}</Text>
               <Text style={styles.imageDate}>{image.date}</Text>
             </View>
-          </View>
+            {/* </View> */}
+          </TouchableOpacity>
+
         ))}
       </View>
     );
   };
+  const isRTL = I18nManager.isRTL;
   
   return (
     <View style={styles.container}>
@@ -129,7 +142,7 @@ const GroupScreen = ({ route, navigation }) => {
               style={styles.backButton}
               onPress={() => navigation.goBack()}
             >
-              <Text style={styles.backButtonText}>←</Text>
+              <Feather name={isRTL ? 'chevron-right' : 'chevron-left'} size={24} color="white" />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>{t('GroupScreen.details')}</Text>
             <View style={styles.placeholder} />
@@ -159,7 +172,7 @@ const GroupScreen = ({ route, navigation }) => {
                 <View style={styles.groupCodeBox}>
                   <Text style={styles.groupCodeText}>{groupCode}</Text>
                   <TouchableOpacity style={styles.copyButton} onPress={handleCopyGroupCode}>
-                    <Text style={styles.copyButtonText}>📋</Text>
+                    <Feather name="copy" size={24} color="white" style={styles.copyButtonText} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -168,7 +181,7 @@ const GroupScreen = ({ route, navigation }) => {
                 style={styles.uploadButton}
                 onPress={handleImageUpload}
               >
-                <Text style={styles.uploadButtonIcon}>📷</Text>
+                <Feather name="camera" size={24} color="white" style={styles.uploadButtonIcon} />
                 <Text style={styles.uploadButtonText}>{t('GroupScreen.uploadImage')}</Text>
               </TouchableOpacity>
             </View>
@@ -201,7 +214,7 @@ const GroupScreen = ({ route, navigation }) => {
                 renderImageGrid(myPictures)
               ) : (
                 <View style={styles.emptyState}>
-                  <Text style={styles.emptyStateIcon}>📸</Text>
+                  <Feather name="camera" size={48} color="#9CA3AF" style={styles.emptyStateIcon} />
                   <Text style={styles.emptyStateTitle}>{t('GroupScreen.noPics')}</Text>
                   <Text style={styles.emptyStateText}>
                     {t('GroupScreen.desc')}
@@ -238,7 +251,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   statusBarSpacer: {
-    height: 50,
+    height: 5,
   },
 
   // Header Styles
@@ -331,7 +344,7 @@ const styles = StyleSheet.create({
   groupCodeBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1F2937',
+    backgroundColor: '#000000',
     borderRadius: 12,
     padding: 12,
     borderWidth: 1,
@@ -377,7 +390,7 @@ const styles = StyleSheet.create({
   // Tabs Styles
   tabsContainer: {
     flexDirection: 'row',
-    backgroundColor: '#1F2937',
+    backgroundColor: '#000000',
     borderRadius: 16,
     padding: 4,
     marginBottom: 24,
@@ -395,7 +408,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#6366F1',
   },
   tabText: {
-    color: '#9CA3AF',
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
   },

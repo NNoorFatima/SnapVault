@@ -19,9 +19,7 @@ import CustomButton from '../../components/CustomButton';
 import { useTranslation } from 'react-i18next';
 import i18n from '../../localization/i18n';
 import { changeAppLanguage } from '../../localization/i18n';
-import ProfileOption from '../../components/ProfileOption';
-// @ts-ignore
-import Feather from 'react-native-vector-icons/Feather';
+
 
 const { width, height } = Dimensions.get('window');
 
@@ -29,6 +27,7 @@ const SignInScreen = ({ navigation, onSignIn }) => {
   const {t} = useTranslation();
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [showPassword, setShowPassword] = React.useState(false);
   return (
     <SafeAreaView style={styles.safeArea}>
       <ImageBackground
@@ -59,7 +58,7 @@ const SignInScreen = ({ navigation, onSignIn }) => {
                 iconSource={require('../../assets/Icons/email.png')}
                 inputTextColor="#fff"
                 labelColor="#FFFFFF"
-                placeholderColor="#6BDCE1"
+                placeholderColor="#FFFFFF"
                 height={55}
                 fontSize={20}
                 style={{ marginBottom: 16, borderRadius: 10 }}
@@ -72,23 +71,27 @@ const SignInScreen = ({ navigation, onSignIn }) => {
                 iconSource={require('../../assets/Icons/lock.png')}
                 inputTextColor="#fff"
                 labelColor="#FFFFFF"
-                placeholderColor="#6BDCE1"
+                placeholderColor="#FFFFFF"
                 secureTextEntry
                 height={55}
                 fontSize={20}
                 style={{ marginBottom: 8, borderRadius: 10 }}
+                showVisibilityIcon={true}
+                isPassword={true}
+                isPasswordVisible={showPassword}
+                onToggleVisibility={() => setShowPassword(!showPassword)}
               />
               <View style={styles.forgotWrapperBox}>
                 <ClickableText
                   text={t('SignIn.forgot')}
-                  color="#73DBE5"
+                  color="#FFFFFF"
                   fontSize={16}
                   onPress={() => navigation.navigate('ForgetPassword')}
                 />
               </View>
               <CustomButton
                 buttonText={t('Button.signIn')}
-                backgroundColor="#73DBE5"
+                backgroundColor="#aedde1ff"
                 width="100%"
                 height={50}
                 textColor="#1B1C41"

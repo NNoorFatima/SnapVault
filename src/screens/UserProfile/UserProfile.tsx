@@ -5,30 +5,36 @@ import ProfileBottomOptions from '../../components/ProfileBottomOptions';
 import BackgroundImage from '../../assets/UserProfileBackground';
 const UserProfile = () => (
 
-    <ScrollView style={styles.container}>
+   <ScrollView
+  style={styles.container}
+  contentContainerStyle={styles.contentContainer}
+>
       <BackgroundImage />
       <UserCard 
-        name="Muhammad Waleed"
+        name="Monkey D. Luffy"
         phone="123-456-7890" 
-        email="waleed@example.com" 
+        email="luffy@strawhat.com" 
         // avatar="https://randomuser.me/api/portraits/men/1.jpg" 
-        avatar={require('./img/person-icon.png')}
+        avatar={require('../../assets/temp-pfp.jpg')}
       />
     
       <ProfileBottomOptions />
-    {/* Add <BottomActions /> and modal later */}
     </ScrollView>
-  // </LinearGradient>
 )
 
 
 export default UserProfile; 
 
 const styles = StyleSheet.create({
-  container: 
-  {
+  container: {
     flex: 1,
     backgroundColor: 'transparent',
-  }
+  },
+  contentContainer: {
+    flexGrow: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    // paddingVertical: 40,
+  },
 
 });

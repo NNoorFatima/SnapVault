@@ -1,55 +1,76 @@
 // screens/ContactUs/ContactUs.tsx
-import React from 'react';
-import { View, Text, ScrollView, StyleSheet, Alert } from 'react-native';
+import React, { useState } from 'react'; // Import useState
+import { View, Text, ScrollView, StyleSheet } from 'react-native'; // Removed Alert
 import { useNavigation } from '@react-navigation/native';
 import ContactHeader from '../../components/ContactHeader';
 import ContactCard from '../../components/ContactCard';
 import SocialMediaCard from '../../components/SocialMediaCard';
 //for localization
 import { useTranslation } from 'react-i18next';
+import CustomAlertModal from '../../components/CustomAlertModal'; // Import your custom alert modal
+// @ts-ignore
+import Feather from 'react-native-vector-icons/Feather'; //for icons
 
 const ContactUs: React.FC = () => {
   //for localization
   const { t } = useTranslation();
-
   const navigation = useNavigation();
+
+  // State for managing the custom alert modal's visibility and content
+  const [isAlertVisible, setIsAlertVisible] = useState(false);
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+
+  // Function to show the custom alert
+  const showAlert = (title: string, message: string) => {
+    setAlertTitle(title);
+    setAlertMessage(message);
+    setIsAlertVisible(true);
+  };
+
+  // Function to hide the custom alert
+  const hideAlert = () => {
+    setIsAlertVisible(false);
+    setAlertTitle('');
+    setAlertMessage('');
+  };
 
   const handleBackPress = () => {
     navigation.goBack();
   };
 
   const handleChatPress = () => {
-    Alert.alert(t('ContactUs.chat'), t('ContactUs.chatMsg'));
+    showAlert(t('ContactUs.chat'), t('ContactUs.chatMsg'));
   };
 
   const handleCallPress = () => {
-    Alert.alert(t('ContactUs.call'), t('ContactUs.callMsg'));
+    showAlert(t('ContactUs.call'), t('ContactUs.callMsg'));
   };
 
   const handleEmailPress = () => {
-    Alert.alert(t('ContactUs.email'), t('ContactUs.emailMsg'));
+    showAlert(t('ContactUs.email'), t('ContactUs.emailMsg'));
   };
 
   const handleSocialPress = (platformKey: string) => {
-  const platformName = t(`platforms.${platformKey}`);
-  Alert.alert(
-    t('ContactUs.social'),
-    t('ContactUs.socialMsg', { platform: platformName })
-  );
-};
+    const platformName = t(`platforms.${platformKey}`);
+    showAlert(
+      t('ContactUs.social'),
+      t('ContactUs.socialMsg', { platform: platformName })
+    );
+  };
 
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        <View style={styles.phoneContainer}>
-          <ContactHeader onBackPress={handleBackPress} />
-          
+        <View style={styles.phoneContainer}> 
+
+          <ContactHeader/>
           {/* Action Cards */}
           <View style={styles.actionCardsContainer}>
             <ContactCard
               title={t('ContactUs.chat')}
               description={t('ContactUs.chatDes')}
-              icon={<Text style={styles.cardIcon}>💬</Text>}
+              icon={<Feather name="message-square" size={24} color="white" />}
               backgroundColor="#950091"
               iconBackgroundColor="#b134a6"
               onPress={handleChatPress}
@@ -58,7 +79,7 @@ const ContactUs: React.FC = () => {
             <ContactCard
               title={t('ContactUs.call')}
               description={t('ContactUs.callDes')}
-              icon={<Text style={styles.cardIcon}>📞</Text>}
+              icon={<Feather name="phone-call" size={24} color="white"  />}
               backgroundColor="#5000a9"
               iconBackgroundColor="#5000a9"
               onPress={handleCallPress}
@@ -67,8 +88,8 @@ const ContactUs: React.FC = () => {
             <ContactCard
               title={t('ContactUs.email')}
               description={t('ContactUs.emailDes')}
-              icon={<Text style={styles.cardIcon}>✉️</Text>}
-              backgroundColor="#303f45"
+              icon={<Feather name="mail" size={24} color="white"  />}
+              backgroundColor="#1c2b38"
               iconBackgroundColor="#303f45"
               onPress={handleEmailPress}
             />
@@ -80,33 +101,42 @@ const ContactUs: React.FC = () => {
             <View style={styles.socialMediaContainer}>
               <SocialMediaCard
                 title={t('platforms.twitter')}
-                icon={<Text style={styles.socialIcon}>🐦</Text>}
+                icon={<Feather name="twitter" size={24} color="teal"  />}
                 onPress={() => handleSocialPress('twitter')}
               />
               
               <SocialMediaCard
                 title={t('platforms.instagram')}
-                icon={<Text style={styles.socialIcon}>📷</Text>}
+                icon={<Feather name="instagram" size={24} color="darkpink"  />}
                 onPress={() => handleSocialPress('instagram')}
               />
               
               <SocialMediaCard
                 title={t('platforms.facebook')}
-                icon={<Text style={styles.socialIcon}>👥</Text>}
+                icon={<Feather name="facebook" size={24} color="blue"  />}
                 onPress={() => handleSocialPress('facebook')}
               />
             </View>
           </View>
         </View>
       </ScrollView>
+
+      {/* Custom Alert Modal */}
+      <CustomAlertModal
+        visible={isAlertVisible}
+        title={alertTitle}
+        message={alertMessage}
+        onClose={hideAlert}
+      />
     </View>
   );
 };
- 
+  
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000', 
+    backgroundColor: '#000',
+    // paddingBottom: 55,
   },
   scrollView: {
     flex: 1,
@@ -115,10 +145,8 @@ const styles = StyleSheet.create({
     flex: 1,
     maxWidth: 400,
     alignSelf: 'center',
-    width: '100%', 
-    borderRadius: 24,
-    overflow: 'hidden',
-    margin: 16,
+    width: '100%',    
+    overflow: 'hidden', 
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -130,9 +158,9 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   socialMediaSection: {
-    backgroundColor: '#f3f4f6',
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32, 
+    backgroundColor: '#eae5e0', 
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
     padding: 16,
     paddingTop: 32,
   },
@@ -145,13 +173,13 @@ const styles = StyleSheet.create({
   socialMediaContainer: {
     gap: 12,
   },
-  cardIcon: {
-    fontSize: 20,
-    color: 'white',
-  },
-  socialIcon: {
-    fontSize: 16,
-  },
+  // cardIcon: {
+  //   // fontSize: 20,
+  //   color: 'white',
+  // },
+  // socialIcon: {
+  //   fontSize: 16,
+  // },
 });
 
 export default ContactUs;

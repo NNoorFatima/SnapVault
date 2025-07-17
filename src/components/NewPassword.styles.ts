@@ -4,16 +4,19 @@ import { I18nManager } from 'react-native';
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
+        
         backgroundColor: 'rgba(0,0,0,0.6)',
         justifyContent: 'center',
         alignItems: 'center',
     },
     container: {
-        padding: 30,
+        padding: 20, // reduced padding
+
         backgroundColor: '#1F1F51',
         borderRadius: 20,
-        marginTop: '50%', // vertical center approx
-        width: '80%',
+        // marginTop: 50, // add space below SnapVault text
+        width: '80%', // reduce width
+        height: '60%',
     },
     title: {
         fontSize: 18,
@@ -36,23 +39,32 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row',
-        justifyContent: 'flex-end',
+        // justifyContent: 'flex-end',
+        justifyContent: 'space-evenly',
         marginTop: 10,
-        gap: 43
+        
+        // gap: '10%'
     },
     updateButton: {
         backgroundColor: '#73DBE5',
         paddingVertical: 8,
         paddingHorizontal: 16,
         borderRadius: 6,
-        marginEnd: 10,
+        // marginEnd: 10,
     },
     cancelButton: {
         paddingVertical: 8,
         paddingHorizontal: 16,
         borderRadius: 6,
-        marginLeft: 10,
+        // marginLeft: 10,
         backgroundColor: '#D7EDEF',
+    },
+    snapVaultText: {
+        fontSize: 22,
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginBottom: 4,
     },
 
 });

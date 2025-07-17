@@ -1,9 +1,9 @@
+import facesReducer from './slices/facesSlice';
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './slices/authSlice';
 import profileReducer from './slices/profileSlice';
 import groupsReducer from './slices/groupsSlice';
 import photosReducer from './slices/photosSlice';
-import facesReducer from './slices/facesSlice';
 
 const store = configureStore({
   reducer: {
@@ -11,7 +11,7 @@ const store = configureStore({
     profile: profileReducer,
     groups: groupsReducer,
     photos: photosReducer,
-    faces: facesReducer
+    faces: facesReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
