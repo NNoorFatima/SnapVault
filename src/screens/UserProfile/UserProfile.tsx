@@ -38,12 +38,38 @@ const UserProfile = () => {
       
       if (profile.profile_picture) {
         try {
-          // Try to load the profile picture from the backend
-          avatarSource = { uri: `${apiConfig.getBaseURL()}${profile.profile_picture}` };
+          console.log('Profile picture path:', profile.profile_picture);
+          
+          // Check if the path already starts with /uploads
+          let imagePath = profile.profile_picture;
+          if (!imagePath.startsWith('/uploads')) {
+            // If it's a relative path like "uploads/profile_pictures/...", convert it
+            if (imagePath.startsWith('uploads/')) {
+              imagePath = '/' + imagePath;
+            } else {
+              // If it's just a filename, assume it's in profile_pictures
+              imagePath = `/uploads/profile_pictures/${imagePath}`;
+            }
+          }
+          
+          const fullImageUrl = `${apiConfig.getBaseURL()}${imagePath}`;
+          console.log('Full image URL:', fullImageUrl);
+          
+          // Test if the image URL is accessible
+          const testResponse = await fetch(fullImageUrl, { method: 'HEAD' });
+          if (testResponse.ok) {
+            console.log('✅ Profile picture URL is accessible');
+            avatarSource = { uri: fullImageUrl };
+          } else {
+            console.log('❌ Profile picture URL returned status:', testResponse.status);
+            avatarSource = require('../../assets/temp-pfp.jpg');
+          }
         } catch (error) {
           console.log('Failed to load profile picture, using fallback:', error);
           avatarSource = require('../../assets/temp-pfp.jpg');
         }
+      } else {
+        console.log('No profile picture found, using fallback');
       }
       
       setUserProfile({
