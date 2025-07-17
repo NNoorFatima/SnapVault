@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Dimensions, FlatList, ListRenderItem } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, Dimensions, FlatList, ListRenderItem, Alert } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import Toast from 'react-native-toast-message';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
@@ -11,6 +11,8 @@ import StatsSection from '../../components/StatsSection';
 import GroupsSection from '../../components/GroupsSection';
 import CreateGroupPopup from '../../components/CreateGroupPopup';
 import JoinGroupPopup from '../../components/JoinGroupPopup';
+import { profileService } from '../../api/services/ProfileService';
+import { apiConfig } from '../../api/config/ApiConfig';
 
 type DashboardScreenNavigationProp = BottomTabNavigationProp<MainTabParamList, 'Dashboard'>;
 
@@ -24,12 +26,107 @@ interface DashboardSection {
   data?: any;
 }
 
+interface UserProfileData {
+  name?: string;
+  phone?: string;
+  email?: string;
+  profile_picture?: string;
+}
+
 const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
   // State for popups
   const [showCreateGroupPopup, setShowCreateGroupPopup] = useState(false);
   const [showJoinGroupPopup, setShowJoinGroupPopup] = useState(false);
+  const [userProfile, setUserProfile] = useState({
+    name: 'User',
+    userImage: require('../../assets/temp-pfp.jpg')
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  
   //for localization
   const { t } = useTranslation();
+
+  useEffect(() => {
+    fetchUserProfile();
+  }, []);
+
+  const fetchUserProfile = async () => {
+    try {
+      setIsLoading(true);
+      const profile: UserProfileData = await profileService.getProfile();
+      
+      console.log('Fetched user profile for dashboard:', profile);
+      
+      // Handle profile picture with fallback
+      let userImage = require('../../assets/temp-pfp.jpg');
+      
+      if (profile.profile_picture) {
+        try {
+          console.log('Profile picture path:', profile.profile_picture);
+          
+          // Normalize the path - convert Windows backslashes to forward slashes
+          let imagePath = profile.profile_picture.replace(/\\/g, '/');
+          console.log('Normalized imagePath:', imagePath);
+          
+          // Check if the path already starts with /uploads
+          if (!imagePath.startsWith('/uploads')) {
+            // If it's a relative path like "uploads/profile_pictures/...", convert it
+            if (imagePath.startsWith('uploads/')) {
+              imagePath = '/' + imagePath;
+              console.log('Converted uploads/ path to:', imagePath);
+            } else {
+              // If it's just a filename, assume it's in profile_pictures
+              imagePath = `/uploads/profile_pictures/${imagePath}`;
+              console.log('Converted filename to:', imagePath);
+            }
+          }
+          
+          const baseURL = apiConfig.getBaseURL();
+          console.log('Base URL:', baseURL);
+          const fullImageUrl = `${baseURL}${imagePath}`;
+          console.log('Full image URL:', fullImageUrl);
+          
+          // Test if the image URL is accessible
+          console.log('Testing URL accessibility...');
+          const testResponse = await fetch(fullImageUrl, { method: 'HEAD' });
+          console.log('Response status:', testResponse.status);
+          console.log('Response headers:', testResponse.headers);
+          
+          if (testResponse.ok) {
+            console.log('✅ Profile picture URL is accessible');
+            userImage = { uri: fullImageUrl };
+          } else {
+            console.log('❌ Profile picture URL returned status:', testResponse.status);
+            console.log('Response text:', await testResponse.text());
+            userImage = require('../../assets/temp-pfp.jpg');
+          }
+        } catch (error) {
+          console.log('❌ Error during profile picture processing:', error);
+          console.log('Error details:', error instanceof Error ? error.message : String(error));
+          userImage = require('../../assets/temp-pfp.jpg');
+        }
+      } else {
+        console.log('No profile picture found, using fallback');
+      }
+      
+      setUserProfile({
+        name: profile.name || 'User',
+        userImage: userImage
+      });
+      
+    } catch (error) {
+      console.error('Failed to fetch user profile for dashboard:', error);
+      Alert.alert('Error', 'Failed to load user profile. Using default data.');
+      
+      // Set default data on error
+      setUserProfile({
+        name: 'User',
+        userImage: require('../../assets/temp-pfp.jpg')
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Mock data - in a real app, this would come from state management or API
   const groupsData = [
@@ -161,8 +258,8 @@ const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
         return (
           <DashboardHeader
             navigation={navigation}
-            userName="Monkey D. Luffy"
-            userImage={require('../../assets/temp-pfp.jpg')}
+            userName={userProfile.name}
+            userImage={userProfile.userImage}
           />
         );
       

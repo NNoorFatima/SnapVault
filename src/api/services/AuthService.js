@@ -45,7 +45,7 @@ class AuthService extends BaseService {
       
       // Store authentication data
       if (response.access_token) {
-        await this.tokenManager.storeAuthData(response);
+      await this.tokenManager.storeAuthData(response);
       }
       
       return this.transformResponse(response);

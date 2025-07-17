@@ -36,9 +36,9 @@ const CustomButton = ({
       {isLoading ? (
         <ActivityIndicator size="small" color={textColor} />
       ) : (
-        <Text style={{ color: textColor, fontSize, fontWeight: 'bold' }}>
-          {buttonText}
-        </Text>
+      <Text style={{ color: textColor, fontSize, fontWeight: 'bold' }}>
+        {buttonText}
+      </Text>
       )}
     </TouchableOpacity>
   );

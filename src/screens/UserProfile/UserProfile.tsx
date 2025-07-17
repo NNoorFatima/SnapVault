@@ -38,39 +38,57 @@ const UserProfile = () => {
       
       if (profile.profile_picture) {
         try {
-          console.log('Profile picture path:', profile.profile_picture);
+          console.log('=== PROFILE PICTURE DEBUG ===');
+          console.log('Original profile_picture:', profile.profile_picture);
+          console.log('Type of profile_picture:', typeof profile.profile_picture);
+          
+          // Normalize the path - convert Windows backslashes to forward slashes
+          let imagePath = profile.profile_picture.replace(/\\/g, '/');
+          console.log('Normalized imagePath:', imagePath);
           
           // Check if the path already starts with /uploads
-          let imagePath = profile.profile_picture;
           if (!imagePath.startsWith('/uploads')) {
             // If it's a relative path like "uploads/profile_pictures/...", convert it
             if (imagePath.startsWith('uploads/')) {
               imagePath = '/' + imagePath;
+              console.log('Converted uploads/ path to:', imagePath);
             } else {
               // If it's just a filename, assume it's in profile_pictures
               imagePath = `/uploads/profile_pictures/${imagePath}`;
+              console.log('Converted filename to:', imagePath);
             }
           }
           
-          const fullImageUrl = `${apiConfig.getBaseURL()}${imagePath}`;
+          const baseURL = apiConfig.getBaseURL();
+          console.log('Base URL:', baseURL);
+          const fullImageUrl = `${baseURL}${imagePath}`;
           console.log('Full image URL:', fullImageUrl);
           
           // Test if the image URL is accessible
+          console.log('Testing URL accessibility...');
           const testResponse = await fetch(fullImageUrl, { method: 'HEAD' });
+          console.log('Response status:', testResponse.status);
+          console.log('Response headers:', testResponse.headers);
+          
           if (testResponse.ok) {
             console.log('✅ Profile picture URL is accessible');
             avatarSource = { uri: fullImageUrl };
           } else {
             console.log('❌ Profile picture URL returned status:', testResponse.status);
+            console.log('Response text:', await testResponse.text());
             avatarSource = require('../../assets/temp-pfp.jpg');
           }
         } catch (error) {
-          console.log('Failed to load profile picture, using fallback:', error);
+          console.log('❌ Error during profile picture processing:', error);
+          console.log('Error details:', error instanceof Error ? error.message : String(error));
           avatarSource = require('../../assets/temp-pfp.jpg');
         }
       } else {
-        console.log('No profile picture found, using fallback');
+        console.log('No profile picture found in response, using fallback');
       }
+      
+      console.log('Final avatarSource:', avatarSource);
+      console.log('=== END PROFILE PICTURE DEBUG ===');
       
       setUserProfile({
         name: profile.name || 'User',
