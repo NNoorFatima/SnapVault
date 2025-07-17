@@ -44,7 +44,7 @@ const ResetPasswordScreen = ({ navigation }) => {
               style={styles.logo}
               resizeMode="contain"
             />
-            <Text style={styles.snapvaultTitle}>SnapVault</Text>
+           
           </View>
 
           <CustomBox
