@@ -48,7 +48,7 @@ const API_ENDPOINTS = {
     RESET_PASSWORD: '/supabase/auth/reset-password',
   },
   PROFILE: {
-    ME: '/supabase/user/profile/me',
+    ME: '/supabase/user/supabase_profile',
     UPDATE: '/supabase/user/profile/update',
     AVATAR: '/supabase/user/profile/avatar',
     CHANGE_PASSWORD: '/supabase/user/profile/change-password',
