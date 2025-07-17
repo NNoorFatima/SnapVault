@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, Dimensions } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, Dimensions, ActivityIndicator } from 'react-native';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -12,7 +12,9 @@ const CustomButton = ({
   fontSize = 16,
   borderRadius = 20,
   onPress = () => {},
-  style = {}
+  style = {},
+  isLoading = false,
+  disabled = false
 }) => {
   return (
     <TouchableOpacity
@@ -23,15 +25,21 @@ const CustomButton = ({
           width: typeof width === 'string' ? width : screenWidth * (width / 100),
           height,
           borderRadius,
+          opacity: (isLoading || disabled) ? 0.6 : 1,
         },
         style
       ]}
       activeOpacity={0.8}
       onPress={onPress}
+      disabled={isLoading || disabled}
     >
-      <Text style={{ color: textColor, fontSize, fontWeight: 'bold' }}>
-        {buttonText}
-      </Text>
+      {isLoading ? (
+        <ActivityIndicator size="small" color={textColor} />
+      ) : (
+        <Text style={{ color: textColor, fontSize, fontWeight: 'bold' }}>
+          {buttonText}
+        </Text>
+      )}
     </TouchableOpacity>
   );
 };

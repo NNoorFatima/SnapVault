@@ -10,6 +10,7 @@ import {
   StatusBar,
   Image,
   ScrollView,
+  Alert,
 } from 'react-native';
 import CustomBox from '../../components/CustomBox';
 import CustomTextField from '../../components/CustomTextField';
@@ -19,7 +20,7 @@ import CustomButton from '../../components/CustomButton';
 import { useTranslation } from 'react-i18next';
 import i18n from '../../localization/i18n';
 import { changeAppLanguage } from '../../localization/i18n';
-
+import { authService } from '../../api/services/AuthService';
 
 const { width, height } = Dimensions.get('window');
 
@@ -28,6 +29,49 @@ const SignInScreen = ({ navigation, onSignIn }) => {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [showPassword, setShowPassword] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  const handleSignIn = async () => {
+    if (!email.trim() || !password.trim()) {
+      Alert.alert('Error', 'Please enter both email and password');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      console.log('Starting login process...');
+      const response = await authService.login({
+        email: email.trim(),
+        password: password
+      });
+      
+      console.log('Login successful:', response);
+      
+      // Call the onSignIn callback if provided
+      if (onSignIn) {
+        onSignIn(response);
+      } else {
+        // Navigate to main app
+        navigation.navigate('Dashboard');
+      }
+      
+      Alert.alert('Success', 'Login successful!');
+      
+    } catch (error) {
+      console.error('Login failed:', error);
+      let errorMessage = 'Login failed. Please try again.';
+      
+      if (error.response?.data?.detail) {
+        errorMessage = error.response.data.detail;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      Alert.alert('Login Error', errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <SafeAreaView style={styles.safeArea}>
       <ImageBackground
@@ -97,8 +141,9 @@ const SignInScreen = ({ navigation, onSignIn }) => {
                 textColor="#1B1C41"
                 fontSize={20}
                 borderRadius={20}
-                onPress={() => onSignIn && onSignIn()}
+                onPress={handleSignIn}
                 style={{ marginTop: 16 }}
+                isLoading={isLoading}
               />
               {/*change language  */}
               {/* <ProfileOption icon={<Feather name="globe" size={20} color="grey" />} label= {t('profile.changeLanguage')}

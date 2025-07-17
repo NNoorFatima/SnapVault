@@ -13,9 +13,11 @@
 import BaseService from './BaseService';
 import { tokenManager } from '../core/TokenManager';
 import { ERROR_TYPES } from '../config/ApiConfig';
+import { apiClient } from '../core/ApiClient';
+import { apiConfig } from '../config/ApiConfig';
 
 class AuthService extends BaseService {
-  constructor(client, config, tokenMgr = tokenManager) {
+  constructor(client = apiClient, config = apiConfig, tokenMgr = tokenManager) {
     super(client, config);
     this.tokenManager = tokenMgr;
   }
@@ -34,13 +36,21 @@ class AuthService extends BaseService {
       const url = this.buildUrl('AUTH', 'LOGIN');
       const transformedData = this.transformRequest(credentials);
       
+      console.log('Attempting login to:', url);
+      console.log('Login data:', { email: transformedData.email, password: '***' });
+      
       const response = await this.post(url, transformedData);
       
+      console.log('Login response received:', response);
+      
       // Store authentication data
-      await this.tokenManager.storeAuthData(response);
+      if (response.access_token) {
+        await this.tokenManager.storeAuthData(response);
+      }
       
       return this.transformResponse(response);
     } catch (error) {
+      console.error('Login error:', error);
       this.logError('Login failed', error);
       throw error;
     }
@@ -60,9 +70,23 @@ class AuthService extends BaseService {
       this.validateRequired(userData, ['email', 'password', 'name']);
       
       const url = this.buildUrl('AUTH', 'REGISTER');
-      const transformedData = this.transformRequest(userData);
       
-      const response = await this.post(url, transformedData);
+      // Create FormData for the simple registration endpoint
+      const formData = new FormData();
+      formData.append('name', userData.name);
+      formData.append('email', userData.email);
+      formData.append('password', userData.password);
+      
+      console.log('Attempting registration to:', url);
+      console.log('Registration data:', { name: userData.name, email: userData.email, password: '***' });
+      
+      const response = await this.post(url, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      console.log('Registration response received:', response);
       
       // Store authentication data if auto-login after registration
       if (response.access_token) {
@@ -71,6 +95,7 @@ class AuthService extends BaseService {
       
       return this.transformResponse(response);
     } catch (error) {
+      console.error('Registration error:', error);
       this.logError('Registration failed', error);
       throw error;
     }
