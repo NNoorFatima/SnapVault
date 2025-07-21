@@ -11,8 +11,7 @@ import StatsSection from '../../components/StatsSection';
 import GroupsSection from '../../components/GroupsSection';
 import CreateGroupPopup from '../../components/CreateGroupPopup';
 import JoinGroupPopup from '../../components/JoinGroupPopup';
-import { profileService } from '../../api/services/ProfileService';
-import { apiConfig } from '../../api/config/ApiConfig';
+import { getUserService } from '../../api/ApiFactory';
 
 type DashboardScreenNavigationProp = BottomTabNavigationProp<MainTabParamList, 'Dashboard'>;
 
@@ -53,7 +52,8 @@ const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
   const fetchUserProfile = async () => {
     try {
       setIsLoading(true);
-      const profile: UserProfileData = await profileService.getProfile();
+      const userService = getUserService();
+      const profile: UserProfileData = await userService.getProfile();
       
       console.log('Fetched user profile for dashboard:', profile);
       
@@ -81,7 +81,8 @@ const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
             }
           }
           
-          const baseURL = apiConfig.getBaseURL();
+          // Use the API config from the service
+          const baseURL = userService.config.getBaseURL();
           console.log('Base URL:', baseURL);
           const fullImageUrl = `${baseURL}${imagePath}`;
           console.log('Full image URL:', fullImageUrl);

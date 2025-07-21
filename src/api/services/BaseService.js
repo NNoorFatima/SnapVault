@@ -1,199 +1,201 @@
 /**
- * BaseService
- * Abstract base class for all API services
- * 
- * SOLID Principles Applied:
- * - Single Responsibility: Provides common functionality for all services
- * - Open/Closed: Easy to extend with new service methods
- * - Liskov Substitution: All services can be used interchangeably
- * - Interface Segregation: Provides only essential methods
- * - Dependency Inversion: Depends on abstractions, not concretions
+ * Base Service
+ * Abstract base class for all API services with common functionality
  */
 
-import { apiClient } from '../core/ApiClient';
-import { apiConfig } from '../config/ApiConfig';
+import { buildUrl } from '../config/ApiConfig';
 
 class BaseService {
-  constructor(client = apiClient, config = apiConfig) {
+  constructor(client, config, tokenManager) {
     this.client = client;
     this.config = config;
-    this.serviceName = this.constructor.name;
+    this.tokenManager = tokenManager;
   }
 
   /**
-   * Log service actions (useful for debugging)
+   * Build full URL from route with parameters
+   * @param {string} route - API route
+   * @param {Object} params - Path parameters
+   * @returns {string} Full URL
    */
-  log(message, data = null) {
-    if (__DEV__) {
-      console.log(`[${this.serviceName}] ${message}`, data || '');
-    }
-  }
-
-  /**
-   * Log service errors
-   */
-  logError(message, error) {
-    console.error(`[${this.serviceName}] ${message}`, error);
-  }
-
-  /**
-   * Build URL with path parameters
-   */
-  buildUrl(category, endpoint, params = {}) {
-    return this.config.buildUrl(category, endpoint, params);
-  }
-
-  /**
-   * GET request wrapper
-   */
-  async get(url, config = {}) {
-    try {
-      this.log(`GET ${url}`);
-      const response = await this.client.get(url, config);
-      this.log(`GET ${url} - Success`, response);
-      return response;
-    } catch (error) {
-      this.logError(`GET ${url} - Error`, error);
-      throw error;
-    }
-  }
-
-  /**
-   * POST request wrapper
-   */
-  async post(url, data = {}, config = {}) {
-    try {
-      this.log(`POST ${url}`, data);
-      const response = await this.client.post(url, data, config);
-      this.log(`POST ${url} - Success`, response);
-      return response;
-    } catch (error) {
-      this.logError(`POST ${url} - Error`, error);
-      throw error;
-    }
-  }
-
-  /**
-   * PUT request wrapper
-   */
-  async put(url, data = {}, config = {}) {
-    try {
-      this.log(`PUT ${url}`, data);
-      const response = await this.client.put(url, data, config);
-      this.log(`PUT ${url} - Success`, response);
-      return response;
-    } catch (error) {
-      this.logError(`PUT ${url} - Error`, error);
-      throw error;
-    }
-  }
-
-  /**
-   * PATCH request wrapper
-   */
-  async patch(url, data = {}, config = {}) {
-    try {
-      this.log(`PATCH ${url}`, data);
-      const response = await this.client.patch(url, data, config);
-      this.log(`PATCH ${url} - Success`, response);
-      return response;
-    } catch (error) {
-      this.logError(`PATCH ${url} - Error`, error);
-      throw error;
-    }
-  }
-
-  /**
-   * DELETE request wrapper
-   */
-  async delete(url, config = {}) {
-    try {
-      this.log(`DELETE ${url}`);
-      const response = await this.client.delete(url, config);
-      this.log(`DELETE ${url} - Success`, response);
-      return response;
-    } catch (error) {
-      this.logError(`DELETE ${url} - Error`, error);
-      throw error;
-    }
-  }
-
-  /**
-   * Upload file wrapper
-   */
-  async uploadFile(url, formData, onProgress = null) {
-    try {
-      this.log(`UPLOAD ${url}`);
-      const response = await this.client.uploadFile(url, formData, onProgress);
-      this.log(`UPLOAD ${url} - Success`, response);
-      return response;
-    } catch (error) {
-      this.logError(`UPLOAD ${url} - Error`, error);
-      throw error;
-    }
-  }
-
-  /**
-   * Download file wrapper
-   */
-  async downloadFile(url, onProgress = null) {
-    try {
-      this.log(`DOWNLOAD ${url}`);
-      const response = await this.client.downloadFile(url, onProgress);
-      this.log(`DOWNLOAD ${url} - Success`);
-      return response;
-    } catch (error) {
-      this.logError(`DOWNLOAD ${url} - Error`, error);
-      throw error;
-    }
-  }
-
-  /**
-   * Create cancel token
-   */
-  createCancelToken() {
-    return this.client.createCancelToken();
-  }
-
-  /**
-   * Cancel request
-   */
-  cancelRequest(cancelToken) {
-    this.client.cancelRequest(cancelToken);
+  buildUrl(route, params = {}) {
+    return buildUrl(this.config.getBaseURL(), route, params);
   }
 
   /**
    * Validate required parameters
+   * @param {Object} data - Data object to validate
+   * @param {Array} requiredFields - Array of required field names
+   * @throws {Error} If required fields are missing
    */
-  validateRequired(params, requiredFields) {
-    const missing = requiredFields.filter(field => 
-      params[field] === undefined || params[field] === null
-    );
-    
-    if (missing.length > 0) {
-      throw new Error(`Missing required parameters: ${missing.join(', ')}`);
+  validateRequired(data, requiredFields) {
+    const missingFields = requiredFields.filter(field => {
+      const value = data[field];
+      return value === undefined || value === null || value === '';
+    });
+
+    if (missingFields.length > 0) {
+      throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
     }
   }
 
   /**
-   * Transform data before sending (override in subclasses)
+   * Transform API response to standard format
+   * @param {Object} response - API response
+   * @returns {Object} Transformed response
    */
-  transformRequest(data) {
-    return data;
+  transformResponse(response) {
+    // If response is already in the expected format, return as is
+    if (response && typeof response === 'object') {
+      return response;
+    }
+
+    // If response is a string, try to parse as JSON
+    if (typeof response === 'string') {
+      try {
+        return JSON.parse(response);
+      } catch (error) {
+        return { data: response };
+      }
+    }
+
+    // Default transformation
+    return { data: response };
   }
 
   /**
-   * Transform response data (override in subclasses)
+   * Log error with context
+   * @param {string} context - Error context
+   * @param {Error} error - Error object
    */
-  transformResponse(data) {
-    return data;
+  logError(context, error) {
+    console.error(`[${this.constructor.name}] ${context}:`, {
+      message: error.message,
+      type: error.type,
+      status: error.status,
+      timestamp: new Date().toISOString(),
+    });
   }
 
   /**
-   * Get service name
+   * Create form data for file uploads
+   * @param {Object} data - Form data
+   * @param {Object} files - File objects
+   * @returns {FormData} FormData object
    */
-  getServiceName() {
-    return this.serviceName;
+  createFormData(data = {}, files = {}) {
+    const formData = new FormData();
+
+    // Add regular data
+    Object.keys(data).forEach(key => {
+      if (data[key] !== undefined && data[key] !== null) {
+        formData.append(key, data[key]);
+      }
+    });
+
+    // Add files
+    Object.keys(files).forEach(key => {
+      const file = files[key];
+      if (file) {
+        formData.append(key, {
+          uri: file.uri,
+          type: file.type || 'application/octet-stream',
+          name: file.name || 'file',
+        });
+      }
+    });
+
+    return formData;
+  }
+
+  /**
+   * Handle pagination parameters
+   * @param {Object} options - Options object
+   * @param {number} options.page - Page number
+   * @param {number} options.limit - Items per page
+   * @returns {Object} Pagination parameters
+   */
+  handlePagination(options = {}) {
+    return {
+      page: options.page || 1,
+      limit: options.limit || 20,
+    };
+  }
+
+  /**
+   * Make authenticated request (ensures user is logged in)
+   * @param {Function} requestFn - Request function to execute
+   * @returns {Promise<Object>} Response data
+   */
+  async authenticatedRequest(requestFn) {
+    if (!this.tokenManager.isAuthenticated()) {
+      throw new Error('Authentication required');
+    }
+
+    return requestFn();
+  }
+
+  /**
+   * Retry request with exponential backoff
+   * @param {Function} requestFn - Request function to retry
+   * @param {number} maxRetries - Maximum number of retries
+   * @returns {Promise<Object>} Response data
+   */
+  async retryRequest(requestFn, maxRetries = 3) {
+    return this.client.retryRequest(requestFn, maxRetries);
+  }
+
+  /**
+   * Upload file with progress tracking
+   * @param {string} url - Upload URL
+   * @param {Object} data - Form data
+   * @param {Object} files - File objects
+   * @param {Function} onProgress - Progress callback
+   * @returns {Promise<Object>} Response data
+   */
+  async uploadFiles(url, data = {}, files = {}, onProgress = null) {
+    const formData = this.createFormData(data, files);
+    return this.client.uploadFile(url, formData, onProgress);
+  }
+
+  /**
+   * Download file
+   * @param {string} url - Download URL
+   * @returns {Promise<Object>} Response with file data
+   */
+  async downloadFile(url) {
+    return this.client.downloadFile(url);
+  }
+
+  /**
+   * Check if user is authenticated
+   * @returns {boolean} Authentication status
+   */
+  isAuthenticated() {
+    return this.tokenManager.isAuthenticated();
+  }
+
+  /**
+   * Get current user data
+   * @returns {Object|null} User data
+   */
+  getCurrentUser() {
+    return this.tokenManager.getUserData();
+  }
+
+  /**
+   * Logout user
+   */
+  async logout() {
+    await this.tokenManager.clearTokens();
+  }
+
+  /**
+   * Update user data in token manager
+   * @param {Object} userData - Updated user data
+   */
+  async updateUserData(userData) {
+    await this.tokenManager.updateUserData(userData);
   }
 }
 

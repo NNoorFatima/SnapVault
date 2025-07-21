@@ -1,30 +1,15 @@
 /**
- * AuthService
- * Handles all authentication-related API calls
- * 
- * SOLID Principles Applied:
- * - Single Responsibility: Only handles authentication operations
- * - Open/Closed: Easy to extend with new auth methods
- * - Liskov Substitution: Can be swapped with different auth implementations
- * - Interface Segregation: Provides focused authentication interface
- * - Dependency Inversion: Depends on abstractions (BaseService)
+ * Auth Service
+ * Handles authentication-related API calls
  */
 
 import BaseService from './BaseService';
-import { tokenManager } from '../core/TokenManager';
-import { ERROR_TYPES } from '../config/ApiConfig';
-import { apiClient } from '../core/ApiClient';
-import { apiConfig } from '../config/ApiConfig';
+import { API_ROUTES } from '../config/ApiConfig';
 
 class AuthService extends BaseService {
-  constructor(client = apiClient, config = apiConfig, tokenMgr = tokenManager) {
-    super(client, config);
-    this.tokenManager = tokenMgr;
-  }
-
   /**
-   * Login user with credentials
-   * @param {Object} credentials - User credentials
+   * Login user
+   * @param {Object} credentials - Login credentials
    * @param {string} credentials.email - User email
    * @param {string} credentials.password - User password
    * @returns {Promise<Object>} Authentication response
@@ -32,25 +17,36 @@ class AuthService extends BaseService {
   async login(credentials) {
     try {
       this.validateRequired(credentials, ['email', 'password']);
-      
-      const url = this.buildUrl('AUTH', 'LOGIN');
-      const transformedData = this.transformRequest(credentials);
-      
-      console.log('Attempting login to:', url);
-      console.log('Login data:', { email: transformedData.email, password: '***' });
-      
-      const response = await this.post(url, transformedData);
-      
-      console.log('Login response received:', response);
-      
+
+      const url = this.buildUrl(API_ROUTES.AUTH.LOGIN);
+      const response = await this.client.post(url, credentials);
+
       // Store authentication data
-      if (response.access_token) {
       await this.tokenManager.storeAuthData(response);
+
+      // Fetch user profile after successful login
+      let userData = null;
+      try {
+        // Small delay to ensure token is properly set in memory
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Import UserService dynamically to avoid circular dependencies
+        const UserService = (await import('./UserService')).default;
+        const userService = new UserService(this.client, this.config, this.tokenManager);
+        userData = await userService.getProfile();
+        // Update stored user data
+        await this.tokenManager.updateUserData(userData);
+      } catch (profileError) {
+        console.warn('Failed to fetch user profile after login:', profileError);
+        // Don't fail the login if profile fetch fails
       }
-      
-      return this.transformResponse(response);
+
+      // Return combined response with user data
+      return {
+        ...this.transformResponse(response),
+        user: userData
+      };
     } catch (error) {
-      console.error('Login error:', error);
       this.logError('Login failed', error);
       throw error;
     }
@@ -59,43 +55,34 @@ class AuthService extends BaseService {
   /**
    * Register new user
    * @param {Object} userData - User registration data
+   * @param {string} userData.name - User name
    * @param {string} userData.email - User email
    * @param {string} userData.password - User password
-   * @param {string} userData.name - User name
-   * @param {string} userData.phone - User phone (optional)
+   * @param {Object} userData.profilePicture - Profile picture file
    * @returns {Promise<Object>} Registration response
    */
   async register(userData) {
     try {
-      this.validateRequired(userData, ['email', 'password', 'name']);
+      this.validateRequired(userData, ['name', 'email', 'password', 'profilePicture']);
+
+      const url = this.buildUrl(API_ROUTES.AUTH.REGISTER);
       
-      const url = this.buildUrl('AUTH', 'REGISTER');
-      
-      // Create FormData for the simple registration endpoint
-      const formData = new FormData();
-      formData.append('name', userData.name);
-      formData.append('email', userData.email);
-      formData.append('password', userData.password);
-      
-      console.log('Attempting registration to:', url);
-      console.log('Registration data:', { name: userData.name, email: userData.email, password: '***' });
-      
-      const response = await this.post(url, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
+      // Create form data for file upload
+      const formData = this.createFormData(
+        {
+          name: userData.name,
+          email: userData.email,
+          password: userData.password,
         },
-      });
-      
-      console.log('Registration response received:', response);
-      
-      // Store authentication data if auto-login after registration
-      if (response.access_token) {
-        await this.tokenManager.storeAuthData(response);
-      }
-      
+        {
+          file: userData.profilePicture,
+        }
+      );
+
+      const response = await this.client.uploadFile(url, formData);
+
       return this.transformResponse(response);
     } catch (error) {
-      console.error('Registration error:', error);
       this.logError('Registration failed', error);
       throw error;
     }
@@ -107,243 +94,98 @@ class AuthService extends BaseService {
    */
   async logout() {
     try {
-      const url = this.buildUrl('AUTH', 'LOGOUT');
-      
-      let response = { success: true };
-      
-      // Try to call logout endpoint (optional - backend may not have it)
-      try {
-        response = await this.post(url);
-      } catch (error) {
-        // If logout endpoint doesn't exist, just log the error
-        this.log('Logout endpoint not available, proceeding with local logout');
-      }
-      
-      // Clear all stored authentication data
-      await this.tokenManager.clearAll();
-      
+      const url = this.buildUrl(API_ROUTES.AUTH.LOGOUT);
+      const response = await this.client.post(url);
+
+      // Clear stored tokens
+      await this.tokenManager.clearTokens();
+
       return this.transformResponse(response);
     } catch (error) {
       this.logError('Logout failed', error);
-      // Still clear local data even if server logout fails
-      await this.tokenManager.clearAll();
+      // Clear tokens even if logout request fails
+      await this.tokenManager.clearTokens();
       throw error;
     }
   }
 
   /**
-   * Refresh authentication token
-   * @returns {Promise<Object>} Refresh response
+   * Update user password
+   * @param {Object} passwordData - Password update data
+   * @param {string} passwordData.current_password - Current password
+   * @param {string} passwordData.new_password - New password
+   * @returns {Promise<Object>} Password update response
    */
-  async refreshToken() {
+  async updatePassword(passwordData) {
     try {
-      const refreshToken = await this.tokenManager.getRefreshToken();
-      
-      if (!refreshToken) {
-        throw new Error('No refresh token available');
-      }
-      
-      const url = this.buildUrl('AUTH', 'REFRESH');
-      const data = { refresh_token: refreshToken };
-      
-      const response = await this.post(url, data);
-      
-      // Store new authentication data
-      await this.tokenManager.storeAuthData(response);
-      
+      this.validateRequired(passwordData, ['current_password', 'new_password']);
+
+      const url = this.buildUrl(API_ROUTES.AUTH.UPDATE_PASSWORD);
+      const response = await this.authenticatedRequest(() =>
+        this.client.put(url, passwordData)
+      );
+
       return this.transformResponse(response);
     } catch (error) {
-      this.logError('Token refresh failed', error);
-      // Clear all tokens if refresh fails
-      await this.tokenManager.clearAll();
+      this.logError('Password update failed', error);
       throw error;
     }
   }
 
   /**
-   * Forgot password - send reset email
-   * @param {Object} data - Email data
-   * @param {string} data.email - User email
-   * @returns {Promise<Object>} Forgot password response
+   * Check if user is authenticated
+   * @returns {boolean} Authentication status
    */
-  async forgotPassword(data) {
-    try {
-      this.validateRequired(data, ['email']);
-      
-      const url = this.buildUrl('AUTH', 'FORGOT_PASSWORD');
-      const transformedData = this.transformRequest(data);
-      
-      const response = await this.post(url, transformedData);
-      
-      return this.transformResponse(response);
-    } catch (error) {
-      this.logError('Forgot password failed', error);
-      throw error;
-    }
+  isAuthenticated() {
+    return this.tokenManager.isAuthenticated();
   }
 
   /**
-   * Reset password with token
-   * @param {Object} data - Reset password data
-   * @param {string} data.token - Reset token
-   * @param {string} data.password - New password
-   * @param {string} data.confirmPassword - Confirm new password
-   * @returns {Promise<Object>} Reset password response
+   * Get current user data
+   * @returns {Object|null} Current user data
    */
-  async resetPassword(data) {
-    try {
-      this.validateRequired(data, ['token', 'password', 'confirmPassword']);
-      
-      // Validate password match
-      if (data.password !== data.confirmPassword) {
-        throw new Error('Passwords do not match');
-      }
-      
-      const url = this.buildUrl('AUTH', 'RESET_PASSWORD');
-      const transformedData = this.transformRequest(data);
-      
-      const response = await this.post(url, transformedData);
-      
-      return this.transformResponse(response);
-    } catch (error) {
-      this.logError('Reset password failed', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Check if user is currently authenticated
-   * @returns {Promise<boolean>} Authentication status
-   */
-  async isAuthenticated() {
-    try {
-      return await this.tokenManager.isAuthenticated();
-    } catch (error) {
-      this.logError('Authentication check failed', error);
-      return false;
-    }
-  }
-
-  /**
-   * Get current user info from token
-   * @returns {Promise<Object|null>} User info or null
-   */
-  async getCurrentUser() {
-    try {
-      return await this.tokenManager.getUserInfo();
-    } catch (error) {
-      this.logError('Get current user failed', error);
-      return null;
-    }
-  }
-
-  /**
-   * Check if access token is expired
-   * @returns {Promise<boolean>} True if token is expired
-   */
-  async isTokenExpired() {
-    try {
-      return await this.tokenManager.isTokenExpired();
-    } catch (error) {
-      this.logError('Token expiry check failed', error);
-      return true;
-    }
+  getCurrentUser() {
+    return this.tokenManager.getUserData();
   }
 
   /**
    * Get access token
-   * @returns {Promise<string|null>} Access token or null
+   * @returns {string|null} Access token
    */
-  async getAccessToken() {
-    try {
-      return await this.tokenManager.getAccessToken();
-    } catch (error) {
-      this.logError('Get access token failed', error);
-      return null;
-    }
+  getAccessToken() {
+    return this.tokenManager.getAccessToken();
   }
 
   /**
-   * Validate email format
-   * @param {string} email - Email to validate
-   * @returns {boolean} True if valid email
+   * Check if token is expiring soon
+   * @returns {boolean} True if token expires within 5 minutes
    */
-  validateEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+  isTokenExpiringSoon() {
+    return this.tokenManager.isTokenExpiringSoon();
   }
 
   /**
-   * Validate password strength
-   * @param {string} password - Password to validate
-   * @returns {Object} Validation result
+   * Get time until token expires
+   * @returns {number} Seconds until token expires
    */
-  validatePassword(password) {
-    const minLength = 8;
-    const hasUpperCase = /[A-Z]/.test(password);
-    const hasLowerCase = /[a-z]/.test(password);
-    const hasNumbers = /\d/.test(password);
-    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-
-    const isValid = password.length >= minLength && 
-                   hasUpperCase && 
-                   hasLowerCase && 
-                   hasNumbers && 
-                   hasSpecialChar;
-
-    return {
-      isValid,
-      errors: [
-        ...(password.length < minLength ? ['Password must be at least 8 characters'] : []),
-        ...(!hasUpperCase ? ['Password must contain uppercase letters'] : []),
-        ...(!hasLowerCase ? ['Password must contain lowercase letters'] : []),
-        ...(!hasNumbers ? ['Password must contain numbers'] : []),
-        ...(!hasSpecialChar ? ['Password must contain special characters'] : []),
-      ]
-    };
+  getTimeUntilExpiry() {
+    return this.tokenManager.getTimeUntilExpiry();
   }
 
   /**
-   * Transform request data (override from BaseService)
+   * Clear all authentication data
    */
-  transformRequest(data) {
-    // Add any auth-specific transformations
-    const transformed = { ...data };
-    
-    // Remove confirmPassword from request
-    if (transformed.confirmPassword) {
-      delete transformed.confirmPassword;
-    }
-    
-    return transformed;
+  async clearAuthData() {
+    await this.tokenManager.clearTokens();
   }
 
   /**
-   * Transform response data (override from BaseService)
+   * Update stored user data
+   * @param {Object} userData - Updated user data
    */
-  transformResponse(data) {
-    // Add any auth-specific response transformations
-    return {
-      ...data,
-      timestamp: new Date().toISOString(),
-    };
-  }
-
-  /**
-   * Handle authentication errors
-   * @param {Object} error - Error object
-   * @returns {Object} Formatted error
-   */
-  handleAuthError(error) {
-    if (error.type === ERROR_TYPES.AUTHENTICATION_ERROR) {
-      // Clear tokens on auth error
-      this.tokenManager.clearAll();
-    }
-    
-    return error;
+  async updateUserData(userData) {
+    await this.tokenManager.updateUserData(userData);
   }
 }
 
-// Export singleton instance
-export const authService = new AuthService();
-export { AuthService }; 
+export default AuthService; 

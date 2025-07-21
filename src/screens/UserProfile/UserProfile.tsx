@@ -3,8 +3,7 @@ import { ScrollView, StyleSheet, I18nManager, Alert, RefreshControl} from 'react
 import UserCard from '../../components/UserCard';
 import ProfileBottomOptions from '../../components/ProfileBottomOptions';
 import BackgroundImage from '../../assets/UserProfileBackground';
-import { profileService } from '../../api/services/ProfileService';
-import { apiConfig } from '../../api/config/ApiConfig';
+import { getUserService } from '../../api/ApiFactory';
 
 interface UserProfileData {
   name?: string;
@@ -29,7 +28,8 @@ const UserProfile = () => {
   const fetchUserProfile = async () => {
     try {
       setIsLoading(true);
-      const profile: UserProfileData = await profileService.getProfile();
+      const userService = getUserService();
+      const profile: UserProfileData = await userService.getProfile();
       
       console.log('Fetched user profile:', profile);
       
@@ -59,7 +59,7 @@ const UserProfile = () => {
             }
           }
           
-          const baseURL = apiConfig.getBaseURL();
+          const baseURL = userService.config.getBaseURL();
           console.log('Base URL:', baseURL);
           const fullImageUrl = `${baseURL}${imagePath}`;
           console.log('Full image URL:', fullImageUrl);
