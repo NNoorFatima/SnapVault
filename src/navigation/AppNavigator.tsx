@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useSelector, useDispatch } from 'react-redux';
+import { AppDispatch } from '../store/store';
+import { initializeAuth } from '../store/slices/authSlice';
 
 import AuthNavigator from './AuthNavigator';
 import MainTabNavigator from './MainTabNavigator';
@@ -53,16 +56,29 @@ const Tab = createBottomTabNavigator<TabParamList>();
 
 
 const AppNavigator = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { isAuthenticated, loading } = useSelector((state: any) => state.auth);
   const [isLoading, setIsLoading] = useState(true);
   const [isOnboardingDone, setIsOnboardingDone] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // No auth yet
 
   useEffect(() => {
-    // Simulate splash loading
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
-  }, []);
+    const initializeApp = async () => {
+      try {
+        // Initialize authentication state
+        dispatch(initializeAuth());
+        
+        // Simulate splash loading
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 2000);
+      } catch (error) {
+        console.error('Failed to initialize auth:', error);
+        setIsLoading(false);
+      }
+    };
+
+    initializeApp();
+  }, [dispatch]);
 
   if (isLoading) {
     return <SplashScreen />;
@@ -80,9 +96,9 @@ const AppNavigator = () => {
               />
             )}
           </Stack.Screen>
-        ) : !isLoggedIn ? (
+        ) : !isAuthenticated ? (
           <Stack.Screen name="Auth">
-            {props => <AuthNavigator {...props} onSignIn={() => setIsLoggedIn(true)} />} 
+            {props => <AuthNavigator {...props} />} 
           </Stack.Screen>
         ) : (
           <>

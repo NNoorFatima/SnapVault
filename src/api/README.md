@@ -2,31 +2,23 @@
 
 ## 📋 Overview
 
-This API client system is built following **SOLID principles** and provides a comprehensive, extensible, and maintainable way to handle all API communications in your React Native app.
+This API client system provides a clean, organized, and maintainable way to handle all API communications in your React Native app. It follows modern JavaScript patterns and provides a comprehensive solution for authentication, error handling, and service management.
 
 ## 🏗️ Architecture
-
-### SOLID Principles Applied
-
-1. **Single Responsibility**: Each class has one clear responsibility
-2. **Open/Closed**: Easy to extend with new features without modifying existing code
-3. **Liskov Substitution**: Services can be swapped with different implementations
-4. **Interface Segregation**: Separate interfaces for different concerns
-5. **Dependency Inversion**: High-level modules don't depend on low-level modules
 
 ### Core Components
 
 ```
 src/api/
 ├── config/
-│   └── ApiConfig.js          # Centralized configuration
+│   └── ApiConfig.js          # Centralized configuration and API routes
 ├── core/
 │   ├── ApiClient.js          # Main HTTP client with interceptors
 │   └── TokenManager.js       # Token storage and management
 ├── services/
 │   ├── BaseService.js        # Abstract base class for all services
 │   ├── AuthService.js        # Authentication operations
-│   ├── ProfileService.js     # Profile management
+│   ├── UserService.js        # User profile management
 │   ├── GroupsService.js      # Group operations
 │   └── PhotosService.js      # Photo operations
 ├── ApiFactory.js             # Service factory and entry point
@@ -35,46 +27,36 @@ src/api/
 
 ## 🚀 Getting Started
 
-### Basic Usage
+### 1. Initialize the API Factory
 
 ```javascript
-import { apiFactory } from '../api/ApiFactory';
+import apiFactory from '../api/ApiFactory';
 
 // Initialize on app start
 const initializeApp = async () => {
   try {
-    const { isAuthenticated } = await apiFactory.initialize();
-    console.log('User authenticated:', isAuthenticated);
+    const result = await apiFactory.initialize('development');
+    console.log('User authenticated:', result.isAuthenticated);
+    console.log('User data:', result.userData);
   } catch (error) {
     console.error('Initialization failed:', error);
   }
 };
-
-// Use services
-const authService = apiFactory.getAuthService();
-const profileService = apiFactory.getProfileService();
-const groupsService = apiFactory.getGroupsService();
-const photosService = apiFactory.getPhotosService();
 ```
 
-### In Redux Slices
+### 2. Use Services
 
 ```javascript
-import { createAsyncThunk } from '@reduxjs/toolkit';
-import { apiFactory } from '../../api/ApiFactory';
+// Get service instances
+const authService = apiFactory.getAuthService();
+const userService = apiFactory.getUserService();
+const groupsService = apiFactory.getGroupsService();
+const photosService = apiFactory.getPhotosService();
 
-export const loginUser = createAsyncThunk(
-  'auth/loginUser',
-  async (credentials, { rejectWithValue }) => {
-    try {
-      const authService = apiFactory.getAuthService();
-      const response = await authService.login(credentials);
-      return response;
-    } catch (error) {
-      return rejectWithValue(error.message || 'Login failed');
-    }
-  }
-);
+// Or use convenience methods
+import { getAuthService, getUserService } from '../api/ApiFactory';
+const authService = getAuthService();
+const userService = getUserService();
 ```
 
 ## 🔧 Configuration
@@ -86,120 +68,117 @@ export const loginUser = createAsyncThunk(
 apiFactory.setEnvironment('production'); // or 'development', 'staging'
 
 // Update configuration
-apiFactory.configure({
+apiFactory.updateConfig({
   timeout: 30000,
   retryAttempts: 5,
 });
 ```
 
-### API Endpoints
+### API Routes
 
 All endpoints are centralized in `ApiConfig.js`:
 
 ```javascript
-const API_ENDPOINTS = {
-  AUTH: {
-    LOGIN: '/login',
-    REGISTER: '/register',
-    LOGOUT: '/logout',
-    REFRESH: '/refresh',
-    FORGOT_PASSWORD: '/forgot-password',
-    RESET_PASSWORD: '/reset-password',
-  },
-  PROFILE: {
-    ME: '/profile/me',
-    UPDATE: '/profile/update',
-    AVATAR: '/profile/avatar',
-    // ... more endpoints
-  },
-  // ... other categories
-};
+import { API_ROUTES } from '../api/config/ApiConfig';
+
+// Use routes
+const loginUrl = API_ROUTES.AUTH.LOGIN; // '/auth/login'
+const profileUrl = API_ROUTES.USER.PROFILE; // '/user/profile'
+const createGroupUrl = API_ROUTES.GROUPS.CREATE; // '/groups/create'
 ```
 
 ## 🔐 Authentication
 
-### Token Management
-
-The system automatically handles:
-- Token storage and retrieval
-- Token expiration checks
-- Automatic token refresh
-- Bearer token injection in requests
+### Login
 
 ```javascript
 const authService = apiFactory.getAuthService();
 
-// Login
-const response = await authService.login({
-  email: 'user@example.com',
-  password: 'password123'
-});
+try {
+  const response = await authService.login({
+    email: 'user@example.com',
+    password: 'password123'
+  });
+  
+  console.log('Login successful:', response);
+} catch (error) {
+  console.error('Login failed:', error.message);
+}
+```
 
-// Check authentication
-const isAuthenticated = await authService.isAuthenticated();
+### Registration
 
-// Get current user
-const currentUser = await authService.getCurrentUser();
+```javascript
+const authService = apiFactory.getAuthService();
 
-// Logout
+try {
+  const response = await authService.register({
+    name: 'John Doe',
+    email: 'john@example.com',
+    password: 'securePassword123',
+    profilePicture: {
+      uri: 'file://path/to/avatar.jpg',
+      type: 'image/jpeg',
+      name: 'avatar.jpg'
+    }
+  });
+  
+  console.log('Registration successful:', response);
+} catch (error) {
+  console.error('Registration failed:', error.message);
+}
+```
+
+### Check Authentication Status
+
+```javascript
+const authService = apiFactory.getAuthService();
+
+// Check if user is authenticated
+const isAuthenticated = authService.isAuthenticated();
+
+// Get current user data
+const currentUser = authService.getCurrentUser();
+
+// Get access token
+const token = authService.getAccessToken();
+```
+
+### Logout
+
+```javascript
+// Logout using service
+const authService = apiFactory.getAuthService();
 await authService.logout();
+
+// Or logout using factory (recommended)
+await apiFactory.logout();
 ```
 
 ## 📊 Service Examples
 
-### AuthService
+### UserService
 
 ```javascript
-const authService = apiFactory.getAuthService();
+const userService = apiFactory.getUserService();
 
-// Login
-const loginResponse = await authService.login({
-  email: 'user@example.com',
-  password: 'password123'
+// Get user profile
+const profile = await userService.getProfile();
+
+// Update user bio
+const updatedProfile = await userService.updateBio('My new bio');
+
+// Update user name
+const updatedProfile = await userService.updateName('John Updated');
+
+// Update user email
+const updatedProfile = await userService.updateEmail({
+  email: 'john.updated@example.com',
+  password: 'currentPassword'
 });
 
-// Register
-const registerResponse = await authService.register({
-  name: 'John Doe',
-  email: 'john@example.com',
-  password: 'securePassword123'
-});
-
-// Forgot password
-await authService.forgotPassword({
-  email: 'user@example.com'
-});
-
-// Reset password
-await authService.resetPassword({
-  token: 'reset-token',
-  password: 'newPassword123',
-  confirmPassword: 'newPassword123'
-});
-```
-
-### ProfileService
-
-```javascript
-const profileService = apiFactory.getProfileService();
-
-// Get profile
-const profile = await profileService.getProfile();
-
-// Update profile
-const updatedProfile = await profileService.updateProfile({
-  name: 'John Updated',
-  email: 'john.updated@example.com'
-});
-
-// Upload avatar
-const avatarResponse = await profileService.uploadAvatar({
-  uri: 'file://path/to/image.jpg',
-  type: 'image/jpeg',
-  name: 'avatar.jpg'
-}, (progress) => {
-  console.log('Upload progress:', progress);
-});
+// Delete account
+await userService.deleteAccount();
 ```
 
 ### GroupsService
@@ -208,22 +187,35 @@ const avatarResponse = await profileService.uploadAvatar({
 const groupsService = apiFactory.getGroupsService();
 
 // Get user's groups
-const groups = await groupsService.getMyGroups({
-  page: 1,
-  limit: 20
-});
+const groups = await groupsService.getMyGroups();
 
 // Create group
 const newGroup = await groupsService.createGroup({
   name: 'My New Group',
-  description: 'A great group for sharing photos',
-  isPrivate: false
+  description: 'A great group for sharing photos'
 });
 
 // Join group
 await groupsService.joinGroup({
-  groupId: 'group-123',
-  inviteCode: 'ABC123'
+  invite_code: 'ABC123'
+});
+
+// Get group details
+const group = await groupsService.getGroup(123);
+
+// Get group members
+const members = await groupsService.getGroupMembers(123);
+
+// Leave group
+await groupsService.leaveGroup(123);
+
+// Delete group (owner only)
+await groupsService.deleteGroup(123);
+
+// Update group
+const updatedGroup = await groupsService.updateGroup(123, {
+  name: 'Updated Group Name',
+  description: 'Updated description'
 });
 ```
 
@@ -232,24 +224,39 @@ await groupsService.joinGroup({
 ```javascript
 const photosService = apiFactory.getPhotosService();
 
-// Get group photos
-const photos = await photosService.getGroupPhotos('group-123', {
-  page: 1,
-  limit: 20
-});
-
 // Upload photo
-const uploadResponse = await photosService.uploadPhoto('group-123', {
-  uri: 'file://path/to/photo.jpg',
-  type: 'image/jpeg',
-  name: 'photo.jpg',
-  caption: 'Beautiful sunset!'
-}, (progress) => {
-  console.log('Upload progress:', progress);
+const uploadResponse = await photosService.uploadPhoto(123, {
+  file: {
+    uri: 'file://path/to/photo.jpg',
+    type: 'image/jpeg',
+    name: 'photo.jpg'
+  }
 });
 
-// Like photo
-await photosService.toggleLike('photo-123', true);
+// Get group photos
+const photos = await photosService.getGroupPhotos(123);
+
+// Get photos where user appears
+const myPhotos = await photosService.getMyPhotos();
+
+// Get photos where user appears in specific group
+const myPhotosInGroup = await photosService.getMyPhotosInGroup(123);
+
+// Get specific photo
+const photo = await photosService.getPhoto(456);
+
+// Download photo
+const photoFile = await photosService.downloadPhoto(456);
+
+// Upload multiple photos
+const photos = [
+  { uri: 'file://path/to/photo1.jpg', type: 'image/jpeg', name: 'photo1.jpg' },
+  { uri: 'file://path/to/photo2.jpg', type: 'image/jpeg', name: 'photo2.jpg' }
+];
+
+const results = await photosService.uploadMultiplePhotos(123, photos, (progress) => {
+  console.log(`Upload progress: ${progress}%`);
+});
 ```
 
 ## 🔄 Error Handling
@@ -260,11 +267,12 @@ All services return standardized error objects:
 
 ```javascript
 {
-  type: 'NETWORK_ERROR' | 'AUTHENTICATION_ERROR' | 'VALIDATION_ERROR' | 'SERVER_ERROR' | 'UNKNOWN_ERROR',
+  type: 'NETWORK_ERROR' | 'AUTHENTICATION_ERROR' | 'AUTHORIZATION_ERROR' | 'VALIDATION_ERROR' | 'NOT_FOUND_ERROR' | 'CONFLICT_ERROR' | 'SERVER_ERROR' | 'UNKNOWN_ERROR',
   message: 'Human-readable error message',
   status: 400, // HTTP status code
   data: {...}, // Response data if available
-  timestamp: '2023-12-01T10:00:00.000Z'
+  timestamp: '2023-12-01T10:00:00.000Z',
+  originalError: {...} // Original error object
 }
 ```
 
@@ -299,14 +307,14 @@ try {
 ### Single File Upload
 
 ```javascript
-const profileService = apiFactory.getProfileService();
+const photosService = apiFactory.getPhotosService();
 
-const result = await profileService.uploadAvatar({
-  uri: 'file://path/to/avatar.jpg',
-  type: 'image/jpeg',
-  name: 'avatar.jpg'
-}, (progress) => {
-  console.log(`Upload progress: ${progress}%`);
+const result = await photosService.uploadPhoto(groupId, {
+  file: {
+    uri: 'file://path/to/photo.jpg',
+    type: 'image/jpeg',
+    name: 'photo.jpg'
+  }
 });
 ```
 
@@ -320,7 +328,7 @@ const photos = [
   { uri: 'file://path/to/photo2.jpg', type: 'image/jpeg', name: 'photo2.jpg' }
 ];
 
-const result = await photosService.uploadMultiplePhotos('group-123', photos, (progress) => {
+const results = await photosService.uploadMultiplePhotos(groupId, photos, (progress) => {
   console.log(`Upload progress: ${progress}%`);
 });
 ```
@@ -334,63 +342,34 @@ const result = await photosService.uploadMultiplePhotos('group-123', photos, (pr
 ```javascript
 // src/api/services/NotificationsService.js
 import BaseService from './BaseService';
+import { API_ROUTES } from '../config/ApiConfig';
 
 class NotificationsService extends BaseService {
-  /**
-   * Get user notifications
-   * @param {Object} options - Query options
-   * @returns {Promise<Object>} Notifications
-   */
-  async getNotifications(options = {}) {
+  async getNotifications() {
     try {
-      const url = this.buildUrl('NOTIFICATIONS', 'LIST');
-      const config = {
-        params: {
-          page: options.page || 1,
-          limit: options.limit || 20,
-        }
-      };
+      const url = this.buildUrl(API_ROUTES.NOTIFICATIONS.LIST);
+      const response = await this.authenticatedRequest(() =>
+        this.client.get(url)
+      );
       
-      const response = await this.get(url, config);
       return this.transformResponse(response);
     } catch (error) {
       this.logError('Get notifications failed', error);
       throw error;
     }
   }
-
-  /**
-   * Mark notification as read
-   * @param {string} notificationId - Notification ID
-   * @returns {Promise<Object>} Response
-   */
-  async markAsRead(notificationId) {
-    try {
-      this.validateRequired({ notificationId }, ['notificationId']);
-      
-      const url = this.buildUrl('NOTIFICATIONS', 'MARK_READ', { id: notificationId });
-      const response = await this.put(url);
-      
-      return this.transformResponse(response);
-    } catch (error) {
-      this.logError('Mark as read failed', error);
-      throw error;
-    }
-  }
 }
 
-export const notificationsService = new NotificationsService();
-export { NotificationsService };
+export default NotificationsService;
 ```
 
 2. **Add endpoints to ApiConfig.js**:
 
 ```javascript
-// In API_ENDPOINTS object
+// In API_ROUTES object
 NOTIFICATIONS: {
   LIST: '/notifications',
   MARK_READ: '/notifications/:id/read',
-  MARK_ALL_READ: '/notifications/read-all',
   DELETE: '/notifications/:id',
 },
 ```
@@ -398,18 +377,18 @@ NOTIFICATIONS: {
 3. **Update ApiFactory.js**:
 
 ```javascript
-import { NotificationsService } from './services/NotificationsService';
+import NotificationsService from './services/NotificationsService';
 
 class ApiFactory {
   // ... existing code ...
 
-  /**
-   * Get or create NotificationsService instance
-   * @returns {NotificationsService} Notifications service instance
-   */
   getNotificationsService() {
+    if (!this.isInitialized) {
+      throw new Error('API Factory not initialized. Call initialize() first.');
+    }
+
     if (!this.services.notifications) {
-      this.services.notifications = new NotificationsService(this.client, this.config);
+      this.services.notifications = new NotificationsService(this.client, this.config, this.tokenManager);
     }
     return this.services.notifications;
   }
@@ -417,7 +396,7 @@ class ApiFactory {
   getAllServices() {
     return {
       auth: this.getAuthService(),
-      profile: this.getProfileService(),
+      user: this.getUserService(),
       groups: this.getGroupsService(),
       photos: this.getPhotosService(),
       notifications: this.getNotificationsService(), // Add this
@@ -426,50 +405,7 @@ class ApiFactory {
 }
 
 // Export convenience method
-export const getNotificationsService = apiFactory.getNotificationsService.bind(apiFactory);
-```
-
-### Adding Request/Response Interceptors
-
-```javascript
-// In ApiClient.js
-setupRequestInterceptors() {
-  this.instance.interceptors.request.use(
-    async (config) => {
-      // Add custom headers
-      config.headers['X-Client-Version'] = '1.0.0';
-      config.headers['X-Platform'] = 'mobile';
-      
-      // Add authorization header
-      const authHeader = await this.tokenManager.getAuthHeader();
-      if (authHeader) {
-        config.headers.Authorization = authHeader;
-      }
-
-      return config;
-    },
-    (error) => Promise.reject(error)
-  );
-}
-```
-
-### Custom Error Handling
-
-```javascript
-// In BaseService.js or specific service
-handleServiceError(error) {
-  if (error.status === 429) {
-    // Rate limiting
-    return this.handleRateLimit(error);
-  }
-  
-  if (error.status === 503) {
-    // Service unavailable
-    return this.handleServiceUnavailable(error);
-  }
-  
-  throw error;
-}
+export const getNotificationsService = () => apiFactory.getNotificationsService();
 ```
 
 ## 🧪 Testing
@@ -492,7 +428,7 @@ describe('AuthService', () => {
     };
     mockTokenManager = {
       storeAuthData: jest.fn(),
-      clearAll: jest.fn(),
+      clearTokens: jest.fn(),
     };
     authService = new AuthService(mockClient, mockConfig, mockTokenManager);
   });
@@ -509,7 +445,7 @@ describe('AuthService', () => {
       password: 'password123'
     });
 
-    expect(mockClient.post).toHaveBeenCalledWith('/login', {
+    expect(mockClient.post).toHaveBeenCalledWith('/auth/login', {
       email: 'test@example.com',
       password: 'password123'
     });
@@ -519,64 +455,13 @@ describe('AuthService', () => {
 });
 ```
 
-### Integration Testing
-
-```javascript
-// __tests__/ApiFactory.test.js
-import { apiFactory } from '../src/api/ApiFactory';
-
-describe('ApiFactory', () => {
-  it('should initialize successfully', async () => {
-    const result = await apiFactory.initialize();
-    expect(result).toHaveProperty('isAuthenticated');
-  });
-
-  it('should provide all services', () => {
-    const services = apiFactory.getAllServices();
-    expect(services).toHaveProperty('auth');
-    expect(services).toHaveProperty('profile');
-    expect(services).toHaveProperty('groups');
-    expect(services).toHaveProperty('photos');
-  });
-});
-```
-
-## 🔧 Environment Configuration
-
-### Development
-
-```javascript
-// src/api/config/ApiConfig.js
-const ENVIRONMENTS = {
-  development: {
-    baseURL: 'http://localhost:3000/api',
-    timeout: 10000,
-    retryAttempts: 3,
-  },
-  // ... other environments
-};
-```
-
-### Production
-
-```javascript
-const ENVIRONMENTS = {
-  production: {
-    baseURL: 'https://api.yourdomain.com/api',
-    timeout: 20000,
-    retryAttempts: 5,
-  },
-  // ... other environments
-};
-```
-
 ## 📱 React Native Integration
 
 ### App.js Integration
 
 ```javascript
 // App.js
-import { apiFactory } from './src/api/ApiFactory';
+import apiFactory from './src/api/ApiFactory';
 
 const App = () => {
   useEffect(() => {
@@ -599,7 +484,7 @@ const App = () => {
 
 ```javascript
 // In your components
-import { apiFactory } from '../api/ApiFactory';
+import { getAuthService, getGroupsService } from '../api/ApiFactory';
 
 const LoginScreen = () => {
   const [loading, setLoading] = useState(false);
@@ -610,7 +495,7 @@ const LoginScreen = () => {
       setLoading(true);
       setError(null);
       
-      const authService = apiFactory.getAuthService();
+      const authService = getAuthService();
       const response = await authService.login(credentials);
       
       console.log('Login successful:', response);
@@ -626,6 +511,27 @@ const LoginScreen = () => {
 };
 ```
 
+### Redux Integration
+
+```javascript
+// store/slices/authSlice.js
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import { getAuthService } from '../../api/ApiFactory';
+
+export const loginUser = createAsyncThunk(
+  'auth/loginUser',
+  async (credentials, { rejectWithValue }) => {
+    try {
+      const authService = getAuthService();
+      const response = await authService.login(credentials);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.message || 'Login failed');
+    }
+  }
+);
+```
+
 ## 🔄 Migration Guide
 
 ### From Direct Axios to ApiClient
@@ -635,121 +541,20 @@ const LoginScreen = () => {
 import axios from 'axios';
 
 const loginUser = async (credentials) => {
-  const response = await axios.post('http://api.example.com/login', credentials);
+  const response = await axios.post('http://api.example.com/auth/login', credentials);
   return response.data;
 };
 ```
 
 **After:**
 ```javascript
-import { apiFactory } from '../api/ApiFactory';
+import { getAuthService } from '../api/ApiFactory';
 
 const loginUser = async (credentials) => {
-  const authService = apiFactory.getAuthService();
+  const authService = getAuthService();
   const response = await authService.login(credentials);
   return response;
 };
-```
-
-## 🚀 Performance Optimization
-
-### Request Caching
-
-```javascript
-// In BaseService.js
-class BaseService {
-  constructor(client, config) {
-    super(client, config);
-    this.cache = new Map();
-  }
-
-  async getCached(key, fetcher, ttl = 300000) { // 5 minutes
-    const cached = this.cache.get(key);
-    if (cached && Date.now() - cached.timestamp < ttl) {
-      return cached.data;
-    }
-
-    const data = await fetcher();
-    this.cache.set(key, { data, timestamp: Date.now() });
-    return data;
-  }
-}
-```
-
-### Request Debouncing
-
-```javascript
-// In service methods
-const debounce = (func, delay) => {
-  let timeoutId;
-  return (...args) => {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => func.apply(this, args), delay);
-  };
-};
-
-// Usage
-this.debouncedSearch = debounce(this.searchGroups.bind(this), 300);
-```
-
-## 📊 Monitoring and Analytics
-
-### Request Logging
-
-```javascript
-// In ApiClient.js
-setupRequestInterceptors() {
-  this.instance.interceptors.request.use(
-    async (config) => {
-      // Log request
-      if (__DEV__) {
-        console.log('🚀 API Request:', {
-          method: config.method?.toUpperCase(),
-          url: config.url,
-          headers: config.headers,
-          data: config.data,
-        });
-      }
-
-      return config;
-    },
-    (error) => Promise.reject(error)
-  );
-}
-```
-
-### Analytics Integration
-
-```javascript
-// In BaseService.js
-async post(url, data = {}, config = {}) {
-  const startTime = Date.now();
-  
-  try {
-    const response = await this.client.post(url, data, config);
-    
-    // Track successful request
-    this.trackApiCall(url, 'POST', Date.now() - startTime, 'success');
-    
-    return response;
-  } catch (error) {
-    // Track failed request
-    this.trackApiCall(url, 'POST', Date.now() - startTime, 'error', error);
-    throw error;
-  }
-}
-
-trackApiCall(url, method, duration, status, error = null) {
-  // Send to analytics service
-  analytics.track('api_call', {
-    url,
-    method,
-    duration,
-    status,
-    error: error?.message,
-    timestamp: Date.now(),
-  });
-}
 ```
 
 ## 🎯 Best Practices
@@ -773,17 +578,64 @@ trackApiCall(url, method, duration, status, error = null) {
 - Validate all inputs
 
 ### 4. Maintainability
-- Follow SOLID principles
+- Follow consistent naming conventions
 - Write comprehensive tests
 - Document all public methods
-- Use consistent naming conventions
+- Use TypeScript for better type safety
 
-## 📚 Further Reading
+## 📚 API Reference
 
-- [SOLID Principles](https://en.wikipedia.org/wiki/SOLID)
-- [React Native Networking](https://reactnative.dev/docs/network)
-- [Redux Toolkit](https://redux-toolkit.js.org/)
-- [Axios Documentation](https://axios-http.com/docs/intro)
+### ApiFactory Methods
+
+- `initialize(environment)` - Initialize the API factory
+- `getAuthService()` - Get authentication service
+- `getUserService()` - Get user service
+- `getGroupsService()` - Get groups service
+- `getPhotosService()` - Get photos service
+- `getAllServices()` - Get all services
+- `setEnvironment(environment)` - Set environment
+- `updateConfig(config)` - Update configuration
+- `logout()` - Logout user and clear data
+- `reset()` - Reset factory state
+
+### AuthService Methods
+
+- `login(credentials)` - Login user
+- `register(userData)` - Register new user
+- `logout()` - Logout user
+- `updatePassword(passwordData)` - Update password
+- `isAuthenticated()` - Check authentication status
+- `getCurrentUser()` - Get current user data
+- `getAccessToken()` - Get access token
+
+### UserService Methods
+
+- `getProfile()` - Get user profile
+- `updateBio(bio)` - Update user bio
+- `updateName(name)` - Update user name
+- `updateEmail(emailData)` - Update user email
+- `deleteAccount()` - Delete user account
+
+### GroupsService Methods
+
+- `getMyGroups()` - Get user's groups
+- `createGroup(groupData)` - Create new group
+- `joinGroup(joinData)` - Join group
+- `getGroup(groupId)` - Get group details
+- `getGroupMembers(groupId)` - Get group members
+- `leaveGroup(groupId)` - Leave group
+- `deleteGroup(groupId)` - Delete group
+- `updateGroup(groupId, groupData)` - Update group
+
+### PhotosService Methods
+
+- `uploadPhoto(groupId, photoData)` - Upload photo
+- `getGroupPhotos(groupId)` - Get group photos
+- `getMyPhotos()` - Get user's photos
+- `getMyPhotosInGroup(groupId)` - Get user's photos in group
+- `getPhoto(photoId)` - Get photo details
+- `downloadPhoto(photoId)` - Download photo
+- `uploadMultiplePhotos(groupId, photos, onProgress)` - Upload multiple photos
 
 ---
 

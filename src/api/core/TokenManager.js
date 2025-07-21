@@ -1,258 +1,248 @@
 /**
- * TokenManager
- * Handles secure storage and retrieval of authentication tokens
- * 
- * SOLID Principles Applied:
- * - Single Responsibility: Only manages token storage/retrieval
- * - Open/Closed: Easy to extend with different storage methods
- * - Dependency Inversion: Uses interface abstraction for storage
+ * Token Manager
+ * Handles authentication token storage, retrieval, and management
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Storage keys
 const STORAGE_KEYS = {
-  ACCESS_TOKEN: 'access_token',
-  REFRESH_TOKEN: 'refresh_token',
-  TOKEN_EXPIRY: 'token_expiry',
-  USER_INFO: 'user_info',
+  ACCESS_TOKEN: 'snapvault_access_token',
+  USER_DATA: 'snapvault_user_data',
+  REFRESH_TOKEN: 'snapvault_refresh_token',
+  TOKEN_EXPIRY: 'snapvault_token_expiry',
 };
 
 class TokenManager {
-  constructor(storageProvider = AsyncStorage) {
-    this.storage = storageProvider;
+  constructor() {
+    this.accessToken = null;
+    this.userData = null;
+    this.refreshToken = null;
+    this.tokenExpiry = null;
   }
 
   /**
-   * Store access token
-   * @param {string} token - Access token
-   * @param {number} expiresIn - Token expiry in seconds
+   * Initialize token manager by loading stored tokens
    */
-  async setAccessToken(token, expiresIn = null) {
+  async initialize() {
     try {
-      await this.storage.setItem(STORAGE_KEYS.ACCESS_TOKEN, token);
+      const [accessToken, userData, refreshToken, tokenExpiry] = await Promise.all([
+        AsyncStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN),
+        AsyncStorage.getItem(STORAGE_KEYS.USER_DATA),
+        AsyncStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN),
+        AsyncStorage.getItem(STORAGE_KEYS.TOKEN_EXPIRY),
+      ]);
+
+      this.accessToken = accessToken;
+      this.userData = userData ? JSON.parse(userData) : null;
+      this.refreshToken = refreshToken;
+      this.tokenExpiry = tokenExpiry ? new Date(tokenExpiry) : null;
+
+      return {
+        isAuthenticated: this.isAuthenticated(),
+        userData: this.userData,
+      };
+    } catch (error) {
+      console.error('TokenManager initialization failed:', error);
+      return {
+        isAuthenticated: false,
+        userData: null,
+      };
+    }
+  }
+
+  /**
+   * Store authentication data after successful login
+   * @param {Object} authData - Authentication response data
+   */
+  async storeAuthData(authData) {
+    try {
+      const { access_token, user, refresh_token, expires_in } = authData;
       
-      if (expiresIn) {
-        const expiryTime = Date.now() + (expiresIn * 1000);
-        await this.storage.setItem(STORAGE_KEYS.TOKEN_EXPIRY, expiryTime.toString());
+      // Calculate token expiry
+      const expiryDate = expires_in 
+        ? new Date(Date.now() + expires_in * 1000)
+        : new Date(Date.now() + 24 * 60 * 60 * 1000); // Default 24 hours
+
+      this.accessToken = access_token;
+      this.userData = user || null; // Handle case where user data is not provided
+      this.refreshToken = refresh_token || null;
+      this.tokenExpiry = expiryDate;
+      
+
+
+      // Store in AsyncStorage - only store non-null values
+      const storagePromises = [
+        AsyncStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, access_token),
+        AsyncStorage.setItem(STORAGE_KEYS.TOKEN_EXPIRY, expiryDate.toISOString()),
+      ];
+
+      // Only store user data if it exists
+      if (user) {
+        storagePromises.push(AsyncStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(user)));
       }
-    } catch (error) {
-      console.error('TokenManager: Error storing access token:', error);
-      throw new Error('Failed to store access token');
-    }
-  }
 
-  /**
-   * Get access token
-   * @returns {string|null} Access token or null if not found
-   */
-  async getAccessToken() {
-    try {
-      const token = await this.storage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
-      
-      // Check if token is expired
-      if (token && await this.isTokenExpired()) {
-        await this.clearAccessToken();
-        return null;
+      // Only store refresh token if it exists
+      if (refresh_token) {
+        storagePromises.push(AsyncStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refresh_token));
       }
-      
-      return token;
+
+      await Promise.all(storagePromises);
+
+      console.log('Authentication data stored successfully');
     } catch (error) {
-      console.error('TokenManager: Error retrieving access token:', error);
-      return null;
+      console.error('Failed to store authentication data:', error);
+      throw new Error('Failed to store authentication data');
     }
   }
 
   /**
-   * Store refresh token
-   * @param {string} token - Refresh token
+   * Get current access token
+   * @returns {string|null} Access token
    */
-  async setRefreshToken(token) {
-    try {
-      await this.storage.setItem(STORAGE_KEYS.REFRESH_TOKEN, token);
-    } catch (error) {
-      console.error('TokenManager: Error storing refresh token:', error);
-      throw new Error('Failed to store refresh token');
-    }
+  getAccessToken() {
+    return this.accessToken;
+  }
+
+  /**
+   * Get current user data
+   * @returns {Object|null} User data
+   */
+  getUserData() {
+    return this.userData;
   }
 
   /**
    * Get refresh token
-   * @returns {string|null} Refresh token or null if not found
+   * @returns {string|null} Refresh token
    */
-  async getRefreshToken() {
-    try {
-      return await this.storage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
-    } catch (error) {
-      console.error('TokenManager: Error retrieving refresh token:', error);
-      return null;
-    }
-  }
-
-  /**
-   * Store user information
-   * @param {Object} userInfo - User information object
-   */
-  async setUserInfo(userInfo) {
-    try {
-      await this.storage.setItem(STORAGE_KEYS.USER_INFO, JSON.stringify(userInfo));
-    } catch (error) {
-      console.error('TokenManager: Error storing user info:', error);
-      throw new Error('Failed to store user info');
-    }
-  }
-
-  /**
-   * Get user information
-   * @returns {Object|null} User information or null if not found
-   */
-  async getUserInfo() {
-    try {
-      const userInfo = await this.storage.getItem(STORAGE_KEYS.USER_INFO);
-      return userInfo ? JSON.parse(userInfo) : null;
-    } catch (error) {
-      console.error('TokenManager: Error retrieving user info:', error);
-      return null;
-    }
-  }
-
-  /**
-   * Check if access token is expired
-   * @returns {boolean} True if token is expired
-   */
-  async isTokenExpired() {
-    try {
-      const expiryTime = await this.storage.getItem(STORAGE_KEYS.TOKEN_EXPIRY);
-      
-      if (!expiryTime) {
-        return false; // No expiry set, assume token is valid
-      }
-      
-      return Date.now() >= parseInt(expiryTime);
-    } catch (error) {
-      console.error('TokenManager: Error checking token expiry:', error);
-      return true; // Assume expired on error
-    }
+  getRefreshToken() {
+    return this.refreshToken;
   }
 
   /**
    * Check if user is authenticated
-   * @returns {boolean} True if user has valid tokens
+   * @returns {boolean} Authentication status
    */
-  async isAuthenticated() {
-    try {
-      const accessToken = await this.getAccessToken();
-      return !!accessToken;
-    } catch (error) {
-      console.error('TokenManager: Error checking authentication:', error);
+  isAuthenticated() {
+    if (!this.accessToken) {
       return false;
     }
-  }
 
-  /**
-   * Clear access token and expiry
-   */
-  async clearAccessToken() {
-    try {
-      await Promise.all([
-        this.storage.removeItem(STORAGE_KEYS.ACCESS_TOKEN),
-        this.storage.removeItem(STORAGE_KEYS.TOKEN_EXPIRY),
-      ]);
-    } catch (error) {
-      console.error('TokenManager: Error clearing access token:', error);
-      throw new Error('Failed to clear access token');
+    // Check if token is expired
+    if (this.tokenExpiry && new Date() > this.tokenExpiry) {
+      this.clearTokens();
+      return false;
     }
+
+    return true;
   }
 
   /**
-   * Clear refresh token
+   * Get authorization header for API requests
+   * @returns {string|null} Authorization header
    */
-  async clearRefreshToken() {
-    try {
-      await this.storage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
-    } catch (error) {
-      console.error('TokenManager: Error clearing refresh token:', error);
-      throw new Error('Failed to clear refresh token');
-    }
-  }
-
-  /**
-   * Clear user information
-   */
-  async clearUserInfo() {
-    try {
-      await this.storage.removeItem(STORAGE_KEYS.USER_INFO);
-    } catch (error) {
-      console.error('TokenManager: Error clearing user info:', error);
-      throw new Error('Failed to clear user info');
-    }
-  }
-
-  /**
-   * Clear all stored data
-   */
-  async clearAll() {
-    try {
-      await Promise.all([
-        this.clearAccessToken(),
-        this.clearRefreshToken(),
-        this.clearUserInfo(),
-      ]);
-    } catch (error) {
-      console.error('TokenManager: Error clearing all data:', error);
-      throw new Error('Failed to clear all data');
-    }
-  }
-
-  /**
-   * Get authorization header value
-   * @returns {string|null} Authorization header value or null
-   */
-  async getAuthHeader() {
-    try {
-      const token = await this.getAccessToken();
-      return token ? `Bearer ${token}` : null;
-    } catch (error) {
-      console.error('TokenManager: Error getting auth header:', error);
+  getAuthHeader() {
+    if (!this.isAuthenticated()) {
       return null;
     }
+    // Return just the token without "Bearer " prefix as per API requirements
+    return this.accessToken;
   }
 
   /**
-   * Store complete authentication data
-   * @param {Object} authData - Authentication data object
-   * @param {string} authData.access_token - Access token
-   * @param {string} authData.refresh_token - Refresh token (optional)
-   * @param {number} authData.expires_in - Token expiry in seconds (optional)
-   * @param {Object} authData.user - User information (optional)
+   * Update access token (for token refresh)
+   * @param {string} newAccessToken - New access token
+   * @param {number} expiresIn - Token expiry time in seconds
    */
-  async storeAuthData(authData) {
+  async updateAccessToken(newAccessToken, expiresIn = 3600) {
     try {
-      const promises = [];
-      
-      // Store access token
-      if (authData.access_token) {
-        promises.push(this.setAccessToken(authData.access_token, authData.expires_in));
-      }
-      
-      // Store refresh token
-      if (authData.refresh_token) {
-        promises.push(this.setRefreshToken(authData.refresh_token));
-      }
-      
-      // Store user info
-      if (authData.user) {
-        promises.push(this.setUserInfo(authData.user));
-      }
-      
-      await Promise.all(promises);
+      this.accessToken = newAccessToken;
+      this.tokenExpiry = new Date(Date.now() + expiresIn * 1000);
+
+      await AsyncStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, newAccessToken);
+      await AsyncStorage.setItem(STORAGE_KEYS.TOKEN_EXPIRY, this.tokenExpiry.toISOString());
+
+      console.log('Access token updated successfully');
     } catch (error) {
-      console.error('TokenManager: Error storing auth data:', error);
-      throw new Error('Failed to store authentication data');
+      console.error('Failed to update access token:', error);
+      throw new Error('Failed to update access token');
     }
+  }
+
+  /**
+   * Update user data
+   * @param {Object} userData - Updated user data
+   */
+  async updateUserData(userData) {
+    try {
+      this.userData = { ...this.userData, ...userData };
+      await AsyncStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(this.userData));
+      console.log('User data updated successfully');
+    } catch (error) {
+      console.error('Failed to update user data:', error);
+      throw new Error('Failed to update user data');
+    }
+  }
+
+  /**
+   * Clear all stored tokens and user data
+   */
+  async clearTokens() {
+    try {
+      this.accessToken = null;
+      this.userData = null;
+      this.refreshToken = null;
+      this.tokenExpiry = null;
+
+      await Promise.all([
+        AsyncStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN),
+        AsyncStorage.removeItem(STORAGE_KEYS.USER_DATA),
+        AsyncStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN),
+        AsyncStorage.removeItem(STORAGE_KEYS.TOKEN_EXPIRY),
+      ]);
+
+      console.log('All tokens cleared successfully');
+    } catch (error) {
+      console.error('Failed to clear tokens:', error);
+      throw new Error('Failed to clear tokens');
+    }
+  }
+
+  /**
+   * Check if token is about to expire (within 5 minutes)
+   * @returns {boolean} True if token expires soon
+   */
+  isTokenExpiringSoon() {
+    if (!this.tokenExpiry) {
+      return false;
+    }
+
+    const fiveMinutesFromNow = new Date(Date.now() + 5 * 60 * 1000);
+    return this.tokenExpiry <= fiveMinutesFromNow;
+  }
+
+  /**
+   * Get token expiry time
+   * @returns {Date|null} Token expiry date
+   */
+  getTokenExpiry() {
+    return this.tokenExpiry;
+  }
+
+  /**
+   * Get time until token expires in seconds
+   * @returns {number} Seconds until expiry
+   */
+  getTimeUntilExpiry() {
+    if (!this.tokenExpiry) {
+      return 0;
+    }
+
+    const now = new Date();
+    const timeUntilExpiry = this.tokenExpiry.getTime() - now.getTime();
+    return Math.max(0, Math.floor(timeUntilExpiry / 1000));
   }
 }
 
-// Export singleton instance
-export const tokenManager = new TokenManager();
-export { TokenManager, STORAGE_KEYS }; 
+export default TokenManager; 

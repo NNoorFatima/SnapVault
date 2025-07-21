@@ -10,7 +10,9 @@ import {
   StatusBar,
   Image,
   ScrollView,
+  Alert,
 } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 import CustomBox from '../../components/CustomBox';
 import CustomTextField from '../../components/CustomTextField';
 import ClickableText from '../../components/ClickableText';
@@ -19,15 +21,53 @@ import CustomButton from '../../components/CustomButton';
 import { useTranslation } from 'react-i18next';
 import i18n from '../../localization/i18n';
 import { changeAppLanguage } from '../../localization/i18n';
-
+import { loginUser } from '../../store/slices/authSlice';
 
 const { width, height } = Dimensions.get('window');
 
-const SignInScreen = ({ navigation, onSignIn }) => {
+const SignInScreen = ({ navigation }) => {
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.auth);
   const {t} = useTranslation();
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [showPassword, setShowPassword] = React.useState(false);
+
+  const handleSignIn = async () => {
+    if (!email.trim() || !password.trim()) {
+      Alert.alert('Error', 'Please enter both email and password');
+      return;
+    }
+
+    try {
+      console.log('Starting login process...');
+      const result = await dispatch(loginUser({
+        email: email.trim(),
+        password: password
+      }));
+      
+      if (loginUser.fulfilled.match(result)) {
+        console.log('Login successful:', result.payload);
+        Alert.alert('Success', 'Login successful!');
+        // Navigation will be handled automatically by the AppNavigator
+        // based on the Redux state change
+      } else {
+        console.error('Login failed:', result.error);
+        let errorMessage = 'Login failed. Please try again.';
+        
+        if (result.error?.message) {
+          errorMessage = result.error.message;
+        }
+        
+        Alert.alert('Login Error', errorMessage);
+      }
+      
+    } catch (error) {
+      console.error('Login failed:', error);
+      Alert.alert('Login Error', 'An unexpected error occurred. Please try again.');
+    }
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ImageBackground
@@ -97,8 +137,9 @@ const SignInScreen = ({ navigation, onSignIn }) => {
                 textColor="#1B1C41"
                 fontSize={20}
                 borderRadius={20}
-                onPress={() => onSignIn && onSignIn()}
+                onPress={handleSignIn}
                 style={{ marginTop: 16 }}
+                isLoading={loading}
               />
               {/*change language  */}
               {/* <ProfileOption icon={<Feather name="globe" size={20} color="grey" />} label= {t('profile.changeLanguage')}
