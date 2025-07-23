@@ -1,13 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {View, Text, Image, TouchableOpacity, StyleSheet,
   Dimensions, ScrollView, ImageBackground, Alert, Platform, } from 'react-native';
 // @ts-ignore
 import Feather from 'react-native-vector-icons/Feather'; //for icons
 import { I18nManager } from 'react-native';
-
-
-
+// No API imports needed since we use passed data
 
 // Import clipboard with fallback
 let Clipboard;
@@ -42,12 +40,19 @@ try {
 
 const GroupScreen = ({ route, navigation }) => {
   const { t } = useTranslation();
-  const { groupId, groupName, groupDescription, groupCode } = route.params || {
+  console.log('🔄 GroupScreen route params:', route.params);
+  
+  const { groupId, groupName, groupDescription, groupCode, fullGroupData } = route.params || {
     groupId: 1,
     groupName: t('GroupScreen.sampleName'),
     groupDescription: t('GroupScreen.sampleDescription'),
     groupCode: 'ABC123'
   };
+  
+  console.log('🔍 Extracted groupId:', groupId);
+  console.log('🔍 Extracted groupName:', groupName);
+  console.log('🔍 Full group data received:', fullGroupData);
+  
   const [activeTab, setActiveTab] = useState('myPictures');
   const [myPictures, setMyPictures] = useState([]);
   const [allPictures, setAllPictures] = useState([
@@ -56,9 +61,57 @@ const GroupScreen = ({ route, navigation }) => {
     { id: 3, uri: 'https://placehold.co/300x300/F59E0B/FFFFFF', uploadedBy: 'User 3', date: '2024-01-13' },
     { id: 4, uri: 'https://placehold.co/300x300/EF4444/FFFFFF', uploadedBy: 'User 1', date: '2024-01-12' },
   ]);
+  
+  // Group data state - will be updated when route params are available
+  const [groupData, setGroupData] = useState({
+    id: groupId,
+    name: groupName,
+    description: groupDescription,
+    invite_code: groupCode,
+    creator: {
+      name: 'Unknown',
+      email: 'unknown@example.com'
+    }
+  });
+
+  useEffect(() => {
+    console.log('🔄 useEffect triggered with route params:', route.params);
+    console.log('🔍 fullGroupData in useEffect:', fullGroupData);
+    console.log('🔍 groupId in useEffect:', groupId);
+    
+    // Update group data when route params are available
+    if (fullGroupData) {
+      console.log('✅ Updating group data with passed data from dashboard');
+      console.log('🔍 Full group data being used:', fullGroupData);
+      setGroupData({
+        id: fullGroupData.id,
+        name: fullGroupData.name,
+        description: fullGroupData.description,
+        invite_code: fullGroupData.code,
+        creator: fullGroupData.creator || {
+          name: 'Unknown',
+          email: 'unknown@example.com'
+        }
+      });
+    } else {
+      console.log('⚠️ No passed data, using route params');
+      setGroupData({
+        id: groupId,
+        name: groupName,
+        description: groupDescription,
+        invite_code: groupCode,
+        creator: {
+          name: 'Unknown',
+          email: 'unknown@example.com'
+        }
+      });
+    }
+  }, [fullGroupData, groupId, groupName, groupDescription, groupCode, route.params]);
+
+  // No API calls needed - using passed data from navigation
 
   const handleCopyGroupCode = () => {
-    Clipboard.setString(groupCode);
+    Clipboard.setString(groupData.invite_code);
     Alert.alert('Copied!', 'Group code copied to clipboard');
   };
 
@@ -97,33 +150,33 @@ const GroupScreen = ({ route, navigation }) => {
     return (
       <View style={styles.imageGrid}>
         {images.map((image) => (
-          // <View key={image.id} style={styles.imageWrapper}>
-            <TouchableOpacity
-                      key={image.id}
-                      style={styles.imageWrapper}
-                      onPress={() =>
-                        navigation.navigate('ImageDetail', {
-                          imageUri: image.uri,
-                          uploadedBy: image.uploadedBy,
-                          date: image.date,
-                          id: image.id,
-                        })
-                      }
-                    >
-
+          <TouchableOpacity
+            key={image.id}
+            style={styles.imageWrapper}
+            onPress={() =>
+              navigation.navigate('ImageDetail', {
+                imageUri: image.uri,
+                uploadedBy: image.uploadedBy,
+                date: image.date,
+                id: image.id,
+              })
+            }
+          >
             <Image source={{ uri: image.uri }} style={styles.gridImage} />
             <View style={styles.imageInfo}>
               <Text style={styles.imageUploader}>{image.uploadedBy}</Text>
               <Text style={styles.imageDate}>{image.date}</Text>
             </View>
-            {/* </View> */}
           </TouchableOpacity>
-
         ))}
       </View>
     );
   };
+  
   const isRTL = I18nManager.isRTL;
+  
+  // No loading or error states needed since we use passed data
+  console.log('✅ Rendering GroupScreen with passed data');
   
   return (
     <View style={styles.container}>
@@ -158,19 +211,20 @@ const GroupScreen = ({ route, navigation }) => {
             <View style={styles.groupInfoContent}>
               <View style={styles.groupHeader}>
                 <Image
-                  source={require('../DashBoard/img/group1.png')}
+                  source={require('../../assets/temp-pfp.jpg')}
                   style={styles.groupImage}
                 />
                 <View style={styles.groupTextContainer}>
-                  <Text style={styles.groupName}>{t('GroupScreen.sampleName')}</Text>
-                  <Text style={styles.groupDescription}>{t('GroupScreen.sampleDescription')}</Text>
+                  <Text style={styles.groupName}>{groupData.name}</Text>
+                  <Text style={styles.groupDescription}>{groupData.description || 'No description available'}</Text>
+                  <Text style={styles.groupCreator}>Created by: {groupData.creator?.name || 'Unknown'}</Text>
                 </View>
               </View>
               
               <View style={styles.groupCodeContainer}>
                 <Text style={styles.groupCodeLabel}>{t('GroupScreen.code')}</Text>
                 <View style={styles.groupCodeBox}>
-                  <Text style={styles.groupCodeText}>{groupCode}</Text>
+                  <Text style={styles.groupCodeText}>{groupData.invite_code}</Text>
                   <TouchableOpacity style={styles.copyButton} onPress={handleCopyGroupCode}>
                     <Feather name="copy" size={24} color="white" style={styles.copyButtonText} />
                   </TouchableOpacity>
@@ -332,6 +386,11 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     fontWeight: '400',
   },
+  groupCreator: {
+    color: '#9CA3AF',
+    fontSize: 12,
+    marginTop: 4,
+  },
   groupCodeContainer: {
     marginBottom: 20,
   },
@@ -479,6 +538,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 24,
   },
+
+  // No loading/error styles needed since we use passed data
 
   bottomSpacer: {
     height: 40,

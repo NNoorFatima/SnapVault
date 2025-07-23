@@ -15,6 +15,14 @@ interface GroupData {
   code: string;
   memberCount: number;
   image: any;
+  creator?: {
+    id: number;
+    name: string;
+    email: string;
+    bio?: string;
+    created_at: string;
+    profile_picture?: string;
+  };
 }
 
 type AllGroupsScreenNavigationProp = BottomTabNavigationProp<MainTabParamList, 'AllGroups'>;
@@ -35,6 +43,14 @@ const AllGroupsScreen: React.FC<AllGroupsScreenProps> = ({ navigation, route }) 
       code: 'GRP001',
       memberCount: 5,
       image: require('../DashBoard/img/group1.png'),
+      creator: {
+        id: 1,
+        name: 'John Doe',
+        email: 'john@example.com',
+        bio: 'Group creator',
+        created_at: '2025-07-23T07:27:36',
+        profile_picture: null
+      }
     },
     {
       id: 2,
@@ -43,6 +59,14 @@ const AllGroupsScreen: React.FC<AllGroupsScreenProps> = ({ navigation, route }) 
       code: 'GRP002',
       memberCount: 8,
       image: require('../DashBoard/img/group1.png'),
+      creator: {
+        id: 2,
+        name: 'Jane Smith',
+        email: 'jane@example.com',
+        bio: 'Group creator',
+        created_at: '2025-07-23T07:27:36',
+        profile_picture: null
+      }
     },
     // ...add more mock groups as needed
   ];
@@ -64,7 +88,25 @@ const AllGroupsScreen: React.FC<AllGroupsScreenProps> = ({ navigation, route }) 
     groupDescription: string;
     groupCode: string;
   }) => {
-    navigation.navigate('GroupScreen', groupData);
+    console.log('🔄 Navigating to group screen from AllGroups with data:', groupData);
+    console.log('🔍 Group ID being sent from AllGroups:', groupData.groupId);
+    console.log('🔍 Group ID type from AllGroups:', typeof groupData.groupId);
+    
+    // Find the full group data from our groups array
+    const fullGroupData = groups.find(group => group.id === groupData.groupId);
+    console.log('🔍 Full group data found in AllGroups:', fullGroupData);
+    
+    // Navigate to the nested GroupScreen stack
+    navigation.navigate('GroupScreen', {
+      screen: 'GroupScreen',
+      params: {
+        groupId: groupData.groupId,
+        groupName: groupData.groupName,
+        groupDescription: groupData.groupDescription,
+        groupCode: groupData.groupCode,
+        fullGroupData: fullGroupData // Pass the complete group data
+      }
+    });
   };
 
   const screenWidth = Dimensions.get('window').width;

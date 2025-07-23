@@ -73,14 +73,21 @@ const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
       console.log('📡 API Response received:', response);
       
       if (response && Array.isArray(response)) {
-        const transformedGroups = response.map(group => ({
-          id: group.id,
-          name: group.name,
-          description: group.description || 'No description available',
-          code: group.invite_code,
-          memberCount: 0, // We'll add this later if needed
-          image: require('../../assets/temp-pfp.jpg'), // Using temp-pfp as fallback
-        }));
+        const transformedGroups = response.map(group => {
+          console.log('🔄 Transforming group:', group);
+          console.log('🔍 Original group ID:', group.id, 'Type:', typeof group.id);
+          console.log('🔍 Creator info:', group.creator);
+          
+          return {
+            id: group.id,
+            name: group.name,
+            description: group.description || 'No description available',
+            code: group.invite_code,
+            memberCount: 0, // We'll add this later if needed
+            image: require('../../assets/temp-pfp.jpg'), // Using temp-pfp as fallback
+            creator: group.creator // Include creator information
+          };
+        });
         
         console.log('🔄 Transformed groups data:', transformedGroups);
         setGroupsData(transformedGroups);
@@ -259,7 +266,7 @@ const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
   // ];
 
   const statsData = [
-    { value: '8', label: t('Dashboard.groups') },
+    { value: groupsData.length.toString(), label: t('Dashboard.groups') },
     { value: '124', label: t('Dashboard.photos') },
     { value: '2.3GB', label: t('Dashboard.storage') },
   ];
@@ -304,7 +311,25 @@ const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
     groupDescription: string;
     groupCode: string;
   }) => {
-    navigation.navigate('GroupScreen', groupData);
+    console.log('🔄 Navigating to group screen with data:', groupData);
+    console.log('🔍 Group ID being sent:', groupData.groupId);
+    console.log('🔍 Group ID type:', typeof groupData.groupId);
+    
+    // Find the full group data from our groupsData array
+    const fullGroupData = groupsData.find(group => group.id === groupData.groupId);
+    console.log('🔍 Full group data found:', fullGroupData);
+    
+    // Navigate to the nested GroupScreen stack
+    navigation.navigate('GroupScreen', {
+      screen: 'GroupScreen',
+      params: {
+        groupId: groupData.groupId,
+        groupName: groupData.groupName,
+        groupDescription: groupData.groupDescription,
+        groupCode: groupData.groupCode,
+        fullGroupData: fullGroupData // Pass the complete group data
+      }
+    });
   };
 
   const handleViewAllGroups = () => {
