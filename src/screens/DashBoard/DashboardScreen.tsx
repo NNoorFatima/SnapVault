@@ -13,6 +13,7 @@ import CreateGroupPopup from '../../components/CreateGroupPopup';
 import JoinGroupPopup from '../../components/JoinGroupPopup';
 import { getUserService, getGroupsService } from '../../api/ApiFactory';
 
+
 type DashboardScreenNavigationProp = BottomTabNavigationProp<MainTabParamList, 'Dashboard'>;
 
 interface DashboardScreenProps {
@@ -31,6 +32,7 @@ interface UserProfileData {
   email?: string;
   profile_picture?: string;
 }
+
 
 interface GroupData {
   id: number;
@@ -52,6 +54,7 @@ const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [groupsData, setGroupsData] = useState<GroupData[]>([]);
   const [groupsLoading, setGroupsLoading] = useState(false);
+
   
   //for localization
   const { t } = useTranslation();
