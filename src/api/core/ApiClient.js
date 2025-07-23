@@ -1,54 +1,51 @@
 /**
- * ApiClient
- * Core HTTP client with interceptors for authentication, error handling, and retry logic
- * 
- * SOLID Principles Applied:
- * - Single Responsibility: Only handles HTTP requests and responses
- * - Open/Closed: Easy to extend with new interceptors
- * - Dependency Inversion: Uses injected dependencies for configuration and token management
+ * API Client
+ * Main HTTP client for making API requests with authentication and error handling
  */
 
 import axios from 'axios';
-import { apiConfig, HTTP_STATUS, ERROR_TYPES } from '../config/ApiConfig';
-import { tokenManager } from './TokenManager';
+import { ERROR_TYPES, HTTP_STATUS } from '../config/ApiConfig';
 
 class ApiClient {
-  constructor(config = apiConfig, tokenMgr = tokenManager) {
+  constructor(config, tokenManager) {
     this.config = config;
-    this.tokenManager = tokenMgr;
-    this.retryCount = 0;
-    this.maxRetries = config.getConfig().retryAttempts || 3;
-    
-    // Create axios instance
+    this.tokenManager = tokenManager;
+    this.instance = null;
+    this.initialize();
+  }
+
+  /**
+   * Initialize axios instance with interceptors
+   */
+  initialize() {
     this.instance = axios.create({
-      baseURL: config.getBaseURL(),
-      timeout: config.getConfig().timeout,
-      headers: config.getConfig().headers,
+      baseURL: this.config.getBaseURL(),
+      timeout: this.config.getTimeout(),
+      headers: this.config.getHeaders(),
     });
 
-    // Setup interceptors
     this.setupRequestInterceptors();
     this.setupResponseInterceptors();
   }
 
   /**
-   * Setup request interceptors
+   * Setup request interceptors for authentication and logging
    */
   setupRequestInterceptors() {
     this.instance.interceptors.request.use(
       async (config) => {
-        // Add authorization header
-        const authHeader = await this.tokenManager.getAuthHeader();
+        // Add authorization header if available
+        const authHeader = this.tokenManager.getAuthHeader();
         if (authHeader) {
           config.headers.Authorization = authHeader;
         }
 
-        // Add request timestamp for performance monitoring
-        config.metadata = { startTime: Date.now() };
+        // Add request timestamp for logging
+        config.metadata = { startTime: new Date() };
 
         // Log request in development
         if (__DEV__) {
-          console.log('🚀 API Request:', {
+          console.log('API Request:', {
             method: config.method?.toUpperCase(),
             url: config.url,
             headers: config.headers,
@@ -59,25 +56,24 @@ class ApiClient {
         return config;
       },
       (error) => {
-        console.error('❌ Request interceptor error:', error);
-        return Promise.reject(this.handleError(error, ERROR_TYPES.NETWORK_ERROR));
+        console.error('Request interceptor error:', error);
+        return Promise.reject(this.createError(error, ERROR_TYPES.NETWORK_ERROR));
       }
     );
   }
 
   /**
-   * Setup response interceptors
+   * Setup response interceptors for error handling and logging
    */
   setupResponseInterceptors() {
     this.instance.interceptors.response.use(
       (response) => {
         // Log response in development
         if (__DEV__) {
-          const duration = Date.now() - response.config.metadata.startTime;
-          console.log('✅ API Response:', {
-            method: response.config.method?.toUpperCase(),
-            url: response.config.url,
+          const duration = new Date() - response.config.metadata.startTime;
+          console.log('API Response:', {
             status: response.status,
+            url: response.config.url,
             duration: `${duration}ms`,
             data: response.data,
           });
@@ -86,149 +82,125 @@ class ApiClient {
         return response;
       },
       async (error) => {
-        return this.handleResponseError(error);
+        // Log error in development
+        if (__DEV__) {
+          const duration = error.config?.metadata?.startTime 
+            ? new Date() - error.config.metadata.startTime 
+            : 'unknown';
+          console.error('API Error:', {
+            status: error.response?.status,
+            url: error.config?.url,
+            duration: `${duration}ms`,
+            message: error.message,
+            data: error.response?.data,
+          });
+        }
+
+        // Handle specific error types
+        const apiError = this.handleApiError(error);
+        return Promise.reject(apiError);
       }
     );
   }
 
   /**
-   * Handle response errors with retry logic and token refresh
+   * Handle API errors and convert to standardized format
+   * @param {Error} error - Axios error
+   * @returns {Object} Standardized error object
    */
-  async handleResponseError(error) {
-    const originalRequest = error.config;
-    
-    // Handle timeout errors
-    if (error.code === 'ECONNABORTED') {
-      console.error('⏱️ Request timeout:', error.message);
-      return Promise.reject(this.handleError(error, ERROR_TYPES.TIMEOUT_ERROR));
-    }
-
-    // Handle network errors
-    if (!error.response) {
-      console.error('🌐 Network error:', error.message);
-      return Promise.reject(this.handleError(error, ERROR_TYPES.NETWORK_ERROR));
-    }
-
-    const status = error.response.status;
-    
-    // Handle 401 Unauthorized - attempt token refresh
-    if (status === HTTP_STATUS.UNAUTHORIZED && !originalRequest._retry) {
-      originalRequest._retry = true;
+  handleApiError(error) {
+    if (error.response) {
+      // Server responded with error status
+      const { status, data } = error.response;
       
-      try {
-        const refreshToken = await this.tokenManager.getRefreshToken();
-        if (refreshToken) {
-          await this.refreshTokens();
-          // Retry original request with new token
-          const authHeader = await this.tokenManager.getAuthHeader();
-          if (authHeader) {
-            originalRequest.headers.Authorization = authHeader;
-            return this.instance(originalRequest);
-          }
-        }
-      } catch (refreshError) {
-        console.error('🔄 Token refresh failed:', refreshError);
-        await this.tokenManager.clearAll();
-        return Promise.reject(this.handleError(error, ERROR_TYPES.AUTHENTICATION_ERROR));
+      switch (status) {
+        case HTTP_STATUS.UNAUTHORIZED:
+          return this.createError(error, ERROR_TYPES.AUTHENTICATION_ERROR, {
+            message: data?.detail || 'Authentication required',
+            status,
+            data,
+          });
+
+        case HTTP_STATUS.FORBIDDEN:
+          return this.createError(error, ERROR_TYPES.AUTHORIZATION_ERROR, {
+            message: data?.detail || 'Access denied',
+            status,
+            data,
+          });
+
+        case HTTP_STATUS.NOT_FOUND:
+          return this.createError(error, ERROR_TYPES.NOT_FOUND_ERROR, {
+            message: data?.detail || 'Resource not found',
+            status,
+            data,
+          });
+
+        case HTTP_STATUS.CONFLICT:
+          return this.createError(error, ERROR_TYPES.CONFLICT_ERROR, {
+            message: data?.detail || 'Resource conflict',
+            status,
+            data,
+          });
+
+        case HTTP_STATUS.UNPROCESSABLE_ENTITY:
+          return this.createError(error, ERROR_TYPES.VALIDATION_ERROR, {
+            message: data?.detail || 'Validation failed',
+            status,
+            data,
+          });
+
+        case HTTP_STATUS.INTERNAL_SERVER_ERROR:
+        case HTTP_STATUS.BAD_GATEWAY:
+        case HTTP_STATUS.SERVICE_UNAVAILABLE:
+          return this.createError(error, ERROR_TYPES.SERVER_ERROR, {
+            message: data?.detail || 'Server error',
+            status,
+            data,
+          });
+
+        default:
+          return this.createError(error, ERROR_TYPES.UNKNOWN_ERROR, {
+            message: data?.detail || 'Unknown error occurred',
+            status,
+            data,
+          });
       }
-      
-      // No refresh token or refresh failed
-      await this.tokenManager.clearAll();
-      return Promise.reject(this.handleError(error, ERROR_TYPES.AUTHENTICATION_ERROR));
+    } else if (error.request) {
+      // Network error
+      return this.createError(error, ERROR_TYPES.NETWORK_ERROR, {
+        message: 'Network error - please check your connection',
+      });
+    } else {
+      // Other error
+      return this.createError(error, ERROR_TYPES.UNKNOWN_ERROR, {
+        message: error.message || 'Unknown error occurred',
+      });
     }
-
-    // Handle other HTTP errors
-    return Promise.reject(this.handleHttpError(error));
   }
 
   /**
-   * Handle HTTP errors based on status codes
+   * Create standardized error object
+   * @param {Error} originalError - Original error
+   * @param {string} type - Error type
+   * @param {Object} additionalData - Additional error data
+   * @returns {Object} Standardized error
    */
-  handleHttpError(error) {
-    const status = error.response?.status;
-    const data = error.response?.data;
-
-    let errorType = ERROR_TYPES.UNKNOWN_ERROR;
-    let message = 'An unexpected error occurred';
-
-    switch (status) {
-      case HTTP_STATUS.BAD_REQUEST:
-        errorType = ERROR_TYPES.VALIDATION_ERROR;
-        message = data?.message || 'Invalid request data';
-        break;
-      case HTTP_STATUS.UNAUTHORIZED:
-        errorType = ERROR_TYPES.AUTHENTICATION_ERROR;
-        message = 'Authentication failed';
-        break;
-      case HTTP_STATUS.FORBIDDEN:
-        errorType = ERROR_TYPES.AUTHENTICATION_ERROR;
-        message = 'Access forbidden';
-        break;
-      case HTTP_STATUS.NOT_FOUND:
-        errorType = ERROR_TYPES.NETWORK_ERROR;
-        message = 'Resource not found';
-        break;
-      case HTTP_STATUS.INTERNAL_SERVER_ERROR:
-      case HTTP_STATUS.SERVICE_UNAVAILABLE:
-        errorType = ERROR_TYPES.SERVER_ERROR;
-        message = 'Server error occurred';
-        break;
-      default:
-        errorType = ERROR_TYPES.UNKNOWN_ERROR;
-        message = data?.message || 'An unexpected error occurred';
-    }
-
-    return this.handleError(error, errorType, message);
-  }
-
-  /**
-   * Standardize error handling
-   */
-  handleError(error, type = ERROR_TYPES.UNKNOWN_ERROR, message = null) {
-    const standardError = {
+  createError(originalError, type, additionalData = {}) {
+    return {
       type,
-      message: message || error.message || 'An error occurred',
-      originalError: error,
-      status: error.response?.status,
-      data: error.response?.data,
+      message: additionalData.message || originalError.message || 'An error occurred',
+      status: additionalData.status || originalError.response?.status,
+      data: additionalData.data || originalError.response?.data,
       timestamp: new Date().toISOString(),
+      originalError,
     };
-
-    // Log error in development
-    if (__DEV__) {
-      console.error('❌ API Error:', standardError);
-    }
-
-    return standardError;
   }
 
   /**
-   * Refresh authentication tokens
-   */
-  async refreshTokens() {
-    try {
-      const refreshToken = await this.tokenManager.getRefreshToken();
-      if (!refreshToken) {
-        throw new Error('No refresh token available');
-      }
-
-      const response = await this.instance.post(
-        this.config.getEndpoint('AUTH', 'REFRESH'),
-        { refresh_token: refreshToken }
-      );
-
-      const authData = response.data;
-      await this.tokenManager.storeAuthData(authData);
-      
-      return authData;
-    } catch (error) {
-      console.error('🔄 Token refresh failed:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * GET request
+   * Make GET request
+   * @param {string} url - Request URL
+   * @param {Object} config - Request configuration
+   * @returns {Promise<Object>} Response data
    */
   async get(url, config = {}) {
     try {
@@ -240,7 +212,11 @@ class ApiClient {
   }
 
   /**
-   * POST request
+   * Make POST request
+   * @param {string} url - Request URL
+   * @param {Object} data - Request data
+   * @param {Object} config - Request configuration
+   * @returns {Promise<Object>} Response data
    */
   async post(url, data = {}, config = {}) {
     try {
@@ -252,7 +228,11 @@ class ApiClient {
   }
 
   /**
-   * PUT request
+   * Make PUT request
+   * @param {string} url - Request URL
+   * @param {Object} data - Request data
+   * @param {Object} config - Request configuration
+   * @returns {Promise<Object>} Response data
    */
   async put(url, data = {}, config = {}) {
     try {
@@ -264,19 +244,10 @@ class ApiClient {
   }
 
   /**
-   * PATCH request
-   */
-  async patch(url, data = {}, config = {}) {
-    try {
-      const response = await this.instance.patch(url, data, config);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  /**
-   * DELETE request
+   * Make DELETE request
+   * @param {string} url - Request URL
+   * @param {Object} config - Request configuration
+   * @returns {Promise<Object>} Response data
    */
   async delete(url, config = {}) {
     try {
@@ -288,26 +259,15 @@ class ApiClient {
   }
 
   /**
-   * Upload file with progress tracking
+   * Make PATCH request
+   * @param {string} url - Request URL
+   * @param {Object} data - Request data
+   * @param {Object} config - Request configuration
+   * @returns {Promise<Object>} Response data
    */
-  async uploadFile(url, formData, onProgress = null) {
+  async patch(url, data = {}, config = {}) {
     try {
-      const config = {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      };
-
-      if (onProgress) {
-        config.onUploadProgress = (progressEvent) => {
-          const progress = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total
-          );
-          onProgress(progress);
-        };
-      }
-
-      const response = await this.instance.post(url, formData, config);
+      const response = await this.instance.patch(url, data, config);
       return response.data;
     } catch (error) {
       throw error;
@@ -315,68 +275,113 @@ class ApiClient {
   }
 
   /**
-   * Download file with progress tracking
+   * Upload file with progress tracking
+   * @param {string} url - Upload URL
+   * @param {Object} formData - Form data with file
+   * @param {Function} onProgress - Progress callback
+   * @param {Object} config - Request configuration
+   * @returns {Promise<Object>} Response data
    */
-  async downloadFile(url, onProgress = null) {
+  async uploadFile(url, formData, onProgress = null, config = {}) {
     try {
-      const config = {
+      const uploadConfig = {
+        ...config,
+        headers: {
+          ...config.headers,
+          'Content-Type': 'multipart/form-data',
+        },
+        onUploadProgress: onProgress ? (progressEvent) => {
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          onProgress(percentCompleted);
+        } : undefined,
+      };
+
+      const response = await this.instance.post(url, formData, uploadConfig);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Download file
+   * @param {string} url - Download URL
+   * @param {Object} config - Request configuration
+   * @returns {Promise<Object>} Response with file data
+   */
+  async downloadFile(url, config = {}) {
+    try {
+      const downloadConfig = {
+        ...config,
         responseType: 'blob',
       };
 
-      if (onProgress) {
-        config.onDownloadProgress = (progressEvent) => {
-          const progress = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total
-          );
-          onProgress(progress);
-        };
-      }
-
-      const response = await this.instance.get(url, config);
-      return response.data;
+      const response = await this.instance.get(url, downloadConfig);
+      return response;
     } catch (error) {
       throw error;
     }
   }
 
   /**
-   * Cancel request
+   * Make request with retry logic
+   * @param {Function} requestFn - Request function to retry
+   * @param {number} maxRetries - Maximum number of retries
+   * @param {number} delay - Delay between retries in ms
+   * @returns {Promise<Object>} Response data
    */
-  cancelRequest(cancelToken) {
-    if (cancelToken) {
-      cancelToken.cancel('Request cancelled by user');
+  async retryRequest(requestFn, maxRetries = 3, delay = 1000) {
+    let lastError;
+
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        return await requestFn();
+      } catch (error) {
+        lastError = error;
+
+        // Don't retry on certain error types
+        if (error.type === ERROR_TYPES.AUTHENTICATION_ERROR ||
+            error.type === ERROR_TYPES.AUTHORIZATION_ERROR ||
+            error.type === ERROR_TYPES.VALIDATION_ERROR) {
+          throw error;
+        }
+
+        // If this is the last attempt, throw the error
+        if (attempt === maxRetries) {
+          throw error;
+        }
+
+        // Wait before retrying
+        await new Promise(resolve => setTimeout(resolve, delay * (attempt + 1)));
+      }
+    }
+
+    throw lastError;
+  }
+
+  /**
+   * Update configuration
+   * @param {Object} newConfig - New configuration
+   */
+  updateConfig(newConfig) {
+    this.config.updateConfig(newConfig);
+    
+    // Update axios instance
+    if (this.instance) {
+      this.instance.defaults.baseURL = this.config.getBaseURL();
+      this.instance.defaults.timeout = this.config.getTimeout();
     }
   }
 
   /**
-   * Create cancel token
+   * Get current configuration
+   * @returns {Object} Current configuration
    */
-  createCancelToken() {
-    return axios.CancelToken.source();
-  }
-
-  /**
-   * Get axios instance for advanced usage
-   */
-  getAxiosInstance() {
-    return this.instance;
-  }
-
-  /**
-   * Update base URL
-   */
-  updateBaseURL(baseURL) {
-    this.instance.defaults.baseURL = baseURL;
-  }
-
-  /**
-   * Set default headers
-   */
-  setDefaultHeaders(headers) {
-    Object.assign(this.instance.defaults.headers, headers);
+  getConfig() {
+    return this.config;
   }
 }
 
-// Export singleton instance
-export const apiClient = new ApiClient();
-export { ApiClient }; 
+export default ApiClient; 

@@ -1,648 +1,683 @@
 /**
- * Usage Examples for SnapVault API Client System
- * 
- * This file demonstrates how to use the new API client system
- * in various scenarios within your React Native app.
+ * API Usage Examples
+ * Comprehensive examples of how to use the new API client system
  */
 
-import { apiFactory } from '../ApiFactory';
-import { useDispatch } from 'react-redux';
-import { 
-  loginUser, 
-  registerUser, 
-  logoutUser, 
-  initializeAuth 
-} from '../../store/slices/authSlice';
-import { fetchUserProfile } from '../../store/slices/profileSlice';
-import { fetchGroups } from '../../store/slices/groupsSlice';
+import apiFactory, { 
+  getAuthService, 
+  getUserService, 
+  getGroupsService, 
+  getPhotosService 
+} from '../ApiFactory';
 
-// =============================================================================
-// 1. APP INITIALIZATION
-// =============================================================================
+// ============================================================================
+// INITIALIZATION
+// ============================================================================
 
 /**
- * Initialize the app with API client
- * Call this in your App.js or main entry point
+ * Initialize the API factory on app start
  */
-export const initializeApp = async () => {
+export const initializeApi = async () => {
   try {
-    console.log('🚀 Initializing SnapVault API Client...');
+    const result = await apiFactory.initialize('development');
     
-    // Initialize API factory
-    const { isAuthenticated } = await apiFactory.initialize();
+    console.log('API Factory initialized:', {
+      isAuthenticated: result.isAuthenticated,
+      environment: result.environment,
+      userData: result.userData
+    });
     
-    if (isAuthenticated) {
-      console.log('✅ User is authenticated');
-      
-      // Optionally pre-load user data
-      const authService = apiFactory.getAuthService();
-      const currentUser = await authService.getCurrentUser();
-      console.log('Current user:', currentUser);
-      
-      return { isAuthenticated: true, user: currentUser };
-    } else {
-      console.log('❌ User not authenticated');
-      return { isAuthenticated: false, user: null };
-    }
+    return result;
   } catch (error) {
-    console.error('❌ App initialization failed:', error);
+    console.error('Failed to initialize API:', error);
     throw error;
   }
 };
 
-// =============================================================================
-// 2. AUTHENTICATION EXAMPLES
-// =============================================================================
+// ============================================================================
+// AUTHENTICATION EXAMPLES
+// ============================================================================
 
 /**
- * Login Example - Direct API usage
+ * Login user
  */
-export const loginExample = async (credentials) => {
+export const loginUser = async (email, password) => {
   try {
-    const authService = apiFactory.getAuthService();
+    const authService = getAuthService();
     
-    // Validate credentials before sending
-    if (!authService.validateEmail(credentials.email)) {
-      throw new Error('Invalid email format');
-    }
-    
-    const response = await authService.login(credentials);
+    const response = await authService.login({
+      email: email,
+      password: password
+    });
     
     console.log('Login successful:', response);
     return response;
   } catch (error) {
-    console.error('Login failed:', error);
+    console.error('Login failed:', error.message);
     throw error;
   }
 };
 
 /**
- * Registration Example with validation
+ * Register new user
  */
-export const registerExample = async (userData) => {
+export const registerUser = async (userData) => {
   try {
-    const authService = apiFactory.getAuthService();
+    const authService = getAuthService();
     
-    // Validate email
-    if (!authService.validateEmail(userData.email)) {
-      throw new Error('Invalid email format');
-    }
-    
-    // Validate password
-    const passwordValidation = authService.validatePassword(userData.password);
-    if (!passwordValidation.isValid) {
-      throw new Error(passwordValidation.errors.join(', '));
-    }
-    
-    const response = await authService.register(userData);
+    const response = await authService.register({
+      name: userData.name,
+      email: userData.email,
+      password: userData.password,
+      profilePicture: {
+        uri: userData.profilePicture.uri,
+        type: 'image/jpeg',
+        name: 'profile.jpg'
+      }
+    });
     
     console.log('Registration successful:', response);
     return response;
   } catch (error) {
-    console.error('Registration failed:', error);
+    console.error('Registration failed:', error.message);
     throw error;
   }
 };
 
 /**
- * Logout Example
+ * Update user password
  */
-export const logoutExample = async () => {
+export const updatePassword = async (currentPassword, newPassword) => {
   try {
-    const authService = apiFactory.getAuthService();
-    await authService.logout();
+    const authService = getAuthService();
     
-    console.log('Logout successful');
-  } catch (error) {
-    console.error('Logout failed:', error);
-    // Note: Logout should still clear local data even if server call fails
-  }
-};
-
-// =============================================================================
-// 3. PROFILE MANAGEMENT EXAMPLES
-// =============================================================================
-
-/**
- * Profile Management Example
- */
-export const profileExample = async () => {
-  try {
-    const profileService = apiFactory.getProfileService();
-    
-    // Get current profile
-    const profile = await profileService.getProfile();
-    console.log('Current profile:', profile);
-    
-    // Update profile
-    const updatedProfile = await profileService.updateProfile({
-      name: 'John Updated',
-      bio: 'Updated bio text'
+    const response = await authService.updatePassword({
+      current_password: currentPassword,
+      new_password: newPassword
     });
-    console.log('Updated profile:', updatedProfile);
     
-    // Upload avatar with progress tracking
-    const avatarData = {
-      uri: 'file://path/to/avatar.jpg',
-      type: 'image/jpeg',
-      name: 'avatar.jpg'
-    };
-    
-    const avatarResponse = await profileService.uploadAvatar(
-      avatarData,
-      (progress) => {
-        console.log(`Avatar upload progress: ${progress}%`);
-      }
-    );
-    console.log('Avatar uploaded:', avatarResponse);
-    
-    return { profile, updatedProfile, avatarResponse };
+    console.log('Password updated successfully');
+    return response;
   } catch (error) {
-    console.error('Profile operations failed:', error);
+    console.error('Password update failed:', error.message);
     throw error;
   }
 };
 
-// =============================================================================
-// 4. GROUP MANAGEMENT EXAMPLES
-// =============================================================================
+/**
+ * Logout user
+ */
+export const logoutUser = async () => {
+  try {
+    await apiFactory.logout();
+    console.log('User logged out successfully');
+  } catch (error) {
+    console.error('Logout failed:', error.message);
+    throw error;
+  }
+};
+
+// ============================================================================
+// USER PROFILE EXAMPLES
+// ============================================================================
 
 /**
- * Group Management Example
+ * Get user profile
  */
-export const groupsExample = async () => {
+export const getUserProfile = async () => {
   try {
-    const groupsService = apiFactory.getGroupsService();
+    const userService = getUserService();
     
-    // Get user's groups with pagination
-    const groups = await groupsService.getMyGroups({
-      page: 1,
-      limit: 10
+    const profile = await userService.getProfile();
+    console.log('User profile:', profile);
+    return profile;
+  } catch (error) {
+    console.error('Failed to get profile:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * Update user bio
+ */
+export const updateUserBio = async (bio) => {
+  try {
+    const userService = getUserService();
+    
+    const updatedProfile = await userService.updateBio(bio);
+    console.log('Bio updated successfully:', updatedProfile);
+    return updatedProfile;
+  } catch (error) {
+    console.error('Failed to update bio:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * Update user name
+ */
+export const updateUserName = async (name) => {
+  try {
+    const userService = getUserService();
+    
+    const updatedProfile = await userService.updateName(name);
+    console.log('Name updated successfully:', updatedProfile);
+    return updatedProfile;
+  } catch (error) {
+    console.error('Failed to update name:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * Update user email
+ */
+export const updateUserEmail = async (email, password) => {
+  try {
+    const userService = getUserService();
+    
+    const updatedProfile = await userService.updateEmail({
+      email: email,
+      password: password
     });
+    
+    console.log('Email updated successfully:', updatedProfile);
+    return updatedProfile;
+  } catch (error) {
+    console.error('Failed to update email:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * Delete user account
+ */
+export const deleteUserAccount = async () => {
+  try {
+    const userService = getUserService();
+    
+    await userService.deleteAccount();
+    console.log('Account deleted successfully');
+  } catch (error) {
+    console.error('Failed to delete account:', error.message);
+    throw error;
+  }
+};
+
+// ============================================================================
+// GROUPS EXAMPLES
+// ============================================================================
+
+/**
+ * Get user's groups
+ */
+export const getUserGroups = async () => {
+  try {
+    const groupsService = getGroupsService();
+    
+    const groups = await groupsService.getMyGroups();
     console.log('User groups:', groups);
+    return groups;
+  } catch (error) {
+    console.error('Failed to get groups:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * Create new group
+ */
+export const createGroup = async (name, description) => {
+  try {
+    const groupsService = getGroupsService();
     
-    // Create new group
     const newGroup = await groupsService.createGroup({
-      name: 'My Photography Group',
-      description: 'A group for sharing amazing photos',
-      isPrivate: false
+      name: name,
+      description: description
     });
-    console.log('New group created:', newGroup);
     
-    // Get group details
-    const groupDetails = await groupsService.getGroupDetails(newGroup.id);
-    console.log('Group details:', groupDetails);
-    
-    // Search for groups
-    const searchResults = await groupsService.searchGroups({
-      query: 'photography',
-      page: 1,
-      limit: 5
-    });
-    console.log('Search results:', searchResults);
-    
-    return { groups, newGroup, groupDetails, searchResults };
+    console.log('Group created successfully:', newGroup);
+    return newGroup;
   } catch (error) {
-    console.error('Group operations failed:', error);
+    console.error('Failed to create group:', error.message);
     throw error;
   }
 };
 
-// =============================================================================
-// 5. PHOTO MANAGEMENT EXAMPLES
-// =============================================================================
+/**
+ * Join group with invite code
+ */
+export const joinGroup = async (inviteCode) => {
+  try {
+    const groupsService = getGroupsService();
+    
+    const response = await groupsService.joinGroup({
+      invite_code: inviteCode
+    });
+    
+    console.log('Joined group successfully:', response);
+    return response;
+  } catch (error) {
+    console.error('Failed to join group:', error.message);
+    throw error;
+  }
+};
 
 /**
- * Photo Management Example
+ * Get group details
  */
-export const photosExample = async (groupId) => {
+export const getGroupDetails = async (groupId) => {
   try {
-    const photosService = apiFactory.getPhotosService();
+    const groupsService = getGroupsService();
     
-    // Get group photos
-    const photos = await photosService.getGroupPhotos(groupId, {
-      page: 1,
-      limit: 20
+    const group = await groupsService.getGroup(groupId);
+    console.log('Group details:', group);
+    return group;
+  } catch (error) {
+    console.error('Failed to get group details:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * Get group members
+ */
+export const getGroupMembers = async (groupId) => {
+  try {
+    const groupsService = getGroupsService();
+    
+    const members = await groupsService.getGroupMembers(groupId);
+    console.log('Group members:', members);
+    return members;
+    } catch (error) {
+    console.error('Failed to get group members:', error.message);
+      throw error;
+    }
+  };
+  
+/**
+ * Leave group
+ */
+export const leaveGroup = async (groupId) => {
+  try {
+    const groupsService = getGroupsService();
+    
+    const response = await groupsService.leaveGroup(groupId);
+    console.log('Left group successfully:', response);
+    return response;
+    } catch (error) {
+    console.error('Failed to leave group:', error.message);
+      throw error;
+    }
+  };
+  
+/**
+ * Delete group (owner only)
+ */
+export const deleteGroup = async (groupId) => {
+  try {
+    const groupsService = getGroupsService();
+    
+    const response = await groupsService.deleteGroup(groupId);
+    console.log('Group deleted successfully:', response);
+    return response;
+    } catch (error) {
+    console.error('Failed to delete group:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * Update group information
+ */
+export const updateGroup = async (groupId, updates) => {
+  try {
+    const groupsService = getGroupsService();
+    
+    const updatedGroup = await groupsService.updateGroup(groupId, updates);
+    console.log('Group updated successfully:', updatedGroup);
+    return updatedGroup;
+    } catch (error) {
+    console.error('Failed to update group:', error.message);
+    throw error;
+  }
+};
+
+// ============================================================================
+// PHOTOS EXAMPLES
+// ============================================================================
+
+/**
+ * Upload photo to group
+ */
+export const uploadPhoto = async (groupId, photoFile) => {
+  try {
+    const photosService = getPhotosService();
+    
+    const response = await photosService.uploadPhoto(groupId, {
+      file: {
+        uri: photoFile.uri,
+        type: photoFile.type || 'image/jpeg',
+        name: photoFile.name || 'photo.jpg'
+      }
     });
+    
+    console.log('Photo uploaded successfully:', response);
+    return response;
+  } catch (error) {
+    console.error('Failed to upload photo:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * Get group photos
+ */
+export const getGroupPhotos = async (groupId) => {
+  try {
+    const photosService = getPhotosService();
+    
+    const photos = await photosService.getGroupPhotos(groupId);
     console.log('Group photos:', photos);
-    
-    // Upload single photo
-    const photoData = {
-      uri: 'file://path/to/photo.jpg',
-      type: 'image/jpeg',
-      name: 'beautiful-sunset.jpg',
-      caption: 'Amazing sunset at the beach!'
-    };
-    
-    const uploadResponse = await photosService.uploadPhoto(
-      groupId,
-      photoData,
-      (progress) => {
-        console.log(`Photo upload progress: ${progress}%`);
-      }
-    );
-    console.log('Photo uploaded:', uploadResponse);
-    
-    // Upload multiple photos
-    const multiplePhotos = [
-      {
-        uri: 'file://path/to/photo1.jpg',
-        type: 'image/jpeg',
-        name: 'photo1.jpg',
-        caption: 'First photo'
-      },
-      {
-        uri: 'file://path/to/photo2.jpg',
-        type: 'image/jpeg',
-        name: 'photo2.jpg',
-        caption: 'Second photo'
-      }
-    ];
-    
-    const multipleUploadResponse = await photosService.uploadMultiplePhotos(
-      groupId,
-      multiplePhotos,
-      (progress) => {
-        console.log(`Multiple photos upload progress: ${progress}%`);
-      }
-    );
-    console.log('Multiple photos uploaded:', multipleUploadResponse);
-    
-    // Like a photo
-    await photosService.toggleLike(uploadResponse.id, true);
-    console.log('Photo liked successfully');
-    
-    // Add comment
-    await photosService.addComment(uploadResponse.id, 'Great photo!');
-    console.log('Comment added successfully');
-    
-    return { photos, uploadResponse, multipleUploadResponse };
+    return photos;
   } catch (error) {
-    console.error('Photo operations failed:', error);
+    console.error('Failed to get group photos:', error.message);
     throw error;
   }
 };
 
-// =============================================================================
-// 6. REDUX INTEGRATION EXAMPLES
-// =============================================================================
-
 /**
- * Redux Integration Example
- * This shows how to use the API client with Redux slices
+ * Get photos where user appears
  */
-export const useReduxWithApiClient = () => {
-  const dispatch = useDispatch();
-  
-  const handleLogin = async (credentials) => {
-    try {
-      // Using Redux action that internally uses API client
-      const result = await dispatch(loginUser(credentials)).unwrap();
-      console.log('Redux login successful:', result);
-      return result;
-    } catch (error) {
-      console.error('Redux login failed:', error);
-      throw error;
-    }
-  };
-  
-  const handleRegister = async (userData) => {
-    try {
-      const result = await dispatch(registerUser(userData)).unwrap();
-      console.log('Redux registration successful:', result);
-      return result;
-    } catch (error) {
-      console.error('Redux registration failed:', error);
-      throw error;
-    }
-  };
-  
-  const handleLogout = async () => {
-    try {
-      await dispatch(logoutUser()).unwrap();
-      console.log('Redux logout successful');
-    } catch (error) {
-      console.error('Redux logout failed:', error);
-    }
-  };
-  
-  const loadUserData = async () => {
-    try {
-      // Initialize auth from storage
-      await dispatch(initializeAuth());
-      
-      // Load user profile
-      await dispatch(fetchUserProfile());
-      
-      // Load user groups
-      await dispatch(fetchGroups());
-      
-      console.log('User data loaded successfully');
-    } catch (error) {
-      console.error('Failed to load user data:', error);
-    }
-  };
-  
-  return {
-    handleLogin,
-    handleRegister,
-    handleLogout,
-    loadUserData
-  };
-};
-
-// =============================================================================
-// 7. ERROR HANDLING EXAMPLES
-// =============================================================================
-
-/**
- * Comprehensive Error Handling Example
- */
-export const errorHandlingExample = async () => {
+export const getMyPhotos = async () => {
   try {
-    const authService = apiFactory.getAuthService();
+    const photosService = getPhotosService();
     
-    // This will fail with invalid credentials
-    await authService.login({
-      email: 'invalid@email.com',
-      password: 'wrongpassword'
-    });
-    
+    const photos = await photosService.getMyPhotos();
+    console.log('My photos:', photos);
+    return photos;
   } catch (error) {
-    console.error('Caught error:', error);
-    
-    // Handle different types of errors
-    switch (error.type) {
-      case 'AUTHENTICATION_ERROR':
-        console.log('Authentication failed - check credentials');
-        // Show login form with error message
-        break;
-        
-      case 'NETWORK_ERROR':
-        console.log('Network error - check connection');
-        // Show retry button
-        break;
-        
-      case 'VALIDATION_ERROR':
-        console.log('Validation error - check input data');
-        // Highlight invalid fields
-        break;
-        
-      case 'SERVER_ERROR':
-        console.log('Server error - try again later');
-        // Show generic error message
-        break;
-        
-      default:
-        console.log('Unknown error occurred');
-        break;
-    }
-    
-    // Access error details
-    console.log('Error message:', error.message);
-    console.log('HTTP status:', error.status);
-    console.log('Response data:', error.data);
-    console.log('Timestamp:', error.timestamp);
-  }
-};
-
-// =============================================================================
-// 8. CONFIGURATION EXAMPLES
-// =============================================================================
-
-/**
- * Configuration Example
- */
-export const configurationExample = () => {
-  // Change environment
-  apiFactory.setEnvironment('production');
-  
-  // Update configuration
-  apiFactory.configure({
-    timeout: 30000,
-    retryAttempts: 5,
-    baseURL: 'https://api.myapp.com/v1'
-  });
-  
-  // Get current configuration
-  const config = apiFactory.getConfig();
-  console.log('Current config:', config.getConfig());
-  
-  // Health check
-  const performHealthCheck = async () => {
-    try {
-      const health = await apiFactory.healthCheck();
-      console.log('Health check:', health);
-    } catch (error) {
-      console.error('Health check failed:', error);
-    }
-  };
-  
-  performHealthCheck();
-};
-
-// =============================================================================
-// 9. REACT NATIVE COMPONENT EXAMPLES
-// =============================================================================
-
-/**
- * React Native Component Example
- */
-export const LoginScreenExample = () => {
-  const [credentials, setCredentials] = useState({
-    email: '',
-    password: ''
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  
-  const handleLogin = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const authService = apiFactory.getAuthService();
-      const response = await authService.login(credentials);
-      
-      console.log('Login successful:', response);
-      // Navigate to dashboard
-      
-    } catch (error) {
-      setError(error.message);
-      console.error('Login failed:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-  
-  return {
-    credentials,
-    setCredentials,
-    loading,
-    error,
-    handleLogin
-  };
-};
-
-// =============================================================================
-// 10. TESTING EXAMPLES
-// =============================================================================
-
-/**
- * Testing Example
- */
-export const testingExample = () => {
-  // Mock API factory for testing
-  const mockApiFactory = {
-    getAuthService: jest.fn(() => ({
-      login: jest.fn().mockResolvedValue({
-        access_token: 'mock-token',
-        user: { id: 1, email: 'test@example.com' }
-      }),
-      logout: jest.fn().mockResolvedValue({ success: true })
-    }))
-  };
-  
-  // Test function
-  const testLogin = async () => {
-    const authService = mockApiFactory.getAuthService();
-    const result = await authService.login({
-      email: 'test@example.com',
-      password: 'password123'
-    });
-    
-    expect(result).toEqual({
-      access_token: 'mock-token',
-      user: { id: 1, email: 'test@example.com' }
-    });
-  };
-  
-  return { mockApiFactory, testLogin };
-};
-
-// =============================================================================
-// 11. PERFORMANCE OPTIMIZATION EXAMPLES
-// =============================================================================
-
-/**
- * Performance Optimization Example
- */
-export const performanceExample = () => {
-  const profileService = apiFactory.getProfileService();
-  
-  // Debounced search
-  const debouncedSearch = debounce(async (query) => {
-    try {
-      const groupsService = apiFactory.getGroupsService();
-      const results = await groupsService.searchGroups({ query });
-      console.log('Search results:', results);
-    } catch (error) {
-      console.error('Search failed:', error);
-    }
-  }, 300);
-  
-  // Cached profile fetch
-  let profileCache = null;
-  let profileCacheTime = 0;
-  const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-  
-  const getCachedProfile = async () => {
-    const now = Date.now();
-    
-    if (profileCache && (now - profileCacheTime) < CACHE_DURATION) {
-      console.log('Returning cached profile');
-      return profileCache;
-    }
-    
-    console.log('Fetching fresh profile');
-    profileCache = await profileService.getProfile();
-    profileCacheTime = now;
-    
-    return profileCache;
-  };
-  
-  return { debouncedSearch, getCachedProfile };
-};
-
-// Helper function for debouncing
-function debounce(func, delay) {
-  let timeoutId;
-  return (...args) => {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => func.apply(this, args), delay);
-  };
-}
-
-// =============================================================================
-// 12. COMPLETE WORKFLOW EXAMPLE
-// =============================================================================
-
-/**
- * Complete Workflow Example
- * This demonstrates a complete user workflow using the API client
- */
-export const completeWorkflowExample = async () => {
-  try {
-    console.log('🚀 Starting complete workflow example...');
-    
-    // 1. Initialize app
-    const initResult = await initializeApp();
-    console.log('✅ App initialized:', initResult);
-    
-    // 2. If not authenticated, register/login
-    if (!initResult.isAuthenticated) {
-      // Register new user
-      await registerExample({
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        password: 'SecurePassword123!'
-      });
-      
-      // Login
-      await loginExample({
-        email: 'john.doe@example.com',
-        password: 'SecurePassword123!'
-      });
-    }
-    
-    // 3. Load user profile
-    const profileResult = await profileExample();
-    console.log('✅ Profile loaded:', profileResult);
-    
-    // 4. Create and manage groups
-    const groupsResult = await groupsExample();
-    console.log('✅ Groups managed:', groupsResult);
-    
-    // 5. Upload and manage photos
-    const photosResult = await photosExample(groupsResult.newGroup.id);
-    console.log('✅ Photos managed:', photosResult);
-    
-    // 6. Perform health check
-    const health = await apiFactory.healthCheck();
-    console.log('✅ Health check:', health);
-    
-    console.log('🎉 Complete workflow finished successfully!');
-    
-  } catch (error) {
-    console.error('❌ Workflow failed:', error);
+    console.error('Failed to get my photos:', error.message);
     throw error;
   }
 };
 
-// Export all examples
+/**
+ * Get photos where user appears in specific group
+ */
+export const getMyPhotosInGroup = async (groupId) => {
+  try {
+    const photosService = getPhotosService();
+    
+    const photos = await photosService.getMyPhotosInGroup(groupId);
+    console.log('My photos in group:', photos);
+    return photos;
+  } catch (error) {
+    console.error('Failed to get my photos in group:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * Get specific photo details
+ */
+export const getPhotoDetails = async (photoId) => {
+  try {
+    const photosService = getPhotosService();
+    
+    const photo = await photosService.getPhoto(photoId);
+    console.log('Photo details:', photo);
+    return photo;
+    } catch (error) {
+    console.error('Failed to get photo details:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * Download photo
+ */
+export const downloadPhoto = async (photoId) => {
+  try {
+    const photosService = getPhotosService();
+    
+    const photoFile = await photosService.downloadPhoto(photoId);
+    console.log('Photo downloaded successfully');
+    return photoFile;
+  } catch (error) {
+    console.error('Failed to download photo:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * Upload multiple photos
+ */
+export const uploadMultiplePhotos = async (groupId, photoFiles) => {
+  try {
+    const photosService = getPhotosService();
+    
+    const results = await photosService.uploadMultiplePhotos(
+      groupId, 
+      photoFiles, 
+      (progress) => {
+        console.log(`Upload progress: ${progress}%`);
+      }
+    );
+    
+    console.log('Multiple photos uploaded successfully:', results);
+    return results;
+    } catch (error) {
+    console.error('Failed to upload multiple photos:', error.message);
+    throw error;
+  }
+};
+
+// ============================================================================
+// UTILITY FUNCTIONS
+// ============================================================================
+
+/**
+ * Check if user is authenticated
+ */
+export const checkAuthentication = () => {
+  const authService = getAuthService();
+  return authService.isAuthenticated();
+};
+
+/**
+ * Get current user data
+ */
+export const getCurrentUser = () => {
+  const authService = getAuthService();
+  return authService.getCurrentUser();
+};
+
+/**
+ * Change API environment
+ */
+export const changeEnvironment = (environment) => {
+  apiFactory.setEnvironment(environment);
+  console.log(`Environment changed to: ${environment}`);
+};
+
+/**
+ * Update API configuration
+ */
+export const updateApiConfig = (config) => {
+  apiFactory.updateConfig(config);
+  console.log('API configuration updated:', config);
+};
+
+/**
+ * Reset API factory
+ */
+export const resetApiFactory = async () => {
+  try {
+    await apiFactory.reset();
+    console.log('API factory reset successfully');
+  } catch (error) {
+    console.error('Failed to reset API factory:', error.message);
+    throw error;
+  }
+};
+
+// ============================================================================
+// ERROR HANDLING EXAMPLES
+// ============================================================================
+
+/**
+ * Example of comprehensive error handling
+ */
+export const handleApiError = (error) => {
+  switch (error.type) {
+    case 'AUTHENTICATION_ERROR':
+      console.log('Authentication error - redirect to login');
+      // Redirect to login screen
+      break;
+      
+    case 'AUTHORIZATION_ERROR':
+      console.log('Authorization error - user lacks permission');
+      // Show permission denied message
+      break;
+      
+    case 'NETWORK_ERROR':
+      console.log('Network error - check connection');
+      // Show network error message
+      break;
+      
+    case 'VALIDATION_ERROR':
+      console.log('Validation error - check input data');
+      // Show validation error message
+      break;
+      
+    case 'NOT_FOUND_ERROR':
+      console.log('Resource not found');
+      // Show not found message
+      break;
+      
+    case 'CONFLICT_ERROR':
+      console.log('Resource conflict');
+      // Show conflict message
+      break;
+      
+    case 'SERVER_ERROR':
+      console.log('Server error - try again later');
+      // Show server error message
+      break;
+      
+    default:
+      console.log('Unknown error occurred');
+      // Show generic error message
+      break;
+  }
+};
+
+// ============================================================================
+// COMPLETE WORKFLOW EXAMPLES
+// ============================================================================
+
+/**
+ * Complete user registration workflow
+ */
+export const completeRegistrationWorkflow = async (userData) => {
+  try {
+    // 1. Register user
+    const registrationResult = await registerUser(userData);
+    
+    // 2. Create a default group
+    const group = await createGroup('My First Group', 'Welcome to SnapVault!');
+    
+    // 3. Get user profile
+    const profile = await getUserProfile();
+    
+    console.log('Registration workflow completed:', {
+      user: registrationResult,
+      group: group,
+      profile: profile
+    });
+    
+    return { registrationResult, group, profile };
+  } catch (error) {
+    console.error('Registration workflow failed:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * Complete photo sharing workflow
+ */
+export const completePhotoSharingWorkflow = async (groupId, photoFiles) => {
+  try {
+    // 1. Upload photos
+    const uploadResults = await uploadMultiplePhotos(groupId, photoFiles);
+    
+    // 2. Get updated group photos
+    const groupPhotos = await getGroupPhotos(groupId);
+    
+    // 3. Get photos where user appears
+    const myPhotos = await getMyPhotos();
+    
+    console.log('Photo sharing workflow completed:', {
+      uploaded: uploadResults,
+      groupPhotos: groupPhotos,
+      myPhotos: myPhotos
+    });
+    
+    return { uploadResults, groupPhotos, myPhotos };
+  } catch (error) {
+    console.error('Photo sharing workflow failed:', error.message);
+    throw error;
+  }
+};
+
 export default {
-  initializeApp,
-  loginExample,
-  registerExample,
-  logoutExample,
-  profileExample,
-  groupsExample,
-  photosExample,
-  useReduxWithApiClient,
-  errorHandlingExample,
-  configurationExample,
-  LoginScreenExample,
-  testingExample,
-  performanceExample,
-  completeWorkflowExample
+  // Initialization
+  initializeApi,
+  
+  // Authentication
+  loginUser,
+  registerUser,
+  updatePassword,
+  logoutUser,
+  
+  // User Profile
+  getUserProfile,
+  updateUserBio,
+  updateUserName,
+  updateUserEmail,
+  deleteUserAccount,
+  
+  // Groups
+  getUserGroups,
+  createGroup,
+  joinGroup,
+  getGroupDetails,
+  getGroupMembers,
+  leaveGroup,
+  deleteGroup,
+  updateGroup,
+  
+  // Photos
+  uploadPhoto,
+  getGroupPhotos,
+  getMyPhotos,
+  getMyPhotosInGroup,
+  getPhotoDetails,
+  downloadPhoto,
+  uploadMultiplePhotos,
+  
+  // Utilities
+  checkAuthentication,
+  getCurrentUser,
+  changeEnvironment,
+  updateApiConfig,
+  resetApiFactory,
+  
+  // Error Handling
+  handleApiError,
+  
+  // Workflows
+  completeRegistrationWorkflow,
+  completePhotoSharingWorkflow
 }; 

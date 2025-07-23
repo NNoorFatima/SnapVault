@@ -1,32 +1,55 @@
 /**
- * ApiFactory
- * Factory class for creating and managing API services
- * Provides a single entry point for all API operations
- * 
- * SOLID Principles Applied:
- * - Single Responsibility: Only manages service creation and configuration
- * - Open/Closed: Easy to extend with new services without modifying existing code
- * - Liskov Substitution: Services can be swapped with different implementations
- * - Interface Segregation: Provides clean interfaces for different service types
- * - Dependency Inversion: Uses dependency injection for service creation
+ * API Factory
+ * Main entry point for all API services
  */
 
-import { apiClient } from './core/ApiClient';
-import { apiConfig } from './config/ApiConfig';
-import { tokenManager } from './core/TokenManager';
-
-// Import all services
-import { AuthService } from './services/AuthService';
-import { ProfileService } from './services/ProfileService';
-import { GroupsService } from './services/GroupsService';
-import { PhotosService } from './services/PhotosService';
+import ApiConfig from './config/ApiConfig';
+import ApiClient from './core/ApiClient';
+import TokenManager from './core/TokenManager';
+import AuthService from './services/AuthService';
+import UserService from './services/UserService';
+import GroupsService from './services/GroupsService';
+import PhotosService from './services/PhotosService';
 
 class ApiFactory {
   constructor() {
+    this.config = null;
+    this.client = null;
+    this.tokenManager = null;
     this.services = {};
-    this.config = apiConfig;
-    this.client = apiClient;
-    this.tokenManager = tokenManager;
+    this.isInitialized = false;
+  }
+
+  /**
+   * Initialize the API factory
+   * @param {string} environment - Environment name (development, staging, production)
+   * @returns {Promise<Object>} Initialization result
+   */
+  async initialize(environment = 'development') {
+    try {
+      // Initialize configuration
+      this.config = new ApiConfig();
+      this.config.setEnvironment(environment);
+
+      // Initialize token manager
+      this.tokenManager = new TokenManager();
+      const authResult = await this.tokenManager.initialize();
+
+      // Initialize API client
+      this.client = new ApiClient(this.config, this.tokenManager);
+
+      this.isInitialized = true;
+
+      console.log('API Factory initialized successfully');
+      return {
+        isAuthenticated: authResult.isAuthenticated,
+        userData: authResult.userData,
+        environment: environment,
+      };
+    } catch (error) {
+      console.error('API Factory initialization failed:', error);
+      throw error;
+    }
   }
 
   /**
@@ -34,6 +57,10 @@ class ApiFactory {
    * @returns {AuthService} Auth service instance
    */
   getAuthService() {
+    if (!this.isInitialized) {
+      throw new Error('API Factory not initialized. Call initialize() first.');
+    }
+
     if (!this.services.auth) {
       this.services.auth = new AuthService(this.client, this.config, this.tokenManager);
     }
@@ -41,14 +68,18 @@ class ApiFactory {
   }
 
   /**
-   * Get or create ProfileService instance
-   * @returns {ProfileService} Profile service instance
+   * Get or create UserService instance
+   * @returns {UserService} User service instance
    */
-  getProfileService() {
-    if (!this.services.profile) {
-      this.services.profile = new ProfileService(this.client, this.config);
+  getUserService() {
+    if (!this.isInitialized) {
+      throw new Error('API Factory not initialized. Call initialize() first.');
     }
-    return this.services.profile;
+
+    if (!this.services.user) {
+      this.services.user = new UserService(this.client, this.config, this.tokenManager);
+    }
+    return this.services.user;
   }
 
   /**
@@ -56,8 +87,12 @@ class ApiFactory {
    * @returns {GroupsService} Groups service instance
    */
   getGroupsService() {
+    if (!this.isInitialized) {
+      throw new Error('API Factory not initialized. Call initialize() first.');
+    }
+
     if (!this.services.groups) {
-      this.services.groups = new GroupsService(this.client, this.config);
+      this.services.groups = new GroupsService(this.client, this.config, this.tokenManager);
     }
     return this.services.groups;
   }
@@ -67,196 +102,143 @@ class ApiFactory {
    * @returns {PhotosService} Photos service instance
    */
   getPhotosService() {
+    if (!this.isInitialized) {
+      throw new Error('API Factory not initialized. Call initialize() first.');
+    }
+
     if (!this.services.photos) {
-      this.services.photos = new PhotosService(this.client, this.config);
+      this.services.photos = new PhotosService(this.client, this.config, this.tokenManager);
     }
     return this.services.photos;
   }
 
   /**
    * Get all services
-   * @returns {Object} All service instances
+   * @returns {Object} Object containing all service instances
    */
   getAllServices() {
     return {
       auth: this.getAuthService(),
-      profile: this.getProfileService(),
+      user: this.getUserService(),
       groups: this.getGroupsService(),
       photos: this.getPhotosService(),
     };
   }
 
   /**
-   * Reset all services (useful for testing or logout)
-   */
-  resetServices() {
-    this.services = {};
-  }
-
-  /**
-   * Configure API client with new settings
-   * @param {Object} newConfig - New configuration
-   */
-  configure(newConfig) {
-    this.config.updateConfig(newConfig);
-    this.client.updateBaseURL(this.config.getBaseURL());
-    
-    // Reset services to pick up new configuration
-    this.resetServices();
-  }
-
-  /**
-   * Set environment (development, staging, production)
+   * Set environment
    * @param {string} environment - Environment name
    */
   setEnvironment(environment) {
-    this.config.setEnvironment(environment);
-    this.client.updateBaseURL(this.config.getBaseURL());
-    
-    // Reset services to pick up new environment
-    this.resetServices();
+    if (this.config) {
+      this.config.setEnvironment(environment);
+      
+      // Update client configuration
+      if (this.client) {
+        this.client.updateConfig(this.config);
+      }
+    }
   }
 
   /**
-   * Get API client instance
-   * @returns {ApiClient} API client
+   * Update configuration
+   * @param {Object} newConfig - New configuration
    */
-  getClient() {
-    return this.client;
+  updateConfig(newConfig) {
+    if (this.config) {
+      this.config.updateConfig(newConfig);
+      
+      // Update client configuration
+      if (this.client) {
+        this.client.updateConfig(this.config);
+      }
+    }
   }
 
   /**
-   * Get configuration instance
-   * @returns {ApiConfig} API configuration
+   * Get current configuration
+   * @returns {Object} Current configuration
    */
   getConfig() {
     return this.config;
   }
 
   /**
+   * Get API client instance
+   * @returns {ApiClient} API client instance
+   */
+  getClient() {
+    return this.client;
+  }
+
+  /**
    * Get token manager instance
-   * @returns {TokenManager} Token manager
+   * @returns {TokenManager} Token manager instance
    */
   getTokenManager() {
     return this.tokenManager;
   }
 
   /**
-   * Check if user is authenticated
-   * @returns {Promise<boolean>} Authentication status
+   * Check if factory is initialized
+   * @returns {boolean} Initialization status
    */
-  async isAuthenticated() {
-    return this.getAuthService().isAuthenticated();
+  isReady() {
+    return this.isInitialized;
   }
 
   /**
-   * Get current user
-   * @returns {Promise<Object|null>} Current user or null
+   * Reset factory (clear all services and data)
    */
-  async getCurrentUser() {
-    return this.getAuthService().getCurrentUser();
-  }
-
-  /**
-   * Initialize API factory (call on app start)
-   */
-  async initialize() {
+  async reset() {
     try {
-      // Initialize token manager
-      await this.tokenManager.initializeAuth();
-      
-      // Check if user is authenticated
-      const isAuthenticated = await this.isAuthenticated();
-      
-      if (isAuthenticated) {
-        console.log('✅ User is authenticated');
-      } else {
-        console.log('❌ User is not authenticated');
+      // Clear all services
+      this.services = {};
+
+      // Clear tokens
+      if (this.tokenManager) {
+        await this.tokenManager.clearTokens();
       }
-      
-      return { isAuthenticated };
+
+      this.isInitialized = false;
+      console.log('API Factory reset successfully');
     } catch (error) {
-      console.error('❌ ApiFactory initialization failed:', error);
+      console.error('API Factory reset failed:', error);
       throw error;
     }
   }
 
   /**
-   * Logout user and reset services
+   * Logout user and clear all data
    */
   async logout() {
     try {
-      await this.getAuthService().logout();
-      this.resetServices();
+      const authService = this.getAuthService();
+      await authService.logout();
+      
+      // Reset factory
+      await this.reset();
+      
+      console.log('User logged out successfully');
     } catch (error) {
-      console.error('❌ Logout failed:', error);
-      // Still reset services even if logout fails
-      this.resetServices();
+      console.error('Logout failed:', error);
+      // Still reset factory even if logout request fails
+      await this.reset();
       throw error;
     }
   }
-
-  /**
-   * Health check - test API connectivity
-   * @returns {Promise<Object>} Health check result
-   */
-  async healthCheck() {
-    try {
-      const startTime = Date.now();
-      
-      // Try to make a simple request
-      const response = await this.client.get('/health');
-      
-      const endTime = Date.now();
-      const responseTime = endTime - startTime;
-      
-      return {
-        status: 'healthy',
-        responseTime,
-        timestamp: new Date().toISOString(),
-        data: response,
-      };
-    } catch (error) {
-      return {
-        status: 'unhealthy',
-        error: error.message,
-        timestamp: new Date().toISOString(),
-      };
-    }
-  }
-
-  /**
-   * Get service statistics
-   * @returns {Object} Service statistics
-   */
-  getServiceStats() {
-    return {
-      totalServices: Object.keys(this.services).length,
-      activeServices: Object.keys(this.services),
-      configuration: {
-        environment: this.config.currentEnvironment,
-        baseURL: this.config.getBaseURL(),
-        timeout: this.config.getConfig().timeout,
-      },
-      timestamp: new Date().toISOString(),
-    };
-  }
 }
 
-// Export singleton instance
-export const apiFactory = new ApiFactory();
+// Create singleton instance
+const apiFactory = new ApiFactory();
 
-// Export convenience methods for easy access
-export const {
-  getAuthService,
-  getProfileService,
-  getGroupsService,
-  getPhotosService,
-  getAllServices,
-  isAuthenticated,
-  getCurrentUser,
-  logout,
-  healthCheck,
-} = apiFactory;
+// Export singleton instance and class
+export default apiFactory;
+export { ApiFactory };
 
-export { ApiFactory }; 
+// Export convenience methods for direct service access
+export const getAuthService = () => apiFactory.getAuthService();
+export const getUserService = () => apiFactory.getUserService();
+export const getGroupsService = () => apiFactory.getGroupsService();
+export const getPhotosService = () => apiFactory.getPhotosService();
+export const getAllServices = () => apiFactory.getAllServices(); 

@@ -1,80 +1,45 @@
 /**
- * PhotosService
+ * Photos Service
  * Handles photo-related API calls
- * 
- * SOLID Principles Applied:
- * - Single Responsibility: Only handles photo operations
- * - Open/Closed: Easy to extend with new photo methods
- * - Liskov Substitution: Can be swapped with different photo implementations
- * - Interface Segregation: Provides focused photo interface
- * - Dependency Inversion: Depends on abstractions (BaseService)
  */
 
 import BaseService from './BaseService';
+import { API_ROUTES } from '../config/ApiConfig';
 
 class PhotosService extends BaseService {
   /**
-   * Get photos for a group
-   * @param {string} groupId - Group ID
-   * @param {Object} options - Query options
-   * @param {number} options.page - Page number
-   * @param {number} options.limit - Items per page
-   * @returns {Promise<Object>} Group photos
-   */
-  async getGroupPhotos(groupId, options = {}) {
-    try {
-      this.validateRequired({ groupId }, ['groupId']);
-      
-      const url = this.buildUrl('PHOTOS', 'GROUP_PHOTOS', { groupId });
-      const config = {
-        params: {
-          page: options.page || 1,
-          limit: options.limit || 20,
-        }
-      };
-      
-      const response = await this.get(url, config);
-      
-      return this.transformResponse(response);
-    } catch (error) {
-      this.logError('Get group photos failed', error);
-      throw error;
-    }
-  }
-
-  /**
    * Upload photo to group
-   * @param {string} groupId - Group ID
-   * @param {Object} photoData - Photo data
-   * @param {string} photoData.uri - Photo URI
-   * @param {string} photoData.type - Photo type
-   * @param {string} photoData.name - Photo name
-   * @param {string} photoData.caption - Photo caption (optional)
-   * @param {Function} onProgress - Progress callback
+   * @param {number} groupId - Group ID
+   * @param {Object} photoData - Photo upload data
+   * @param {Object} photoData.file - Photo file object
    * @returns {Promise<Object>} Upload response
    */
-  async uploadPhoto(groupId, photoData, onProgress = null) {
+  async uploadPhoto(groupId, photoData) {
     try {
-      this.validateRequired({ groupId }, ['groupId']);
-      this.validateRequired(photoData, ['uri']);
-      
-      const url = this.buildUrl('PHOTOS', 'UPLOAD');
-      const formData = new FormData();
-      
-      formData.append('photo', {
-        uri: photoData.uri,
-        type: photoData.type || 'image/jpeg',
-        name: photoData.name || 'photo.jpg',
-      });
-      
-      formData.append('groupId', groupId);
-      
-      if (photoData.caption) {
-        formData.append('caption', photoData.caption);
+      if (!groupId || groupId <= 0) {
+        throw new Error('Invalid group ID');
       }
+
+      this.validateRequired(photoData, ['file']);
+
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+      if (!allowedTypes.includes(photoData.file.type)) {
+        throw new Error('Only JPG, JPEG, and PNG files are allowed');
+      }
+
+      const url = this.buildUrl(API_ROUTES.PHOTOS.UPLOAD);
       
-      const response = await this.uploadFile(url, formData, onProgress);
-      
+      // Create form data
+      const formData = this.createFormData(
+        { group_id: groupId },
+        { file: photoData.file }
+      );
+
+      const response = await this.authenticatedRequest(() =>
+        this.client.uploadFile(url, formData)
+      );
+
       return this.transformResponse(response);
     } catch (error) {
       this.logError('Upload photo failed', error);
@@ -83,216 +48,115 @@ class PhotosService extends BaseService {
   }
 
   /**
-   * Upload multiple photos
-   * @param {string} groupId - Group ID
-   * @param {Array} photos - Array of photo data
-   * @param {Function} onProgress - Progress callback
-   * @returns {Promise<Object>} Upload response
+   * Get photos from a specific group
+   * @param {number} groupId - Group ID
+   * @returns {Promise<Array>} List of photos
    */
-  async uploadMultiplePhotos(groupId, photos, onProgress = null) {
+  async getGroupPhotos(groupId) {
     try {
-      this.validateRequired({ groupId }, ['groupId']);
-      
-      if (!Array.isArray(photos) || photos.length === 0) {
-        throw new Error('Photos array is required and must not be empty');
+      if (!groupId || groupId <= 0) {
+        throw new Error('Invalid group ID');
       }
-      
-      const url = this.buildUrl('PHOTOS', 'UPLOAD_MULTIPLE');
-      const formData = new FormData();
-      
-      formData.append('groupId', groupId);
-      
-      photos.forEach((photo, index) => {
-        this.validateRequired(photo, ['uri']);
-        
-        formData.append(`photos[${index}]`, {
-          uri: photo.uri,
-          type: photo.type || 'image/jpeg',
-          name: photo.name || `photo_${index}.jpg`,
-        });
-        
-        if (photo.caption) {
-          formData.append(`captions[${index}]`, photo.caption);
-        }
-      });
-      
-      const response = await this.uploadFile(url, formData, onProgress);
-      
+
+      const url = this.buildUrl(API_ROUTES.PHOTOS.GET_GROUP_PHOTOS, { group_id: groupId });
+      const response = await this.authenticatedRequest(() =>
+        this.client.get(url)
+      );
+
       return this.transformResponse(response);
     } catch (error) {
-      this.logError('Upload multiple photos failed', error);
+      this.logError('Get group photos failed', error);
       throw error;
     }
   }
 
   /**
-   * Delete photo
-   * @param {string} photoId - Photo ID
-   * @returns {Promise<Object>} Delete response
+   * Get all photos where user appears (face recognition)
+   * @returns {Promise<Array>} List of photos with user
    */
-  async deletePhoto(photoId) {
+  async getMyPhotos() {
     try {
-      this.validateRequired({ photoId }, ['photoId']);
-      
-      const url = this.buildUrl('PHOTOS', 'DELETE', { id: photoId });
-      const response = await this.delete(url);
-      
+      const url = this.buildUrl(API_ROUTES.PHOTOS.GET_MY_PHOTOS);
+      const response = await this.authenticatedRequest(() =>
+        this.client.get(url)
+      );
+
       return this.transformResponse(response);
     } catch (error) {
-      this.logError('Delete photo failed', error);
+      this.logError('Get my photos failed', error);
       throw error;
     }
   }
 
   /**
-   * Like/Unlike photo
-   * @param {string} photoId - Photo ID
-   * @param {boolean} isLiked - Whether to like or unlike
-   * @returns {Promise<Object>} Like response
+   * Get photos where user appears in a specific group
+   * @param {number} groupId - Group ID
+   * @returns {Promise<Array>} List of photos with user in group
    */
-  async toggleLike(photoId, isLiked = true) {
+  async getMyPhotosInGroup(groupId) {
     try {
-      this.validateRequired({ photoId }, ['photoId']);
-      
-      const url = this.buildUrl('PHOTOS', 'LIKE', { id: photoId });
-      const data = { isLiked };
-      
-      const response = await this.post(url, data);
-      
+      if (!groupId || groupId <= 0) {
+        throw new Error('Invalid group ID');
+      }
+
+      const url = this.buildUrl(API_ROUTES.PHOTOS.GET_MY_PHOTOS_IN_GROUP, { group_id: groupId });
+      const response = await this.authenticatedRequest(() =>
+        this.client.get(url)
+      );
+
       return this.transformResponse(response);
     } catch (error) {
-      this.logError('Toggle like failed', error);
+      this.logError('Get my photos in group failed', error);
       throw error;
     }
   }
 
   /**
-   * Add comment to photo
-   * @param {string} photoId - Photo ID
-   * @param {string} comment - Comment text
-   * @returns {Promise<Object>} Comment response
-   */
-  async addComment(photoId, comment) {
-    try {
-      this.validateRequired({ photoId, comment }, ['photoId', 'comment']);
-      
-      const url = this.buildUrl('PHOTOS', 'COMMENTS', { id: photoId });
-      const data = { comment: comment.trim() };
-      
-      const response = await this.post(url, data);
-      
-      return this.transformResponse(response);
-    } catch (error) {
-      this.logError('Add comment failed', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get photo comments
-   * @param {string} photoId - Photo ID
-   * @param {Object} options - Query options
-   * @param {number} options.page - Page number
-   * @param {number} options.limit - Items per page
-   * @returns {Promise<Object>} Photo comments
-   */
-  async getComments(photoId, options = {}) {
-    try {
-      this.validateRequired({ photoId }, ['photoId']);
-      
-      const url = this.buildUrl('PHOTOS', 'COMMENTS', { id: photoId });
-      const config = {
-        params: {
-          page: options.page || 1,
-          limit: options.limit || 20,
-        }
-      };
-      
-      const response = await this.get(url, config);
-      
-      return this.transformResponse(response);
-    } catch (error) {
-      this.logError('Get comments failed', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Delete comment
-   * @param {string} photoId - Photo ID
-   * @param {string} commentId - Comment ID
-   * @returns {Promise<Object>} Delete response
-   */
-  async deleteComment(photoId, commentId) {
-    try {
-      this.validateRequired({ photoId, commentId }, ['photoId', 'commentId']);
-      
-      const url = this.buildUrl('PHOTOS', 'COMMENTS', { id: photoId });
-      const config = { data: { commentId } };
-      
-      const response = await this.delete(url, config);
-      
-      return this.transformResponse(response);
-    } catch (error) {
-      this.logError('Delete comment failed', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Update photo caption
-   * @param {string} photoId - Photo ID
-   * @param {string} caption - New caption
-   * @returns {Promise<Object>} Update response
-   */
-  async updateCaption(photoId, caption) {
-    try {
-      this.validateRequired({ photoId }, ['photoId']);
-      
-      const url = this.buildUrl('PHOTOS', 'CAPTION', { id: photoId });
-      const data = { caption: caption?.trim() || '' };
-      
-      const response = await this.put(url, data);
-      
-      return this.transformResponse(response);
-    } catch (error) {
-      this.logError('Update caption failed', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get photo details
-   * @param {string} photoId - Photo ID
+   * Get specific photo details
+   * @param {number} photoId - Photo ID
    * @returns {Promise<Object>} Photo details
    */
-  async getPhotoDetails(photoId) {
+  async getPhoto(photoId) {
     try {
-      this.validateRequired({ photoId }, ['photoId']);
-      
-      const url = this.buildUrl('PHOTOS', 'DETAILS', { id: photoId });
-      const response = await this.get(url);
-      
+      if (!photoId || photoId <= 0) {
+        throw new Error('Invalid photo ID');
+      }
+
+      const url = this.buildUrl(API_ROUTES.PHOTOS.GET_PHOTO, { photo_id: photoId });
+      const response = await this.authenticatedRequest(() =>
+        this.client.get(url)
+      );
+
       return this.transformResponse(response);
     } catch (error) {
-      this.logError('Get photo details failed', error);
+      this.logError('Get photo failed', error);
       throw error;
     }
   }
 
   /**
-   * Download photo
-   * @param {string} photoId - Photo ID
-   * @param {Function} onProgress - Progress callback
-   * @returns {Promise<Blob>} Photo blob
+   * Download photo file
+   * @param {number} photoId - Photo ID
+   * @returns {Promise<Object>} Photo file data
    */
-  async downloadPhoto(photoId, onProgress = null) {
+  async downloadPhoto(photoId) {
     try {
-      this.validateRequired({ photoId }, ['photoId']);
+      if (!photoId || photoId <= 0) {
+        throw new Error('Invalid photo ID');
+      }
+
+      // First get photo details to get file path
+      const photoDetails = await this.getPhoto(photoId);
       
-      const url = this.buildUrl('PHOTOS', 'DOWNLOAD', { id: photoId });
-      const response = await this.downloadFile(url, onProgress);
-      
+      if (!photoDetails.file_path) {
+        throw new Error('Photo file path not found');
+      }
+
+      // Download the file
+      const response = await this.authenticatedRequest(() =>
+        this.client.downloadFile(photoDetails.file_path)
+      );
+
       return response;
     } catch (error) {
       this.logError('Download photo failed', error);
@@ -301,128 +165,78 @@ class PhotosService extends BaseService {
   }
 
   /**
-   * Search photos
-   * @param {Object} searchOptions - Search options
-   * @param {string} searchOptions.query - Search query
-   * @param {string} searchOptions.groupId - Group ID (optional)
-   * @param {number} searchOptions.page - Page number
-   * @param {number} searchOptions.limit - Items per page
-   * @returns {Promise<Object>} Search results
+   * Upload multiple photos to group
+   * @param {number} groupId - Group ID
+   * @param {Array} photos - Array of photo file objects
+   * @param {Function} onProgress - Progress callback
+   * @returns {Promise<Array>} Array of upload responses
    */
-  async searchPhotos(searchOptions) {
+  async uploadMultiplePhotos(groupId, photos, onProgress = null) {
     try {
-      this.validateRequired(searchOptions, ['query']);
-      
-      const url = this.buildUrl('PHOTOS', 'SEARCH');
-      const config = {
-        params: {
-          q: searchOptions.query,
-          groupId: searchOptions.groupId,
-          page: searchOptions.page || 1,
-          limit: searchOptions.limit || 20,
+      if (!groupId || groupId <= 0) {
+        throw new Error('Invalid group ID');
+      }
+
+      if (!Array.isArray(photos) || photos.length === 0) {
+        throw new Error('No photos provided');
+      }
+
+      const uploadPromises = photos.map(async (photo, index) => {
+        try {
+          const response = await this.uploadPhoto(groupId, { file: photo });
+          
+          // Call progress callback if provided
+          if (onProgress) {
+            const progress = ((index + 1) / photos.length) * 100;
+            onProgress(progress);
+          }
+          
+          return response;
+        } catch (error) {
+          this.logError(`Upload photo ${index + 1} failed`, error);
+          throw error;
         }
-      };
-      
-      const response = await this.get(url, config);
-      
-      return this.transformResponse(response);
+      });
+
+      const results = await Promise.all(uploadPromises);
+      return results;
     } catch (error) {
-      this.logError('Search photos failed', error);
+      this.logError('Upload multiple photos failed', error);
       throw error;
     }
   }
 
   /**
-   * Get photo statistics
-   * @param {string} photoId - Photo ID
-   * @returns {Promise<Object>} Photo statistics
-   */
-  async getPhotoStats(photoId) {
-    try {
-      this.validateRequired({ photoId }, ['photoId']);
-      
-      const url = this.buildUrl('PHOTOS', 'STATS', { id: photoId });
-      const response = await this.get(url);
-      
-      return this.transformResponse(response);
-    } catch (error) {
-      this.logError('Get photo stats failed', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Transform response data (override from BaseService)
-   */
-  transformResponse(data) {
-    if (data.photos) {
-      return {
-        ...data,
-        photos: data.photos.map(photo => this.transformPhoto(photo))
-      };
-    }
-    
-    if (data.photo) {
-      return {
-        ...data,
-        photo: this.transformPhoto(data.photo)
-      };
-    }
-    
-    return data;
-  }
-
-  /**
-   * Transform individual photo data
-   * @param {Object} photo - Photo data
-   * @returns {Object} Transformed photo
-   */
-  transformPhoto(photo) {
-    return {
-      ...photo,
-      url: photo.url ? this.getFullImageUrl(photo.url) : null,
-      thumbnail_url: photo.thumbnail_url ? this.getFullImageUrl(photo.thumbnail_url) : null,
-      created_at: photo.created_at ? new Date(photo.created_at) : null,
-      updated_at: photo.updated_at ? new Date(photo.updated_at) : null,
-    };
-  }
-
-  /**
-   * Get full image URL
-   * @param {string} relativePath - Relative image path
-   * @returns {string} Full image URL
-   */
-  getFullImageUrl(relativePath) {
-    if (relativePath.startsWith('http')) {
-      return relativePath;
-    }
-    
-    return `${this.config.getBaseURL()}${relativePath}`;
-  }
-
-  /**
-   * Validate photo data
-   * @param {Object} photoData - Photo data to validate
+   * Validate photo file
+   * @param {Object} file - File object to validate
    * @returns {Object} Validation result
    */
-  validatePhotoData(photoData) {
+  validatePhotoFile(file) {
     const errors = [];
-    
-    // Validate required fields
-    if (!photoData.uri) {
-      errors.push('Photo URI is required');
+
+    // Check if file exists
+    if (!file) {
+      errors.push('Photo file is required');
+      return { isValid: false, errors };
     }
-    
-    // Validate file type
-    if (photoData.type && !this.isValidImageType(photoData.type)) {
-      errors.push('Invalid image type. Supported types: JPEG, PNG, GIF, WebP');
+
+    // Check file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+    if (!allowedTypes.includes(file.type)) {
+      errors.push('Only JPG, JPEG, and PNG files are allowed');
     }
-    
-    // Validate caption length
-    if (photoData.caption && photoData.caption.length > 500) {
-      errors.push('Caption must be less than 500 characters');
+
+    // Check file size (max 10MB)
+    const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+    if (file.size && file.size > maxSize) {
+      errors.push('File size must be less than 10MB');
     }
-    
+
+    // Check if file has required properties
+    if (!file.uri) {
+      errors.push('File URI is required');
+    }
+
     return {
       isValid: errors.length === 0,
       errors
@@ -430,37 +244,54 @@ class PhotosService extends BaseService {
   }
 
   /**
-   * Check if image type is valid
-   * @param {string} type - Image type
-   * @returns {boolean} True if valid
+   * Get photo file URL
+   * @param {string} filePath - File path from API response
+   * @returns {string} Full photo URL
    */
-  isValidImageType(type) {
-    const validTypes = [
-      'image/jpeg',
-      'image/jpg',
-      'image/png',
-      'image/gif',
-      'image/webp'
-    ];
-    
-    return validTypes.includes(type.toLowerCase());
+  getPhotoUrl(filePath) {
+    if (!filePath) {
+      return null;
+    }
+
+    // If it's already a full URL, return as is
+    if (filePath.startsWith('http')) {
+      return filePath;
+    }
+
+    // Otherwise, construct full URL
+    return `${this.config.getBaseURL()}${filePath}`;
   }
 
   /**
-   * Get supported image formats
-   * @returns {Array} Supported formats
+   * Transform photo response to include full URLs
+   * @param {Object} response - API response
+   * @returns {Object} Transformed response
    */
-  getSupportedFormats() {
-    return [
-      { extension: 'jpg', mimeType: 'image/jpeg' },
-      { extension: 'jpeg', mimeType: 'image/jpeg' },
-      { extension: 'png', mimeType: 'image/png' },
-      { extension: 'gif', mimeType: 'image/gif' },
-      { extension: 'webp', mimeType: 'image/webp' },
-    ];
+  transformResponse(response) {
+    if (Array.isArray(response)) {
+      return response.map(photo => this.transformPhoto(photo));
+    }
+
+    if (response && typeof response === 'object' && response.file_path) {
+      return this.transformPhoto(response);
+    }
+
+    return response;
+  }
+
+  /**
+   * Transform individual photo object
+   * @param {Object} photo - Photo object
+   * @returns {Object} Transformed photo
+   */
+  transformPhoto(photo) {
+    return {
+      ...photo,
+      file_url: this.getPhotoUrl(photo.file_path),
+      created_at: photo.created_at ? new Date(photo.created_at) : null,
+      updated_at: photo.updated_at ? new Date(photo.updated_at) : null,
+    };
   }
 }
 
-// Export singleton instance
-export const photosService = new PhotosService();
-export { PhotosService }; 
+export default PhotosService; 

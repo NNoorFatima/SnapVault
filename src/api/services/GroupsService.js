@@ -1,37 +1,23 @@
 /**
- * GroupsService
+ * Groups Service
  * Handles group-related API calls
- * 
- * SOLID Principles Applied:
- * - Single Responsibility: Only handles group operations
- * - Open/Closed: Easy to extend with new group methods
- * - Liskov Substitution: Can be swapped with different group implementations
- * - Interface Segregation: Provides focused group interface
- * - Dependency Inversion: Depends on abstractions (BaseService)
  */
 
 import BaseService from './BaseService';
+import { API_ROUTES } from '../config/ApiConfig';
 
 class GroupsService extends BaseService {
   /**
    * Get user's groups
-   * @param {Object} options - Query options
-   * @param {number} options.page - Page number
-   * @param {number} options.limit - Items per page
-   * @returns {Promise<Object>} User groups
+   * @returns {Promise<Array>} List of user's groups
    */
-  async getMyGroups(options = {}) {
+  async getMyGroups() {
     try {
-      const url = this.buildUrl('GROUPS', 'MY_GROUPS');
-      const config = {
-        params: {
-          page: options.page || 1,
-          limit: options.limit || 20,
-        }
-      };
-      
-      const response = await this.get(url, config);
-      
+      const url = this.buildUrl(API_ROUTES.GROUPS.MY_GROUPS);
+      const response = await this.authenticatedRequest(() =>
+        this.client.get(url)
+      );
+
       return this.transformResponse(response);
     } catch (error) {
       this.logError('Get my groups failed', error);
@@ -40,22 +26,25 @@ class GroupsService extends BaseService {
   }
 
   /**
-   * Create new group
-   * @param {Object} groupData - Group data
+   * Create a new group
+   * @param {Object} groupData - Group creation data
    * @param {string} groupData.name - Group name
    * @param {string} groupData.description - Group description
-   * @param {boolean} groupData.isPrivate - Is group private
-   * @returns {Promise<Object>} Created group
+   * @returns {Promise<Object>} Created group data
    */
   async createGroup(groupData) {
     try {
-      this.validateRequired(groupData, ['name']);
-      
-      const url = this.buildUrl('GROUPS', 'CREATE');
-      const transformedData = this.transformRequest(groupData);
-      
-      const response = await this.post(url, transformedData);
-      
+      this.validateRequired(groupData, ['name', 'description']);
+
+      if (!groupData.name || groupData.name.trim() === '') {
+        throw new Error('Group name cannot be empty');
+      }
+
+      const url = this.buildUrl(API_ROUTES.GROUPS.CREATE);
+      const response = await this.authenticatedRequest(() =>
+        this.client.post(url, groupData)
+      );
+
       return this.transformResponse(response);
     } catch (error) {
       this.logError('Create group failed', error);
@@ -64,81 +53,24 @@ class GroupsService extends BaseService {
   }
 
   /**
-   * Get group details
-   * @param {string} groupId - Group ID
-   * @returns {Promise<Object>} Group details
-   */
-  async getGroupDetails(groupId) {
-    try {
-      this.validateRequired({ groupId }, ['groupId']);
-      
-      const url = this.buildUrl('GROUPS', 'DETAILS', { id: groupId });
-      const response = await this.get(url);
-      
-      return this.transformResponse(response);
-    } catch (error) {
-      this.logError('Get group details failed', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Update group
-   * @param {string} groupId - Group ID
-   * @param {Object} groupData - Updated group data
-   * @returns {Promise<Object>} Updated group
-   */
-  async updateGroup(groupId, groupData) {
-    try {
-      this.validateRequired({ groupId }, ['groupId']);
-      
-      const url = this.buildUrl('GROUPS', 'DETAILS', { id: groupId });
-      const transformedData = this.transformRequest(groupData);
-      
-      const response = await this.put(url, transformedData);
-      
-      return this.transformResponse(response);
-    } catch (error) {
-      this.logError('Update group failed', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Delete group
-   * @param {string} groupId - Group ID
-   * @returns {Promise<Object>} Delete response
-   */
-  async deleteGroup(groupId) {
-    try {
-      this.validateRequired({ groupId }, ['groupId']);
-      
-      const url = this.buildUrl('GROUPS', 'DETAILS', { id: groupId });
-      const response = await this.delete(url);
-      
-      return this.transformResponse(response);
-    } catch (error) {
-      this.logError('Delete group failed', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Join group
-   * @param {Object} joinData - Join data
-   * @param {string} joinData.groupId - Group ID
-   * @param {string} joinData.inviteCode - Invite code (optional)
+   * Join a group using invite code
+   * @param {Object} joinData - Join group data
+   * @param {string} joinData.invite_code - Group invite code
    * @returns {Promise<Object>} Join response
    */
   async joinGroup(joinData) {
     try {
-      this.validateRequired(joinData, ['groupId']);
-      
-      const url = this.buildUrl('GROUPS', 'JOIN');
-      const transformedData = this.transformRequest(joinData);
-      
-      const response = await this.post(url, transformedData);
-      
+      this.validateRequired(joinData, ['invite_code']);
+
+      if (!joinData.invite_code || joinData.invite_code.trim() === '') {
+        throw new Error('Invite code cannot be empty');
+      }
+
+      const url = this.buildUrl(API_ROUTES.GROUPS.JOIN);
+      const response = await this.authenticatedRequest(() =>
+        this.client.post(url, joinData)
+      );
+
       return this.transformResponse(response);
     } catch (error) {
       this.logError('Join group failed', error);
@@ -147,48 +79,44 @@ class GroupsService extends BaseService {
   }
 
   /**
-   * Leave group
-   * @param {string} groupId - Group ID
-   * @returns {Promise<Object>} Leave response
+   * Get specific group details
+   * @param {number} groupId - Group ID
+   * @returns {Promise<Object>} Group details
    */
-  async leaveGroup(groupId) {
+  async getGroup(groupId) {
     try {
-      this.validateRequired({ groupId }, ['groupId']);
-      
-      const url = this.buildUrl('GROUPS', 'LEAVE');
-      const data = { groupId };
-      
-      const response = await this.post(url, data);
-      
+      if (!groupId || groupId <= 0) {
+        throw new Error('Invalid group ID');
+      }
+
+      const url = this.buildUrl(API_ROUTES.GROUPS.GET_GROUP, { id: groupId });
+      const response = await this.authenticatedRequest(() =>
+        this.client.get(url)
+      );
+
       return this.transformResponse(response);
     } catch (error) {
-      this.logError('Leave group failed', error);
+      this.logError('Get group failed', error);
       throw error;
     }
   }
 
   /**
    * Get group members
-   * @param {string} groupId - Group ID
-   * @param {Object} options - Query options
-   * @param {number} options.page - Page number
-   * @param {number} options.limit - Items per page
-   * @returns {Promise<Object>} Group members
+   * @param {number} groupId - Group ID
+   * @returns {Promise<Object>} Group members data
    */
-  async getGroupMembers(groupId, options = {}) {
+  async getGroupMembers(groupId) {
     try {
-      this.validateRequired({ groupId }, ['groupId']);
-      
-      const url = this.buildUrl('GROUPS', 'MEMBERS', { id: groupId });
-      const config = {
-        params: {
-          page: options.page || 1,
-          limit: options.limit || 20,
-        }
-      };
-      
-      const response = await this.get(url, config);
-      
+      if (!groupId || groupId <= 0) {
+        throw new Error('Invalid group ID');
+      }
+
+      const url = this.buildUrl(API_ROUTES.GROUPS.GET_MEMBERS, { id: groupId });
+      const response = await this.authenticatedRequest(() =>
+        this.client.get(url)
+      );
+
       return this.transformResponse(response);
     } catch (error) {
       this.logError('Get group members failed', error);
@@ -197,239 +125,207 @@ class GroupsService extends BaseService {
   }
 
   /**
-   * Add member to group
-   * @param {string} groupId - Group ID
-   * @param {Object} memberData - Member data
-   * @param {string} memberData.userId - User ID to add
-   * @param {string} memberData.role - Member role (optional)
-   * @returns {Promise<Object>} Add member response
+   * Leave a group
+   * @param {number} groupId - Group ID
+   * @returns {Promise<Object>} Leave response
    */
-  async addMember(groupId, memberData) {
+  async leaveGroup(groupId) {
     try {
-      this.validateRequired({ groupId }, ['groupId']);
-      this.validateRequired(memberData, ['userId']);
-      
-      const url = this.buildUrl('GROUPS', 'MEMBERS', { id: groupId });
-      const transformedData = this.transformRequest(memberData);
-      
-      const response = await this.post(url, transformedData);
-      
+      if (!groupId || groupId <= 0) {
+        throw new Error('Invalid group ID');
+      }
+
+      const url = this.buildUrl(API_ROUTES.GROUPS.LEAVE_GROUP, { id: groupId });
+      const response = await this.authenticatedRequest(() =>
+        this.client.delete(url)
+      );
+
       return this.transformResponse(response);
     } catch (error) {
-      this.logError('Add member failed', error);
+      this.logError('Leave group failed', error);
       throw error;
     }
   }
 
   /**
-   * Remove member from group
-   * @param {string} groupId - Group ID
-   * @param {string} userId - User ID to remove
-   * @returns {Promise<Object>} Remove member response
+   * Delete a group (only for group owner)
+   * @param {number} groupId - Group ID
+   * @returns {Promise<Object>} Delete response
    */
-  async removeMember(groupId, userId) {
+  async deleteGroup(groupId) {
     try {
-      this.validateRequired({ groupId, userId }, ['groupId', 'userId']);
-      
-      const url = this.buildUrl('GROUPS', 'MEMBERS', { id: groupId });
-      const config = { data: { userId } };
-      
-      const response = await this.delete(url, config);
-      
+      if (!groupId || groupId <= 0) {
+        throw new Error('Invalid group ID');
+      }
+
+      const url = this.buildUrl(API_ROUTES.GROUPS.DELETE_GROUP, { id: groupId });
+      const response = await this.authenticatedRequest(() =>
+        this.client.delete(url)
+      );
+
       return this.transformResponse(response);
     } catch (error) {
-      this.logError('Remove member failed', error);
+      this.logError('Delete group failed', error);
       throw error;
     }
   }
 
   /**
-   * Update member role
-   * @param {string} groupId - Group ID
-   * @param {string} userId - User ID
-   * @param {string} role - New role
-   * @returns {Promise<Object>} Update role response
+   * Update group information (only for group owner)
+   * @param {number} groupId - Group ID
+   * @param {Object} groupData - Updated group data
+   * @param {string} groupData.name - New group name (optional)
+   * @param {string} groupData.description - New group description (optional)
+   * @returns {Promise<Object>} Updated group data
    */
-  async updateMemberRole(groupId, userId, role) {
+  async updateGroup(groupId, groupData) {
     try {
-      this.validateRequired({ groupId, userId, role }, ['groupId', 'userId', 'role']);
-      
-      const url = this.buildUrl('GROUPS', 'MEMBERS', { id: groupId });
-      const data = { userId, role };
-      
-      const response = await this.put(url, data);
-      
+      if (!groupId || groupId <= 0) {
+        throw new Error('Invalid group ID');
+      }
+
+      if (!groupData || Object.keys(groupData).length === 0) {
+        throw new Error('No update data provided');
+      }
+
+      const url = this.buildUrl(API_ROUTES.GROUPS.UPDATE_GROUP, { id: groupId });
+      const response = await this.authenticatedRequest(() =>
+        this.client.put(url, groupData)
+      );
+
       return this.transformResponse(response);
     } catch (error) {
-      this.logError('Update member role failed', error);
+      this.logError('Update group failed', error);
       throw error;
     }
   }
 
   /**
-   * Search groups
-   * @param {Object} searchOptions - Search options
-   * @param {string} searchOptions.query - Search query
-   * @param {number} searchOptions.page - Page number
-   * @param {number} searchOptions.limit - Items per page
-   * @returns {Promise<Object>} Search results
+   * Update member access in group (admin only)
+   * @param {number} groupId - Group ID
+   * @param {number} memberId - Member user ID
+   * @param {number} roleId - New role ID
+   * @returns {Promise<Object>} Update response
    */
-  async searchGroups(searchOptions) {
+  async updateMemberAccess(groupId, memberId, roleId) {
     try {
-      this.validateRequired(searchOptions, ['query']);
+      if (!groupId || groupId <= 0) {
+        throw new Error('Invalid group ID');
+      }
+
+      if (!memberId || memberId <= 0) {
+        throw new Error('Invalid member ID');
+      }
+
+      if (!roleId || roleId <= 0) {
+        throw new Error('Invalid role ID');
+      }
+
+      const url = this.buildUrl(API_ROUTES.GROUPS.UPDATE_MEMBER_ACCESS, { id: groupId });
+      const data = { member_id: memberId, role_id: roleId };
       
-      const url = this.buildUrl('GROUPS', 'SEARCH');
-      const config = {
-        params: {
-          q: searchOptions.query,
-          page: searchOptions.page || 1,
-          limit: searchOptions.limit || 20,
-        }
-      };
-      
-      const response = await this.get(url, config);
-      
+      const response = await this.authenticatedRequest(() =>
+        this.client.put(url, data)
+      );
+
       return this.transformResponse(response);
     } catch (error) {
-      this.logError('Search groups failed', error);
+      this.logError('Update member access failed', error);
       throw error;
     }
   }
 
   /**
-   * Get group invite code
-   * @param {string} groupId - Group ID
-   * @returns {Promise<Object>} Invite code
+   * Transfer group ownership (super admin only)
+   * @param {number} groupId - Group ID
+   * @param {number} newOwnerId - New owner user ID
+   * @returns {Promise<Object>} Transfer response
    */
-  async getInviteCode(groupId) {
+  async transferOwnership(groupId, newOwnerId) {
     try {
-      this.validateRequired({ groupId }, ['groupId']);
+      if (!groupId || groupId <= 0) {
+        throw new Error('Invalid group ID');
+      }
+
+      if (!newOwnerId || newOwnerId <= 0) {
+        throw new Error('Invalid new owner ID');
+      }
+
+      const url = this.buildUrl(API_ROUTES.GROUPS.TRANSFER_OWNERSHIP, { id: groupId });
+      const data = { new_owner_id: newOwnerId };
       
-      const url = this.buildUrl('GROUPS', 'INVITE_CODE', { id: groupId });
-      const response = await this.get(url);
-      
+      const response = await this.authenticatedRequest(() =>
+        this.client.put(url, data)
+      );
+
       return this.transformResponse(response);
     } catch (error) {
-      this.logError('Get invite code failed', error);
+      this.logError('Transfer ownership failed', error);
       throw error;
     }
   }
 
   /**
-   * Generate new invite code
-   * @param {string} groupId - Group ID
-   * @returns {Promise<Object>} New invite code
+   * Validate group name
+   * @param {string} name - Group name to validate
+   * @returns {Object} Validation result
    */
-  async generateInviteCode(groupId) {
-    try {
-      this.validateRequired({ groupId }, ['groupId']);
-      
-      const url = this.buildUrl('GROUPS', 'INVITE_CODE', { id: groupId });
-      const response = await this.post(url);
-      
-      return this.transformResponse(response);
-    } catch (error) {
-      this.logError('Generate invite code failed', error);
-      throw error;
-    }
-  }
+  validateGroupName(name) {
+    const minLength = 3;
+    const maxLength = 50;
 
-  /**
-   * Transform request data (override from BaseService)
-   */
-  transformRequest(data) {
-    const transformed = { ...data };
-    
-    // Ensure group name is trimmed
-    if (transformed.name) {
-      transformed.name = transformed.name.trim();
-    }
-    
-    // Ensure description is trimmed
-    if (transformed.description) {
-      transformed.description = transformed.description.trim();
-    }
-    
-    return transformed;
-  }
+    const isValid = name.length >= minLength && name.length <= maxLength;
 
-  /**
-   * Transform response data (override from BaseService)
-   */
-  transformResponse(data) {
-    if (data.groups) {
-      return {
-        ...data,
-        groups: data.groups.map(group => this.transformGroup(group))
-      };
-    }
-    
-    if (data.group) {
-      return {
-        ...data,
-        group: this.transformGroup(data.group)
-      };
-    }
-    
-    return data;
-  }
-
-  /**
-   * Transform individual group data
-   * @param {Object} group - Group data
-   * @returns {Object} Transformed group
-   */
-  transformGroup(group) {
     return {
-      ...group,
-      avatar_url: group.avatar_url ? this.getFullImageUrl(group.avatar_url) : null,
-      created_at: group.created_at ? new Date(group.created_at) : null,
-      updated_at: group.updated_at ? new Date(group.updated_at) : null,
+      isValid,
+      errors: [
+        ...(name.length < minLength ? ['Group name must be at least 3 characters'] : []),
+        ...(name.length > maxLength ? ['Group name must be less than 50 characters'] : []),
+      ]
     };
   }
 
   /**
-   * Get full image URL
-   * @param {string} relativePath - Relative image path
-   * @returns {string} Full image URL
+   * Validate group description
+   * @param {string} description - Group description to validate
+   * @returns {Object} Validation result
    */
-  getFullImageUrl(relativePath) {
-    if (relativePath.startsWith('http')) {
-      return relativePath;
-    }
-    
-    return `${this.config.getBaseURL()}${relativePath}`;
+  validateGroupDescription(description) {
+    const maxLength = 500;
+
+    const isValid = description.length <= maxLength;
+
+    return {
+      isValid,
+      errors: [
+        ...(description.length > maxLength ? ['Group description must be less than 500 characters'] : []),
+      ]
+    };
   }
 
   /**
-   * Validate group data
-   * @param {Object} groupData - Group data to validate
+   * Validate invite code format
+   * @param {string} inviteCode - Invite code to validate
    * @returns {Object} Validation result
    */
-  validateGroupData(groupData) {
-    const errors = [];
-    
-    // Validate name
-    if (!groupData.name || groupData.name.trim().length < 3) {
-      errors.push('Group name must be at least 3 characters');
-    }
-    
-    if (groupData.name && groupData.name.length > 50) {
-      errors.push('Group name must be less than 50 characters');
-    }
-    
-    // Validate description
-    if (groupData.description && groupData.description.length > 500) {
-      errors.push('Group description must be less than 500 characters');
-    }
-    
+  validateInviteCode(inviteCode) {
+    const minLength = 6;
+    const maxLength = 10;
+    const codeRegex = /^[A-Z0-9]+$/;
+
+    const isValid = inviteCode.length >= minLength && 
+                   inviteCode.length <= maxLength && 
+                   codeRegex.test(inviteCode);
+
     return {
-      isValid: errors.length === 0,
-      errors
+      isValid,
+      errors: [
+        ...(inviteCode.length < minLength ? ['Invite code must be at least 6 characters'] : []),
+        ...(inviteCode.length > maxLength ? ['Invite code must be less than 10 characters'] : []),
+        ...(!codeRegex.test(inviteCode) ? ['Invite code can only contain uppercase letters and numbers'] : []),
+      ]
     };
   }
 }
 
-// Export singleton instance
-export const groupsService = new GroupsService();
-export { GroupsService }; 
+export default GroupsService; 

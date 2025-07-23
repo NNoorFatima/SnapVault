@@ -1,19 +1,20 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { apiFactory } from '../../api/ApiFactory';
+import apiFactory, { getAuthService } from '../../api/ApiFactory';
 
 // Initialize auth state from storage
 export const initializeAuth = createAsyncThunk(
   'auth/initializeAuth',
   async (_, { rejectWithValue }) => {
     try {
-      const authService = apiFactory.getAuthService();
-      const token = await authService.getAccessToken();
-      const user = await authService.getCurrentUser();
+      const authService = getAuthService();
+      const isAuthenticated = authService.isAuthenticated();
+      const user = authService.getCurrentUser();
+      const token = authService.getAccessToken();
       
       return {
         token,
         user,
-        isAuthenticated: !!token,
+        isAuthenticated,
       };
     } catch (error) {
       return rejectWithValue(error.message || 'Failed to initialize auth');
@@ -26,7 +27,7 @@ export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async (credentials, { rejectWithValue }) => {
     try {
-      const authService = apiFactory.getAuthService();
+      const authService = getAuthService();
       const response = await authService.login(credentials);
       
       return {
@@ -45,7 +46,7 @@ export const registerUser = createAsyncThunk(
   'auth/registerUser',
   async (userData, { rejectWithValue }) => {
     try {
-      const authService = apiFactory.getAuthService();
+      const authService = getAuthService();
       const response = await authService.register(userData);
       
       return {
@@ -64,8 +65,7 @@ export const logoutUser = createAsyncThunk(
   'auth/logoutUser',
   async (_, { rejectWithValue }) => {
     try {
-      const authService = apiFactory.getAuthService();
-      await authService.logout();
+      await apiFactory.logout();
       
       return {
         token: null,

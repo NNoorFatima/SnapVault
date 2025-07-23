@@ -22,10 +22,20 @@ export type MainTabParamList = {
   Profile: undefined;
   EditProfile: undefined;
   GroupScreen: {
+    screen?: string;
+    params?: {
+      groupId: number;
+      groupName: string;
+      groupDescription: string;
+      groupCode: string;
+      fullGroupData?: any; // Optional full group data from dashboard
+    };
+  } | {
     groupId: number;
     groupName: string;
     groupDescription: string;
     groupCode: string;
+    fullGroupData?: any; // Optional full group data from dashboard
   };
   AllGroups: {
     groups: Array<{
