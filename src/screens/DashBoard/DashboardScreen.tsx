@@ -281,28 +281,87 @@ const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
   ];
 
   // Handlers for popup actions
-  const handleCreateGroup = (groupData: { name: string; description: string }) => {
-    console.log('Creating group:', groupData);
-    
-    Toast.show({
-      type: 'success',
-      text1: 'Group Created!',
-      text2: `Group "${groupData.name}" has been created successfully.`,
-      position: 'bottom',
-      visibilityTime: 3000,
-    });
+  const handleCreateGroup = async (groupData: { name: string; description: string }) => {
+    try {
+      console.log('🔄 Creating group:', groupData);
+      
+      const groupsService = getGroupsService();
+      console.log('✅ Groups service obtained for create group');
+      
+      const response = await groupsService.createGroup(groupData);
+      console.log('📡 Create group API response:', response);
+      
+      if (response && (response as any).id) {
+        console.log('✅ Group created successfully:', response);
+        
+        Toast.show({
+          type: 'success',
+          text1: 'Group Created!',
+          text2: `Group "${(response as any).name}" has been created successfully.`,
+          position: 'bottom',
+          visibilityTime: 3000,
+        });
+        
+        // Refresh groups data to show the new group
+        await fetchGroupsData();
+        
+        // Close the popup
+        setShowCreateGroupPopup(false);
+      } else {
+        console.log('⚠️ Invalid response from create group API');
+        throw new Error('Invalid response from server');
+      }
+    } catch (error) {
+      console.error('❌ Error creating group:', error);
+      console.error('Error details:', error instanceof Error ? error.message : String(error));
+      
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: error instanceof Error ? error.message : 'Failed to create group. Please try again.',
+        position: 'bottom',
+        visibilityTime: 3000,
+      });
+    }
   };
 
-  const handleJoinGroup = (groupData: { code: string }) => {
-    console.log('Joining group with code:', groupData.code);
-    
-    Toast.show({
-      type: 'success',
-      text1: 'Group Joined!',
-      text2: `You have successfully joined the group.`,
-      position: 'bottom',
-      visibilityTime: 3000,
-    });
+  const handleJoinGroup = async (groupData: { code: string }) => {
+    try {
+      console.log('🔄 Joining group with code:', groupData.code);
+      
+      const groupsService = getGroupsService();
+      console.log('✅ Groups service obtained for join group');
+      
+      const response = await groupsService.joinGroup({ invite_code: groupData.code });
+      console.log('📡 Join group API response:', response);
+      
+      console.log('✅ Group joined successfully');
+      
+      Toast.show({
+        type: 'success',
+        text1: 'Group Joined!',
+        text2: `You have successfully joined the group.`,
+        position: 'bottom',
+        visibilityTime: 3000,
+      });
+      
+      // Refresh groups data to show the new group
+      await fetchGroupsData();
+      
+      // Close the popup
+      setShowJoinGroupPopup(false);
+    } catch (error) {
+      console.error('❌ Error joining group:', error);
+      console.error('Error details:', error instanceof Error ? error.message : String(error));
+      
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: error instanceof Error ? error.message : 'Failed to join group. Please check the invite code and try again.',
+        position: 'bottom',
+        visibilityTime: 3000,
+      });
+    }
   };
 
   const handleGroupPress = (groupData: {
