@@ -286,33 +286,25 @@ const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
       console.log('🔄 Creating group:', groupData);
       
       const groupsService = getGroupsService();
-      console.log('✅ Groups service obtained for create group');
+      console.log('✅ Groups service obtained for creation');
       
       const response = await groupsService.createGroup(groupData);
-      console.log('📡 Create group API response:', response);
+      console.log('📡 Group creation API response:', response);
       
-      if (response && (response as any).id) {
-        console.log('✅ Group created successfully:', response);
-        
-        Toast.show({
-          type: 'success',
-          text1: 'Group Created!',
-          text2: `Group "${(response as any).name}" has been created successfully.`,
-          position: 'bottom',
-          visibilityTime: 3000,
-        });
-        
-        // Refresh groups data to show the new group
-        await fetchGroupsData();
-        
-        // Close the popup
-        setShowCreateGroupPopup(false);
-      } else {
-        console.log('⚠️ Invalid response from create group API');
-        throw new Error('Invalid response from server');
-      }
+      Toast.show({
+        type: 'success',
+        text1: 'Group Created!',
+        text2: `Group "${groupData.name}" has been created successfully.`,
+        position: 'bottom',
+        visibilityTime: 3000,
+      });
+      
+      // Refresh groups data to show the new group
+      console.log('🔄 Refreshing groups data after creation...');
+      await fetchGroupsData();
+      
     } catch (error) {
-      console.error('❌ Error creating group:', error);
+      console.error('❌ Failed to create group:', error);
       console.error('Error details:', error instanceof Error ? error.message : String(error));
       
       Toast.show({
@@ -330,12 +322,10 @@ const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
       console.log('🔄 Joining group with code:', groupData.code);
       
       const groupsService = getGroupsService();
-      console.log('✅ Groups service obtained for join group');
+      console.log('✅ Groups service obtained for joining');
       
       const response = await groupsService.joinGroup({ invite_code: groupData.code });
-      console.log('📡 Join group API response:', response);
-      
-      console.log('✅ Group joined successfully');
+      console.log('📡 Group join API response:', response);
       
       Toast.show({
         type: 'success',
@@ -345,13 +335,12 @@ const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
         visibilityTime: 3000,
       });
       
-      // Refresh groups data to show the new group
+      // Refresh groups data to show the joined group
+      console.log('🔄 Refreshing groups data after joining...');
       await fetchGroupsData();
       
-      // Close the popup
-      setShowJoinGroupPopup(false);
     } catch (error) {
-      console.error('❌ Error joining group:', error);
+      console.error('❌ Failed to join group:', error);
       console.error('Error details:', error instanceof Error ? error.message : String(error));
       
       Toast.show({

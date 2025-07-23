@@ -150,18 +150,18 @@ const GroupScreen = ({ route, navigation }) => {
     return (
       <View style={styles.imageGrid}>
         {images.map((image) => (
-          <TouchableOpacity
-            key={image.id}
-            style={styles.imageWrapper}
-            onPress={() =>
-              navigation.navigate('ImageDetail', {
-                imageUri: image.uri,
-                uploadedBy: image.uploadedBy,
-                date: image.date,
-                id: image.id,
-              })
-            }
-          >
+            <TouchableOpacity
+                      key={image.id}
+                      style={styles.imageWrapper}
+                      onPress={() =>
+                        navigation.navigate('ImageDetail', {
+                          imageUri: image.uri,
+                          uploadedBy: image.uploadedBy,
+                          date: image.date,
+                          id: image.id,
+                        })
+                      }
+                    >
             <Image source={{ uri: image.uri }} style={styles.gridImage} />
             <View style={styles.imageInfo}>
               <Text style={styles.imageUploader}>{image.uploadedBy}</Text>
