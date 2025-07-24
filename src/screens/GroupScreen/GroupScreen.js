@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {View, Text, Image, TouchableOpacity, StyleSheet,
-  Dimensions, ScrollView, ImageBackground, Alert, Platform, } from 'react-native';
+  Dimensions, ScrollView, ImageBackground, Alert, Platform, ActivityIndicator, RefreshControl, } from 'react-native';
 // @ts-ignore
 import Feather from 'react-native-vector-icons/Feather'; //for icons
 import { I18nManager } from 'react-native';
-// No API imports needed since we use passed data
+import { useSelector } from 'react-redux';
+import ApiFactory from '../../api/ApiFactory';
 
 // Import clipboard with fallback
 let Clipboard;
@@ -40,6 +41,9 @@ try {
 
 const GroupScreen = ({ route, navigation }) => {
   const { t } = useTranslation();
+  const photosService = ApiFactory.getPhotosService();
+  const user = useSelector(state => state.auth.user);
+  
   console.log('🔄 GroupScreen route params:', route.params);
   
   const { groupId, groupName, groupDescription, groupCode, fullGroupData } = route.params || {
@@ -55,12 +59,10 @@ const GroupScreen = ({ route, navigation }) => {
   
   const [activeTab, setActiveTab] = useState('myPictures');
   const [myPictures, setMyPictures] = useState([]);
-  const [allPictures, setAllPictures] = useState([
-    { id: 1, uri: 'https://placehold.co/300x300/6366F1/FFFFFF', uploadedBy: 'User 1', date: '2024-01-15' },
-    { id: 2, uri: 'https://placehold.co/300x300/10B981/FFFFFF', uploadedBy: 'User 2', date: '2024-01-14' },
-    { id: 3, uri: 'https://placehold.co/300x300/F59E0B/FFFFFF', uploadedBy: 'User 3', date: '2024-01-13' },
-    { id: 4, uri: 'https://placehold.co/300x300/EF4444/FFFFFF', uploadedBy: 'User 1', date: '2024-01-12' },
-  ]);
+  const [allPictures, setAllPictures] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   
   // Group data state - will be updated when route params are available
   const [groupData, setGroupData] = useState({
@@ -106,39 +108,101 @@ const GroupScreen = ({ route, navigation }) => {
         }
       });
     }
-  }, [fullGroupData, groupId, groupName, groupDescription, groupCode, route.params]);
+    
+    // Load photos when group data is available
+    if (groupData.id) {
+      loadPhotos();
+    }
+  }, [fullGroupData, groupId, groupName, groupDescription, groupCode, route.params, groupData.id]);
 
-  // No API calls needed - using passed data from navigation
+  // Load photos from API
+  const loadPhotos = async () => {
+    if (!groupData.id) return;
+    
+    setLoading(true);
+    try {
+      // Load all photos in the group
+      const allPhotosResponse = await photosService.getGroupPhotos(groupData.id);
+      const allPhotos = allPhotosResponse.map(photo => ({
+        id: photo.id,
+        uri: photo.file_url || photo.file_path,
+        uploadedBy: 'Group Member',
+        date: new Date(photo.created_at).toLocaleDateString(),
+        created_at: photo.created_at
+      }));
+      setAllPictures(allPhotos);
+
+      // Load user's photos in the group
+      const myPhotosResponse = await photosService.getMyPhotosInGroup(groupData.id);
+      const myPhotos = myPhotosResponse.map(photo => ({
+        id: photo.id,
+        uri: photo.file_url || photo.file_path,
+        uploadedBy: 'You',
+        date: new Date(photo.created_at).toLocaleDateString(),
+        created_at: photo.created_at
+      }));
+      setMyPictures(myPhotos);
+    } catch (error) {
+      console.error('Error loading photos:', error);
+      // Don't show alert for initial load, just log the error
+      if (!loading) {
+        Alert.alert('Error', 'Failed to load photos. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Refresh photos
+  const refreshPhotos = async () => {
+    setRefreshing(true);
+    await loadPhotos();
+    setRefreshing(false);
+  };
 
   const handleCopyGroupCode = () => {
     Clipboard.setString(groupData.invite_code);
     Alert.alert('Copied!', 'Group code copied to clipboard');
   };
 
-  const handleImageUpload = () => {
+  const handleImageUpload = async () => {
     const options = {
       mediaType: 'photo',
       quality: 0.8,
       maxWidth: 1024,
       maxHeight: 1024,
       includeBase64: false,
+      selectionLimit: 10, // Allow multiple photos
     };
 
-    launchImageLibrary(options, (response) => {
+    launchImageLibrary(options, async (response) => {
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.error) {
         Alert.alert('Error', 'Failed to pick image');
-      } else if (response.assets && response.assets[0]) {
-        const newImage = {
-          id: Date.now(),
-          uri: response.assets[0].uri,
-          uploadedBy: 'You',
-          date: new Date().toISOString().split('T')[0],
-        };
-        setMyPictures([newImage, ...myPictures]);
-        setAllPictures([newImage, ...allPictures]);
-        Alert.alert('Success', 'Image uploaded successfully!');
+      } else if (response.assets && response.assets.length > 0) {
+        setUploading(true);
+        try {
+          // Prepare files for upload
+          const files = response.assets.map(asset => ({
+            uri: asset.uri,
+            type: asset.type || 'image/jpeg',
+            fileName: asset.fileName || `photo_${Date.now()}.jpg`
+          }));
+
+          // Upload photos
+          const uploadedPhotos = await photosService.uploadMultiplePhotos(groupData.id, files);
+          
+          // Refresh photos after upload
+          await loadPhotos();
+          
+          Alert.alert('Success', `${uploadedPhotos.length} photo(s) uploaded successfully!`);
+        } catch (error) {
+          console.error('Upload error:', error);
+          Alert.alert('Upload Failed', error.message || 'Failed to upload photos. Please try again.');
+        } finally {
+          setUploading(false);
+        }
       }
     });
   };
@@ -184,6 +248,14 @@ const GroupScreen = ({ route, navigation }) => {
         style={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={refreshPhotos}
+            tintColor="#6366F1"
+            colors={["#6366F1"]}
+          />
+        }
       >
         <View style={[styles.contentWrapper, { width: contentWrapperWidth }]}>
           {/* Status Bar Spacer */}
@@ -232,11 +304,18 @@ const GroupScreen = ({ route, navigation }) => {
               </View>
 
               <TouchableOpacity
-                style={styles.uploadButton}
+                style={[styles.uploadButton, uploading && styles.uploadButtonDisabled]}
                 onPress={handleImageUpload}
+                disabled={uploading}
               >
-                <Feather name="camera" size={24} color="white" style={styles.uploadButtonIcon} />
-                <Text style={styles.uploadButtonText}>{t('GroupScreen.uploadImage')}</Text>
+                {uploading ? (
+                  <ActivityIndicator size="small" color="white" style={styles.uploadButtonIcon} />
+                ) : (
+                  <Feather name="camera" size={24} color="white" style={styles.uploadButtonIcon} />
+                )}
+                <Text style={styles.uploadButtonText}>
+                  {uploading ? 'Uploading...' : t('GroupScreen.uploadImage')}
+                </Text>
               </TouchableOpacity>
             </View>
           </ImageBackground>
@@ -263,7 +342,12 @@ const GroupScreen = ({ route, navigation }) => {
 
           {/* Tab Content */}
           <View style={styles.tabContent}>
-            {activeTab === 'myPictures' ? (
+            {loading ? (
+              <View style={styles.loadingState}>
+                <ActivityIndicator size="large" color="#6366F1" />
+                <Text style={styles.loadingText}>Loading photos...</Text>
+              </View>
+            ) : activeTab === 'myPictures' ? (
               myPictures.length > 0 ? (
                 renderImageGrid(myPictures)
               ) : (
@@ -276,7 +360,17 @@ const GroupScreen = ({ route, navigation }) => {
                 </View>
               )
             ) : (
-              renderImageGrid(allPictures)
+              allPictures.length > 0 ? (
+                renderImageGrid(allPictures)
+              ) : (
+                <View style={styles.emptyState}>
+                  <Feather name="camera" size={48} color="#9CA3AF" style={styles.emptyStateIcon} />
+                  <Text style={styles.emptyStateTitle}>No Photos Yet</Text>
+                  <Text style={styles.emptyStateText}>
+                    Be the first to upload a photo to this group!
+                  </Text>
+                </View>
+              )
             )}
           </View>
 
@@ -445,6 +539,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     letterSpacing: -0.3,
   },
+  uploadButtonDisabled: {
+    opacity: 0.6,
+  },
 
   // Tabs Styles
   tabsContainer: {
@@ -514,6 +611,19 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
     fontSize: 12,
     fontWeight: '400',
+  },
+
+  // Loading State Styles
+  loadingState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 60,
+  },
+  loadingText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    marginTop: 16,
+    fontWeight: '500',
   },
 
   // Empty State Styles
