@@ -6,6 +6,7 @@ import { styles } from './ImageDetailScreen.styles';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { I18nManager } from 'react-native';
+import ApiFactory from '../../api/ApiFactory';
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
@@ -17,9 +18,36 @@ export default function ImageDetailScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const { t } = useTranslation();
+  const photosService = ApiFactory.getPhotosService();
 
   // Get image data from route params
   const { imageUri, uploadedBy, date, id } = route.params as any || {};
+
+  // Get the full image URL using PhotosService
+  const getFullImageUrl = (uri: string) => {
+    if (!uri) return null;
+    
+    let fullUrl;
+    
+    // If it's already a full URL, use it directly
+    if (uri.startsWith('http://') || uri.startsWith('https://')) {
+      fullUrl = uri;
+      console.log('Using existing full URL:', fullUrl);
+    } else {
+      // If it's a relative path, construct full URL using PhotosService
+      fullUrl = photosService.getPhotoUrl(uri);
+      console.log('Original URL from PhotosService:', fullUrl);
+    }
+    
+    // Clean up the URL by replacing backslashes with forward slashes
+    if (fullUrl) {
+      const cleanedUrl = fullUrl.replace(/\\/g, '/');
+      console.log('Cleaned URL:', cleanedUrl);
+      return cleanedUrl;
+    }
+    
+    return fullUrl;
+  };
 
   const zoomIn = () => {
     const newScale = Math.min(currentScale + 0.2, 3);
@@ -43,33 +71,94 @@ export default function ImageDetailScreen() {
 
   const handleDownload = async () => {
     try {
-      Alert.alert(
-        'Download Image',
-        'This feature will download the image to your device gallery.',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { 
-            text: 'Download', 
-            onPress: () => {
-              // For now, show a success message
-              // In a real implementation, you would use react-native-fs or similar
-              Alert.alert('Success', 'Image download feature will be implemented with proper file system access. For now, you can use the share feature to save the image.');
-            }
-          }
-        ]
-      );
+      if (!imageUri) {
+        Alert.alert('Error', 'No image available to download');
+        return;
+      }
+
+      const fullImageUrl = getFullImageUrl(imageUri);
+      console.log('Original image URI:', imageUri);
+      console.log('Full image URL for download:', fullImageUrl);
+
+      if (!fullImageUrl) {
+        Alert.alert('Error', 'Could not generate full image URL');
+        return;
+      }
+
+      // Use Share API to save image to gallery
+      const shareOptions = {
+        title: 'Save Image to Gallery',
+        message: 'Choose "Save to Photos" or "Save Image" to download this image to your gallery',
+        url: fullImageUrl,
+      };
+
+      const result = await Share.share(shareOptions);
+      
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          console.log('Saved with activity type:', result.activityType);
+          Alert.alert('Success', 'Image saved to gallery successfully!');
+        } else {
+          console.log('Saved successfully');
+          Alert.alert('Success', 'Image saved to gallery successfully!');
+        }
+      } else if (result.action === Share.dismissedAction) {
+        console.log('Download cancelled');
+      }
     } catch (error) {
-      Alert.alert('Error', 'Failed to download image');
+      console.error('Download error:', error);
+      Alert.alert('Error', 'Failed to download image. Please try again.');
     }
   };
 
   const handleShare = async () => {
     try {
-      const shareOptions = {
-        title: 'Share Image',
-        message: `Check out this image from SnapVault!`,
-        url: imageUri, // This will work for web URLs
-      };
+      if (!imageUri) {
+        Alert.alert('Error', 'No image available to share');
+        return;
+      }
+
+      const fullImageUrl = getFullImageUrl(imageUri);
+      console.log('Original image URI:', imageUri);
+      console.log('Full image URL for sharing:', fullImageUrl);
+
+      if (!fullImageUrl) {
+        Alert.alert('Error', 'Could not generate full image URL');
+        return;
+      }
+
+      // Check if the image URI is a local file or remote URL
+      const isLocalFile = fullImageUrl.startsWith('file://') || fullImageUrl.startsWith('content://');
+      const isRemoteUrl = fullImageUrl.startsWith('http://') || fullImageUrl.startsWith('https://');
+
+      console.log('Is local file:', isLocalFile);
+      console.log('Is remote URL:', isRemoteUrl);
+
+      let shareOptions;
+      
+      if (isLocalFile) {
+        // For local files, share the file directly
+        shareOptions = {
+          title: 'Share Image from SnapVault',
+          message: `Check out this image from SnapVault!\n\nImage URL: ${fullImageUrl}`,
+          url: fullImageUrl,
+        };
+      } else if (isRemoteUrl) {
+        // For remote URLs, try to share the URL directly
+        shareOptions = {
+          title: 'Share Image from SnapVault',
+          message: `Check out this image from SnapVault!\n\nImage URL: ${fullImageUrl}`,
+          url: fullImageUrl,
+        };
+      } else {
+        // Fallback to just sharing the URL as text
+        shareOptions = {
+          title: 'Share Image from SnapVault',
+          message: `Check out this image from SnapVault!\n\nImage URL: ${fullImageUrl}`,
+        };
+      }
+
+      console.log('Sharing with options:', shareOptions);
 
       const result = await Share.share(shareOptions);
       
@@ -83,6 +172,7 @@ export default function ImageDetailScreen() {
         console.log('Share dismissed');
       }
     } catch (error) {
+      console.error('Share error:', error);
       Alert.alert('Error', 'Failed to share image');
     }
   };
@@ -111,7 +201,7 @@ export default function ImageDetailScreen() {
       </View>
 
       {/* Zoomable Image */}
-      <View style={{ flex: 1, backgroundColor: '#000' }}>
+      <View style={{ flex: 1, backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' }}>
         <Animated.Image
           source={{ uri: imageUri }}
           resizeMode="contain"
@@ -124,22 +214,12 @@ export default function ImageDetailScreen() {
         />
       </View>
 
-      {/* Image Info */}
-      <View style={styles.imageInfoContainer}>
-        <Text style={styles.imageInfoText}>
-          {uploadedBy && `Uploaded by: ${uploadedBy}`}
-        </Text>
-        <Text style={styles.imageInfoText}>
-          {date && `Date: ${date}`}
-        </Text>
-      </View>
-
       {/* Zoom Buttons */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={zoomOut} style={styles.zoomButton}>
+        <TouchableOpacity onPress={zoomOut}>
           <Feather name="minus" size={28} color="white" />
         </TouchableOpacity>
-        <TouchableOpacity onPress={zoomIn} style={styles.zoomButton}>
+        <TouchableOpacity onPress={zoomIn}>
           <Feather name="plus" size={28} color="white" />
         </TouchableOpacity>
       </View>
