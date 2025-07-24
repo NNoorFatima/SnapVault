@@ -30,11 +30,14 @@ class PhotosService extends BaseService {
 
       const url = this.buildUrl(API_ROUTES.PHOTOS.UPLOAD);
       
-      // Create form data
-      const formData = this.createFormData(
-        { group_id: groupId },
-        { file: photoData.file }
-      );
+      // Create form data for the backend API
+      const formData = new FormData();
+      formData.append('group_id', groupId);
+      formData.append('files', {
+        uri: photoData.file.uri,
+        type: photoData.file.type,
+        name: photoData.file.fileName || `photo_${Date.now()}.jpg`
+      });
 
       const response = await this.authenticatedRequest(() =>
         this.client.uploadFile(url, formData)
@@ -181,25 +184,25 @@ class PhotosService extends BaseService {
         throw new Error('No photos provided');
       }
 
-      const uploadPromises = photos.map(async (photo, index) => {
-        try {
-          const response = await this.uploadPhoto(groupId, { file: photo });
-          
-          // Call progress callback if provided
-          if (onProgress) {
-            const progress = ((index + 1) / photos.length) * 100;
-            onProgress(progress);
-          }
-          
-          return response;
-        } catch (error) {
-          this.logError(`Upload photo ${index + 1} failed`, error);
-          throw error;
-        }
+      const url = this.buildUrl(API_ROUTES.PHOTOS.UPLOAD);
+      
+      // Create form data for multiple files
+      const formData = new FormData();
+      formData.append('group_id', groupId);
+      
+      photos.forEach((photo, index) => {
+        formData.append('files', {
+          uri: photo.uri,
+          type: photo.type,
+          name: photo.fileName || `photo_${Date.now()}_${index}.jpg`
+        });
       });
 
-      const results = await Promise.all(uploadPromises);
-      return results;
+      const response = await this.authenticatedRequest(() =>
+        this.client.uploadFile(url, formData)
+      );
+
+      return this.transformResponse(response);
     } catch (error) {
       this.logError('Upload multiple photos failed', error);
       throw error;
@@ -258,6 +261,11 @@ class PhotosService extends BaseService {
       return filePath;
     }
 
+    // Handle relative paths from backend
+    if (filePath.startsWith('uploads/')) {
+      return `${this.config.getBaseURL()}/${filePath}`;
+    }
+
     // Otherwise, construct full URL
     return `${this.config.getBaseURL()}${filePath}`;
   }
@@ -268,15 +276,18 @@ class PhotosService extends BaseService {
    * @returns {Object} Transformed response
    */
   transformResponse(response) {
-    if (Array.isArray(response)) {
-      return response.map(photo => this.transformPhoto(photo));
+    // Handle axios response structure
+    const data = response.data || response;
+    
+    if (Array.isArray(data)) {
+      return data.map(photo => this.transformPhoto(photo));
     }
 
-    if (response && typeof response === 'object' && response.file_path) {
-      return this.transformPhoto(response);
+    if (data && typeof data === 'object' && data.file_path) {
+      return this.transformPhoto(data);
     }
 
-    return response;
+    return data;
   }
 
   /**
