@@ -124,8 +124,31 @@ try {
   });
   
   console.log('Registration successful:', response);
+  // Note: Registration doesn't return a token, user needs to login after registration
 } catch (error) {
   console.error('Registration failed:', error.message);
+}
+```
+
+**Registration Requirements:**
+- `name`: User's full name (required)
+- `email`: Valid email address (required, will be converted to lowercase)
+- `password`: Password (minimum 6 characters)
+- `profilePicture`: Image file (JPEG/PNG, max 10MB)
+
+**Response Format:**
+```javascript
+{
+  user: {
+    id: 1,
+    name: "John Doe",
+    email: "john@example.com",
+    bio: null,
+    created_at: "2025-07-25T01:35:34.315Z",
+    profile_picture: "/uploads/profile_pictures/uuid.jpg"
+  },
+  access_token: null, // No token returned on registration
+  message: "Registration successful. Please login to continue."
 }
 ```
 
