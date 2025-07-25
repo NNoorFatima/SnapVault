@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, ImageBackground, Dimensions } from 'react-native';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, ImageBackground, Dimensions, ActivityIndicator, RefreshControl } from 'react-native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { RouteProp } from '@react-navigation/native';
 import { MainTabParamList } from '../../navigation/MainTabNavigator';
@@ -7,6 +7,8 @@ import { MainTabParamList } from '../../navigation/MainTabNavigator';
 import Feather from 'react-native-vector-icons/Feather';
 import GroupListItem from '../../components/GroupListItem';
 import { useTranslation } from 'react-i18next';
+import { getGroupsService } from '../../api/ApiFactory';
+import Toast from 'react-native-toast-message';
 
 interface GroupData {
   id: number;
@@ -34,43 +36,91 @@ interface AllGroupsScreenProps {
 }
 
 const AllGroupsScreen: React.FC<AllGroupsScreenProps> = ({ navigation, route }) => {
-  // Fallback to mock data if no params provided
-  const groups = route.params?.groups ?? [
-    {
-      id: 1,
-      name: 'Group 1',
-      description: 'This is the description for Group 1. A wonderful group for sharing memories and photos.',
-      code: 'GRP001',
-      memberCount: 5,
-      image: require('../DashBoard/img/group1.png'),
-      creator: {
-        id: 1,
-        name: 'John Doe',
-        email: 'john@example.com',
-        bio: 'Group creator',
-        created_at: '2025-07-23T07:27:36',
-        profile_picture: null
-      }
-    },
-    {
-      id: 2,
-      name: 'Group 2',
-      description: 'This is the description for Group 2. A wonderful group for sharing memories and photos.',
-      code: 'GRP002',
-      memberCount: 8,
-      image: require('../DashBoard/img/group1.png'),
-      creator: {
-        id: 2,
-        name: 'Jane Smith',
-        email: 'jane@example.com',
-        bio: 'Group creator',
-        created_at: '2025-07-23T07:27:36',
-        profile_picture: null
-      }
-    },
-    // ...add more mock groups as needed
-  ];
+  const [groups, setGroups] = useState<GroupData[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const { t } = useTranslation();
+
+  // Check if groups were passed via route params
+  const groupsFromParams = route.params?.groups;
+
+  useEffect(() => {
+    console.log('🔄 AllGroupsScreen useEffect triggered');
+    console.log('🔍 Groups from params:', groupsFromParams);
+    
+    if (groupsFromParams) {
+      // Use groups passed from dashboard
+      console.log('✅ Using groups from dashboard params');
+      setGroups(groupsFromParams);
+    } else {
+      // Fetch groups from API when navigating from nav bar
+      console.log('🔄 Fetching groups from API (nav bar navigation)');
+      fetchGroupsData();
+    }
+  }, [groupsFromParams]);
+
+  const fetchGroupsData = async () => {
+    try {
+      console.log('🔄 Starting to fetch groups data in AllGroupsScreen...');
+      setIsLoading(true);
+      
+      const groupsService = getGroupsService();
+      console.log('✅ Groups service obtained in AllGroupsScreen');
+      
+      const response = await groupsService.getMyGroups();
+      console.log('📡 API Response received in AllGroupsScreen:', response);
+      
+      if (response && Array.isArray(response)) {
+        const transformedGroups = response.map(group => {
+          console.log('🔄 Transforming group in AllGroupsScreen:', group);
+          console.log('🔍 Original group ID:', group.id, 'Type:', typeof group.id);
+          console.log('🔍 Creator info:', group.creator);
+          
+          return {
+            id: group.id,
+            name: group.name,
+            description: group.description || 'No description available',
+            code: group.invite_code,
+            memberCount: 0, // We'll add this later if needed
+            image: require('../../assets/temp-pfp.jpg'), // Using temp-pfp as fallback
+            creator: group.creator // Include creator information
+          };
+        });
+        
+        console.log('🔄 Transformed groups data in AllGroupsScreen:', transformedGroups);
+        setGroups(transformedGroups);
+        console.log(`✅ Successfully loaded ${transformedGroups.length} groups in AllGroupsScreen`);
+      } else {
+        console.log('⚠️ No groups data or invalid response format in AllGroupsScreen');
+        setGroups([]);
+      }
+    } catch (error) {
+      console.error('❌ Error fetching groups in AllGroupsScreen:', error);
+      console.error('Error details:', error instanceof Error ? error.message : String(error));
+      setGroups([]);
+      
+      // Show error toast only for non-network errors
+      if (error instanceof Error && !error.message.includes('Network')) {
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: 'Failed to load groups. Please try again.',
+          position: 'bottom',
+          visibilityTime: 3000,
+        });
+      }
+    } finally {
+      setIsLoading(false);
+      setRefreshing(false);
+      console.log('🏁 Finished fetching groups data in AllGroupsScreen');
+    }
+  };
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchGroupsData();
+  }, []);
 
   // Filter groups based on search query
   const filteredGroups = useMemo(() => {
@@ -111,7 +161,6 @@ const AllGroupsScreen: React.FC<AllGroupsScreenProps> = ({ navigation, route }) 
 
   const screenWidth = Dimensions.get('window').width;
   const contentWrapperWidth = Math.min(screenWidth - 1, 420);
-  const {t} = useTranslation();
   const renderGroupItem = ({ item }: { item: GroupData }) => (
     <GroupListItem
       groupId={item.id}
@@ -133,14 +182,24 @@ const AllGroupsScreen: React.FC<AllGroupsScreenProps> = ({ navigation, route }) 
         imageStyle={styles.emptyStateImageStyle}
       >
         <View style={styles.emptyStateContent}>
-          <Feather name="search" size={64} color="rgba(255, 255, 255, 0.7)" />
-          <Text style={styles.emptyStateTitle}>{t('AllGroupsScreen.noGroups')}</Text>
-          <Text style={styles.emptyStateText}>
-            {searchQuery.trim() 
-              ? t('AllGroupsScreen.noGroupsMatch', { searchQuery })
-              : t('AllGroupsScreen.noGroupsJoined')
-            }
-          </Text>
+          {isLoading ? (
+            <>
+              <ActivityIndicator size="large" color="#6BDCE1" />
+              <Text style={styles.emptyStateTitle}>Loading Groups...</Text>
+              <Text style={styles.emptyStateText}>Please wait while we fetch your groups</Text>
+            </>
+          ) : (
+            <>
+              <Feather name="search" size={64} color="rgba(255, 255, 255, 0.7)" />
+              <Text style={styles.emptyStateTitle}>{t('AllGroupsScreen.noGroups')}</Text>
+              <Text style={styles.emptyStateText}>
+                {searchQuery.trim() 
+                  ? t('AllGroupsScreen.noGroupsMatch', { searchQuery })
+                  : t('AllGroupsScreen.noGroupsJoined')
+                }
+              </Text>
+            </>
+          )}
         </View>
       </ImageBackground>
     </View>
@@ -231,6 +290,14 @@ const AllGroupsScreen: React.FC<AllGroupsScreenProps> = ({ navigation, route }) 
           contentContainerStyle={styles.listContent}
           ListHeaderComponent={renderHeader}
           ListEmptyComponent={renderEmptyState}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={['#6BDCE1']}
+              tintColor="#6BDCE1"
+            />
+          }
         />
       </View>
     </View>
