@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import Toast from 'react-native-toast-message';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { MainTabParamList } from '../../navigation/MainTabNavigator';
+import { useFocusEffect } from '@react-navigation/native';
 // Import new components
 import DashboardHeader from '../../components/DashboardHeader';
 import IntroCard from '../../components/IntroCard';
@@ -63,6 +64,13 @@ const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
     fetchUserProfile();
     fetchGroupsData();
   }, []);
+
+  // Refresh user profile data when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchUserProfile();
+    }, [])
+  );
 
   const fetchGroupsData = async () => {
     try {

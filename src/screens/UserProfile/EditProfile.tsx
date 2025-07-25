@@ -1,29 +1,118 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import Field from '../../components/EditProfileInput';
 import Button from '../../components/Button';
 import BackgroundImage from '../../assets/UserProfileBackground';
 import { useTranslation } from 'react-i18next';
+import { getUserService } from '../../api/ApiFactory';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../navigation/AppNavigator';
 // @ts-ignore
 import Feather from 'react-native-vector-icons/Feather';
 
+type UserProfileData = {
+  email?: string;
+  name?: string;
+  bio?: string;
+};
+
 const EditProfile = () => {
-    const [email, setEmail] = useState('sample@gmail.com');
-    const [username, setUsername] = useState('sample');
+    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [bio, setBio] = useState('');
+    const [initial, setInitial] = useState<{ email: string; username: string; bio: string }>({ email: '', username: '', bio: '' });
+    const [loading, setLoading] = useState(true);
+    const [updating, setUpdating] = useState(false);
     const { t } = useTranslation();
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            setLoading(true);
+            try {
+                const userService = getUserService();
+                const profile: UserProfileData = await userService.getProfile();
+                setEmail(profile.email || '');
+                setUsername(profile.name || '');
+                setBio(profile.bio || '');
+                setInitial({ email: profile.email || '', username: profile.name || '', bio: profile.bio || '' });
+            } catch (err) {
+                Alert.alert('Error', 'Failed to load profile');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProfile();
+    }, []);
+
+    const handleUpdate = async () => {
+        setUpdating(true);
+        const userService = getUserService();
+        let anyChanged = false;
+        try {
+            // Update email if changed
+            if (email !== initial.email) {
+                // If backend requires password, prompt for it here (not implemented)
+                await userService.updateEmail({ email, password: 'dummyPassword' }); // TODO: prompt for password
+                anyChanged = true;
+            }
+            // Update username if changed
+            if (username !== initial.username) {
+                await userService.updateName(username);
+                anyChanged = true;
+            }
+            // Update bio if changed
+            if (bio !== initial.bio) {
+                await userService.updateBio(bio);
+                anyChanged = true;
+            }
+            if (anyChanged) {
+                Alert.alert('Success', 'Profile updated successfully', [
+                    {
+                        text: 'OK',
+                        onPress: () => {
+                            // Navigate back to Profile screen
+                            navigation.goBack();
+                        }
+                    }
+                ]);
+                setInitial({ email, username, bio });
+            } else {
+                Alert.alert('No changes', 'No fields were changed.');
+            }
+        } catch (err) {
+            let message = 'Failed to update profile';
+            if (err && typeof err === 'object' && 'message' in err && typeof (err as any).message === 'string') {
+                message = (err as any).message;
+            }
+            Alert.alert('Error', message);
+        } finally {
+            setUpdating(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}> 
+                <BackgroundImage />
+                <ActivityIndicator size="large" color="#73DBE5" />
+            </View>
+        );
+    }
+
     return (
         <View style={styles.container}>
             <BackgroundImage />
-            <ScrollView contentContainerStyle={styles.scrollContent} style={styles.scrollView}>
+            <ScrollView contentContainerStyle={styles.scrollContent} style={styles.scrollView} keyboardShouldPersistTaps="handled">
                 <View style={styles.formBox}>
                     <Field label={t('editProfile.email')} icon={<Feather name="mail" size={20} color='#222831' />} value={email} onChangeText={setEmail} placeholder="sample@gmail.com" />
                     <Field label={t('editProfile.userName')} icon={<Feather name="user" size={20} color='#222831' />} value={username} onChangeText={setUsername} placeholder="Username" />
                     <Field label={t('editProfile.bio')} icon={<Feather name="edit-2" size={20} color='#222831' />} value={bio} onChangeText={setBio} placeholderTextColor='#000' placeholder="Description" />
                 </View>
                 <Button
-                    title={t('editProfile.update')}
-                    onPress={() => console.log('Button Pressed')}
+                    title={updating ? t('editProfile.updating') || 'Updating...' : t('editProfile.update')}
+                    onPress={handleUpdate}
                     backgroundColor="#73DBE5"
                     textColor="black"
                     style={styles.button}

@@ -4,6 +4,7 @@ import UserCard from '../../components/UserCard';
 import ProfileBottomOptions from '../../components/ProfileBottomOptions';
 import BackgroundImage from '../../assets/UserProfileBackground';
 import { getUserService } from '../../api/ApiFactory';
+import { useFocusEffect } from '@react-navigation/native';
 
 interface UserProfileData {
   name?: string;
@@ -24,6 +25,13 @@ const UserProfile = () => {
   useEffect(() => {
     fetchUserProfile();
   }, []);
+
+  // Refresh profile data when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchUserProfile();
+    }, [])
+  );
 
   const fetchUserProfile = async () => {
     try {
