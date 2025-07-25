@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next';
 
 
 const Divider = () => <View style={styles.divider} />;
-const UserCard = ({name, phone, email,avatar}: any) => {
+const UserCard = ({name, email, avatar, bio}: any) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const [showLogoutPopup, setShowLogoutPopup] = useState(false);
     const [showDeletePopup, setShowDeletePopup] = useState(false);
@@ -31,7 +31,9 @@ const UserCard = ({name, phone, email,avatar}: any) => {
             <View style={styles.centeredSection}>
                 <Image source={avatar} style={styles.avatar} resizeMode="cover" />
                 <Text style={styles.name}>{name}</Text>
-                <Text style={styles.phone}>{phone}</Text>
+                {bio ? (
+                  <Text style={styles.bio} numberOfLines={2} ellipsizeMode="tail">{bio}</Text>
+                ) : null}
                 <Text style={styles.email}>{email}</Text>
             </View>
             <Divider />

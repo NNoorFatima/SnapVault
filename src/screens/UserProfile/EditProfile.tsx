@@ -13,7 +13,6 @@ const EditProfile = () => {
     const [email,setEmail] = useState('sample@gmail.com');
     const [password,setPassword] = useState('password');
     const [username,setUsername] = useState('sample');
-    const [phone, setPhone] = useState('');
     const [bio, setBio] = useState('');
     //for localization 
     const { t } = useTranslation();
@@ -24,7 +23,6 @@ const EditProfile = () => {
                         <Field label={t('editProfile.email')} icon={<Feather name="mail" size={20} color='#222831' />} value={email} onChangeText={setEmail} placeholder="sample@gmail.com" />
                         <Field label={t('editProfile.password')} icon={<Feather name="lock" size={20} color='#222831' />} value={password} onChangeText={setPassword} placeholder="Password" secureTextEntry />
                         <Field label={t('editProfile.userName')} icon={<Feather name="user" size={20} color='#222831' />} value={username} onChangeText={setUsername} placeholder="Username" />
-                        <Field label={t('editProfile.phone')} icon={<Feather name="phone" size={20} color='#222831' />} value={phone} onChangeText={setPhone} placeholderTextColor='#000' placeholder="Phone number" />
                         <Field label={t('editProfile.bio')} icon={<Feather name="edit-2" size={20} color='#222831' />} value={bio} onChangeText={setBio} placeholderTextColor='#000' placeholder="Description" />
                 </View>
                 <Button

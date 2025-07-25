@@ -7,17 +7,17 @@ import { getUserService } from '../../api/ApiFactory';
 
 interface UserProfileData {
   name?: string;
-  phone?: string;
   email?: string;
   profile_picture?: string;
+  bio?: string;
 }
 
 const UserProfile = () => {
   const [userProfile, setUserProfile] = useState({
     name: '',
-    phone: '',
     email: '',
-    avatar: require('../../assets/temp-pfp.jpg')
+    avatar: require('../../assets/temp-pfp.jpg'),
+    bio: '',
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -92,9 +92,9 @@ const UserProfile = () => {
       
       setUserProfile({
         name: profile.name || 'User',
-        phone: profile.phone || 'No phone',
         email: profile.email || 'No email',
-        avatar: avatarSource
+        avatar: avatarSource,
+        bio: profile.bio || '',
       });
       
     } catch (error) {
@@ -104,9 +104,9 @@ const UserProfile = () => {
       // Set default data on error
       setUserProfile({
         name: 'User',
-        phone: 'No phone',
         email: 'No email',
-        avatar: require('../../assets/temp-pfp.jpg')
+        avatar: require('../../assets/temp-pfp.jpg'),
+        bio: '',
       });
     } finally {
       setIsLoading(false);
@@ -133,9 +133,9 @@ const UserProfile = () => {
       <BackgroundImage />
       <UserCard 
         name={userProfile.name}
-        phone={userProfile.phone} 
         email={userProfile.email} 
         avatar={userProfile.avatar}
+        bio={userProfile.bio}
       />
     
       <ProfileBottomOptions />
