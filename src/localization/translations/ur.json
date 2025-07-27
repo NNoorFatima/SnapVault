@@ -29,6 +29,7 @@
     "NewPassword":
     {
         "message": "پاس ورڈ تبدیل کریں",
+        "currentPassword":"موجودہ پاس ورڈ",
         "label1":"نیا پاس ورڈ",
         "label2": "نئے پاس ورڈ کی تصدیق",
         "cancel":"کینسل",

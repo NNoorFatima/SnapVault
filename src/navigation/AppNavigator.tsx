@@ -16,6 +16,7 @@ import { View, Text, StyleSheet, StyleProp, ViewStyle, TextStyle } from 'react-n
 // Import your screens
 import UserProfile from '../screens/UserProfile/UserProfile';
 import EditProfile from '../screens/UserProfile/EditProfile';
+import ChangePassword from '../screens/UserProfile/ChangePassword';
 // import Logout from '../screens/UserProfile/Logout';
 import ContactUs from '../screens/ContactUs/ContactUs';
 import DashboardScreen from '../screens/DashBoard/DashboardScreen';
@@ -34,6 +35,7 @@ export type RootStackParamList = {
 
   MainTabs: undefined;
   'Edit Profile': undefined;
+  'Change Password': undefined;
   Logout: undefined;
   'Contact Us': undefined;
 };
@@ -124,6 +126,17 @@ const AppNavigator = () => {
               options={{
                 headerShown: true,
                 title: 'Edit Profile',
+                headerStyle: styles.modalHeader,
+                headerTitleStyle: styles.modalHeaderTitle,
+                headerBackTitle: 'Back',
+              }}
+            />
+            <Stack.Screen
+              name="Change Password"
+              component={ChangePassword}
+              options={{
+                headerShown: true,
+                title: 'Change Password',
                 headerStyle: styles.modalHeader,
                 headerTitleStyle: styles.modalHeaderTitle,
                 headerBackTitle: 'Back',

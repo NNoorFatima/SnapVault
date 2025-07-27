@@ -29,6 +29,7 @@
     "NewPassword":
     {
         "message":"Set New Password",
+        "currentPassword":"Current Password",
         "label1":"New Password",
         "label2":"Confirm New Password"
     },

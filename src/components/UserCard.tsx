@@ -10,7 +10,6 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 //for popup
 import ConfirmationPopUp from './ConfirmationPopUp';
-import NewPassword from './NewPassword';
 //for localization
 import { useTranslation } from 'react-i18next';
 
@@ -21,7 +20,6 @@ const UserCard = ({name, email, avatar, bio}: any) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const [showLogoutPopup, setShowLogoutPopup] = useState(false);
     const [showDeletePopup, setShowDeletePopup] = useState(false);
-    const [showPasswordPopup, setShowPasswordPopup] = useState(false);
     //for localization 
     const { t } = useTranslation();
     
@@ -43,22 +41,7 @@ const UserCard = ({name, email, avatar, bio}: any) => {
                     onPress={() =>navigation.navigate('Edit Profile') } shouldFlip={true}/>
                 {/* Change Password */}
                 <ProfileOption icon={<Feather name="lock" size={20}  color='#222831'/>} label={t('profile.changePassword')} 
-                    onPress={() => setShowPasswordPopup(true)}/>
-                    <Modal
-                        visible={showPasswordPopup}
-                        transparent
-                        animationType="fade"
-                        >
-                        <NewPassword
-                            visible={true}
-                            onClose={() => setShowPasswordPopup(false)}
-                            onUpdate={(newPassword:string) => {
-                            setShowPasswordPopup(false);
-                            // handle password update logic here
-                            console.log('Updated password:', newPassword);
-                            }}
-                        />
-                    </Modal>
+                    onPress={() => navigation.navigate('Change Password')}/>
 
                    
                 {/* Delete Acccount */}
