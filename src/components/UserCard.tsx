@@ -12,12 +12,17 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import ConfirmationPopUp from './ConfirmationPopUp';
 //for localization
 import { useTranslation } from 'react-i18next';
+//for Redux
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../store/store';
+import { logoutUser } from '../store/slices/authSlice';
 
 
 
 const Divider = () => <View style={styles.divider} />;
 const UserCard = ({name, email, avatar, bio}: any) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const dispatch = useDispatch<AppDispatch>();
     const [showLogoutPopup, setShowLogoutPopup] = useState(false);
     const [showDeletePopup, setShowDeletePopup] = useState(false);
     //for localization 
@@ -71,12 +76,17 @@ const UserCard = ({name, email, avatar, bio}: any) => {
                         <ConfirmationPopUp
                             message={t('Logout.message')}
                             onCancel={() => setShowLogoutPopup(false)}  // just hide modal
-                            onConfirm={() => {
+                            onConfirm={async () => {
                                 setShowLogoutPopup(false);
-                                // navigation.navigate('SignIn');
+                                try {
+                                    await dispatch(logoutUser());
+                                    navigation.navigate('Auth');
+                                } catch (error) {
+                                    console.error('Logout failed:', error);
+                                    // Still navigate to auth even if logout fails
+                                    navigation.navigate('Auth');
+                                }
                             }}
-                            // perform logout logic here
-                            // }}
                         />
                         </Modal> 
             </View>
