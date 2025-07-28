@@ -30,12 +30,22 @@ export const loginUser = createAsyncThunk(
       const authService = getAuthService();
       const response = await authService.login(credentials);
       
+      console.log('AuthService login response:', response);
+      console.log('Response access_token:', response.access_token);
+      console.log('Response user:', response.user);
+      
+      if (!response.access_token) {
+        console.error('No access_token in response:', response);
+        return rejectWithValue('Invalid response from server - no access token');
+      }
+      
       return {
         token: response.access_token,
         user: response.user,
         isAuthenticated: true,
       };
     } catch (error) {
+      console.error('Login error:', error);
       return rejectWithValue(error.message || 'Login failed');
     }
   }

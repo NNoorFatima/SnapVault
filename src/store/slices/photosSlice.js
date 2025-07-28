@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { apiFactory } from '../../api/ApiFactory';
+import apiFactory from '../../api/ApiFactory';
 
 // Fetch photos for a group
 export const fetchPhotos = createAsyncThunk(

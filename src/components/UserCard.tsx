@@ -10,18 +10,21 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 //for popup
 import ConfirmationPopUp from './ConfirmationPopUp';
-import NewPassword from './NewPassword';
 //for localization
 import { useTranslation } from 'react-i18next';
+//for Redux
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../store/store';
+import { logoutUser } from '../store/slices/authSlice';
 
 
 
 const Divider = () => <View style={styles.divider} />;
-const UserCard = ({name, phone, email,avatar}: any) => {
+const UserCard = ({name, email, avatar, bio}: any) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const dispatch = useDispatch<AppDispatch>();
     const [showLogoutPopup, setShowLogoutPopup] = useState(false);
     const [showDeletePopup, setShowDeletePopup] = useState(false);
-    const [showPasswordPopup, setShowPasswordPopup] = useState(false);
     //for localization 
     const { t } = useTranslation();
     
@@ -31,7 +34,9 @@ const UserCard = ({name, phone, email,avatar}: any) => {
             <View style={styles.centeredSection}>
                 <Image source={avatar} style={styles.avatar} resizeMode="cover" />
                 <Text style={styles.name}>{name}</Text>
-                <Text style={styles.phone}>{phone}</Text>
+                {bio ? (
+                  <Text style={styles.bio} numberOfLines={2} ellipsizeMode="tail">{bio}</Text>
+                ) : null}
                 <Text style={styles.email}>{email}</Text>
             </View>
             <Divider />
@@ -41,22 +46,7 @@ const UserCard = ({name, phone, email,avatar}: any) => {
                     onPress={() =>navigation.navigate('Edit Profile') } shouldFlip={true}/>
                 {/* Change Password */}
                 <ProfileOption icon={<Feather name="lock" size={20}  color='#222831'/>} label={t('profile.changePassword')} 
-                    onPress={() => setShowPasswordPopup(true)}/>
-                    <Modal
-                        visible={showPasswordPopup}
-                        transparent
-                        animationType="fade"
-                        >
-                        <NewPassword
-                            visible={true}
-                            onClose={() => setShowPasswordPopup(false)}
-                            onUpdate={(newPassword:string) => {
-                            setShowPasswordPopup(false);
-                            // handle password update logic here
-                            console.log('Updated password:', newPassword);
-                            }}
-                        />
-                    </Modal>
+                    onPress={() => navigation.navigate('Change Password')}/>
 
                    
                 {/* Delete Acccount */}
@@ -86,12 +76,17 @@ const UserCard = ({name, phone, email,avatar}: any) => {
                         <ConfirmationPopUp
                             message={t('Logout.message')}
                             onCancel={() => setShowLogoutPopup(false)}  // just hide modal
-                            onConfirm={() => {
+                            onConfirm={async () => {
                                 setShowLogoutPopup(false);
-                                // navigation.navigate('SignIn');
+                                try {
+                                    await dispatch(logoutUser());
+                                    navigation.navigate('Auth');
+                                } catch (error) {
+                                    console.error('Logout failed:', error);
+                                    // Still navigate to auth even if logout fails
+                                    navigation.navigate('Auth');
+                                }
                             }}
-                            // perform logout logic here
-                            // }}
                         />
                         </Modal> 
             </View>

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { apiFactory } from '../../api/ApiFactory';
+import apiFactory from '../../api/ApiFactory';
 
 // Fetch user profile
 export const fetchUserProfile = createAsyncThunk(
@@ -66,8 +66,11 @@ export const changePassword = createAsyncThunk(
   'profile/changePassword',
   async (passwordData, { rejectWithValue }) => {
     try {
-      const profileService = apiFactory.getProfileService();
-      const response = await profileService.changePassword(passwordData);
+      const authService = apiFactory.getAuthService();
+      const response = await authService.updatePassword({
+        current_password: passwordData.currentPassword,
+        new_password: passwordData.newPassword
+      });
       
       return response;
     } catch (error) {

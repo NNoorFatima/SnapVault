@@ -61,6 +61,14 @@ const styles = StyleSheet.create({
   },
 
   name: { fontSize: 18, fontWeight: 'bold', textAlign: I18nManager.isRTL ? 'right' : 'left' },
+  bio: {
+    fontSize: 14,
+    color: '#555',
+    marginTop: 2,
+    marginBottom: 2,
+    textAlign: I18nManager.isRTL ? 'right' : 'left',
+    maxWidth: '90%',
+  },
   phone: { fontSize: 14, color: '#222831', textAlign: I18nManager.isRTL ? 'right' : 'left' },
   email: { fontSize: 14, color: '#222831' , textAlign: I18nManager.isRTL ? 'right' : 'left'},
 });

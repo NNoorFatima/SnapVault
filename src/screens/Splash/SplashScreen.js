@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-start',
-    marginTop: '73%', // was 13%, now 22% to bring content a bit down
+    marginTop: '80%', // moved down from 73% to 80%
     marginBottom: 0,
   },
   title: {

@@ -21,6 +21,9 @@ class AuthService extends BaseService {
       const url = this.buildUrl(API_ROUTES.AUTH.LOGIN);
       const response = await this.client.post(url, credentials);
 
+      console.log('Raw login response from server:', response);
+      console.log('Transformed response:', this.transformResponse(response));
+
       // Store authentication data
       await this.tokenManager.storeAuthData(response);
 
@@ -42,10 +45,13 @@ class AuthService extends BaseService {
       }
 
       // Return combined response with user data
-      return {
+      const finalResponse = {
         ...this.transformResponse(response),
         user: userData
       };
+      
+      console.log('Final AuthService response:', finalResponse);
+      return finalResponse;
     } catch (error) {
       this.logError('Login failed', error);
       throw error;

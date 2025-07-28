@@ -16,7 +16,8 @@
         "userName":"Username",
         "phone":"Phone",
         "bio":"Bio",
-        "update":"Update"
+        "update":"Update",
+        "updating":"Updating..."
     },
     "Logout":
     {
@@ -29,6 +30,7 @@
     "NewPassword":
     {
         "message":"Set New Password",
+        "currentPassword":"Current Password",
         "label1":"New Password",
         "label2":"Confirm New Password"
     },
