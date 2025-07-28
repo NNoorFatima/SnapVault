@@ -21,6 +21,9 @@ class AuthService extends BaseService {
       const url = this.buildUrl(API_ROUTES.AUTH.LOGIN);
       const response = await this.client.post(url, credentials);
 
+      console.log('Raw login response from server:', response);
+      console.log('Transformed response:', this.transformResponse(response));
+
       // Store authentication data
       await this.tokenManager.storeAuthData(response);
 
@@ -42,10 +45,13 @@ class AuthService extends BaseService {
       }
 
       // Return combined response with user data
-      return {
+      const finalResponse = {
         ...this.transformResponse(response),
         user: userData
       };
+      
+      console.log('Final AuthService response:', finalResponse);
+      return finalResponse;
     } catch (error) {
       this.logError('Login failed', error);
       throw error;
@@ -80,11 +86,33 @@ class AuthService extends BaseService {
       );
 
       const response = await this.client.uploadFile(url, formData);
+      const transformedResponse = this.transformResponse(response);
 
-      return this.transformResponse(response);
+      // The backend returns the user object directly, but we need to create a token
+      // Since registration doesn't return a token, we'll need to login after registration
+      // For now, we'll return the user data and let the frontend handle login
+      return {
+        user: transformedResponse,
+        access_token: null, // Registration doesn't return a token
+        message: 'Registration successful. Please login to continue.',
+      };
     } catch (error) {
       this.logError('Registration failed', error);
-      throw error;
+      
+      // Handle specific error types
+      if (error.type === 'VALIDATION_ERROR') {
+        throw new Error(error.data?.detail?.[0]?.msg || 'Invalid registration data');
+      } else if (error.type === 'CONFLICT_ERROR') {
+        throw new Error('Email already exists. Please use a different email address.');
+      } else if (error.type === 'NETWORK_ERROR') {
+        throw new Error('Network error. Please check your connection and try again.');
+      } else if (error.status === 400) {
+        throw new Error(error.data?.detail || 'Invalid registration data');
+      } else if (error.status === 422) {
+        throw new Error('Please check your input and try again.');
+      } else {
+        throw new Error(error.message || 'Registration failed. Please try again.');
+      }
     }
   }
 

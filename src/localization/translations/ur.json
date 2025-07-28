@@ -16,7 +16,8 @@
         "userName": "صارف نام",
         "phone": "فون نمبر",
         "bio": "تعارف",
-        "update": "اپ ڈیٹ"
+        "update": "اپ ڈیٹ",
+        "updating": "اپ ڈیٹ ہو رہا ہے..."
     },
     "Logout":
     {
@@ -29,6 +30,7 @@
     "NewPassword":
     {
         "message": "پاس ورڈ تبدیل کریں",
+        "currentPassword":"موجودہ پاس ورڈ",
         "label1":"نیا پاس ورڈ",
         "label2": "نئے پاس ورڈ کی تصدیق",
         "cancel":"کینسل",

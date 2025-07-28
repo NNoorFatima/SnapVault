@@ -48,14 +48,17 @@ const SignInScreen = ({ navigation }) => {
       
       if (loginUser.fulfilled.match(result)) {
         console.log('Login successful:', result.payload);
-        Alert.alert('Success', 'Login successful!');
+        // Don't show success alert - let the navigation handle it
         // Navigation will be handled automatically by the AppNavigator
         // based on the Redux state change
       } else {
         console.error('Login failed:', result.error);
+        console.error('Login error payload:', result.payload);
         let errorMessage = 'Login failed. Please try again.';
         
-        if (result.error?.message) {
+        if (result.payload) {
+          errorMessage = result.payload;
+        } else if (result.error?.message) {
           errorMessage = result.error.message;
         }
         
