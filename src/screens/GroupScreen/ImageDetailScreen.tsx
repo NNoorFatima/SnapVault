@@ -7,6 +7,10 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { I18nManager } from 'react-native';
 import ApiFactory from '../../api/ApiFactory';
+// import RNFetchBlob from 'rn-fetch-blob'; //for download
+import RNFS from 'react-native-fs';
+import { PermissionsAndroid, Platform } from 'react-native';
+
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
@@ -49,6 +53,8 @@ export default function ImageDetailScreen() {
     return fullUrl;
   };
 
+
+
   const zoomIn = () => {
     const newScale = Math.min(currentScale + 0.2, 3);
     setCurrentScale(newScale);
@@ -68,48 +74,85 @@ export default function ImageDetailScreen() {
       useNativeDriver: true,
     }).start();
   };
-
-  const handleDownload = async () => {
+// Request permission to access external storage on Android
+  const requestPermission = async () => {
     try {
-      if (!imageUri) {
-        Alert.alert('Error', 'No image available to download');
-        return;
-      }
-
-      const fullImageUrl = getFullImageUrl(imageUri);
-      console.log('Original image URI:', imageUri);
-      console.log('Full image URL for download:', fullImageUrl);
-
-      if (!fullImageUrl) {
-        Alert.alert('Error', 'Could not generate full image URL');
-        return;
-      }
-
-      // Use Share API to save image to gallery
-      const shareOptions = {
-        title: 'Save Image to Gallery',
-        message: 'Choose "Save to Photos" or "Save Image" to download this image to your gallery',
-        url: fullImageUrl,
-      };
-
-      const result = await Share.share(shareOptions);
-      
-      if (result.action === Share.sharedAction) {
-        if (result.activityType) {
-          console.log('Saved with activity type:', result.activityType);
-          Alert.alert('Success', 'Image saved to gallery successfully!');
+      // For Android devices (API 23+), we need to request storage permission at runtime
+      if (Platform.OS === 'android') {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+          {
+            title: 'Storage Permission',
+            message: 'App needs access to your storage to save images.',
+          }
+        );
+        
+        // Return true if the permission is granted, otherwise false
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          console.log('Storage permission granted');
+          return true;
         } else {
-          console.log('Saved successfully');
-          Alert.alert('Success', 'Image saved to gallery successfully!');
+          console.log('Storage permission denied');
+          return false;
         }
-      } else if (result.action === Share.dismissedAction) {
-        console.log('Download cancelled');
+      } else {
+        // For iOS, permission is generally not required for saving files to the device's documents directory
+        return true;
       }
-    } catch (error) {
-      console.error('Download error:', error);
-      Alert.alert('Error', 'Failed to download image. Please try again.');
+    } catch (err) {
+      console.warn('Permission error: ', err);
+      return false;
     }
   };
+const handleDownload = async () => {
+  try {
+    if (!imageUri) {
+      Alert.alert('Error', 'No image available to download');
+      return;
+    }
+
+    const fullImageUrl = getFullImageUrl(imageUri);
+    console.log('Full image URL for download:', fullImageUrl);
+
+    if (!fullImageUrl) {
+      Alert.alert('Error', 'Could not generate full image URL');
+      return;
+    }
+
+    // Request storage permissions (for Android)
+    const permissionGranted = await requestPermission();
+    if (!permissionGranted) {
+      Alert.alert('Permission Denied', 'Cannot save image without storage permission');
+      return;
+    }
+
+    // Set the download path (for Android, you can use `RNFS.DownloadDirectoryPath`)
+    const downloadPath = RNFS.DownloadDirectoryPath + '/image_' + Date.now() + '.jpg';
+    console.log('Saving image to:', downloadPath);
+
+    // Download the image using `react-native-fs`
+    const downloadResult = await RNFS.downloadFile({
+      fromUrl: fullImageUrl,   // The image URL
+      toFile: downloadPath,    // Path to save the image
+    }).promise;
+
+    // Check if the image was downloaded successfully
+    if (downloadResult.statusCode === 200) {
+      // Trigger media scan for Android (to show the image in the gallery)
+      if (Platform.OS === 'android') {
+        RNFS.scanFile(downloadPath );  // Corrected to pass a single object
+      }
+
+      Alert.alert('Success', 'Image saved to downloads directory!');
+    } else {
+      Alert.alert('Error', 'Failed to download image.');
+    }
+
+  } catch (error) {
+    console.error('Download error:', error);
+    Alert.alert('Error', 'Failed to download image. Please try again.');
+  }
+};
 
   const handleShare = async () => {
     try {
