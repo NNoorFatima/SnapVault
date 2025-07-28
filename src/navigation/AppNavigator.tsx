@@ -124,22 +124,14 @@ const AppNavigator = () => {
               name="Edit Profile"
               component={EditProfile}
               options={{
-                headerShown: true,
-                title: 'Edit Profile',
-                headerStyle: styles.modalHeader,
-                headerTitleStyle: styles.modalHeaderTitle,
-                headerBackTitle: 'Back',
+                headerShown: false,
               }}
             />
             <Stack.Screen
               name="Change Password"
               component={ChangePassword}
               options={{
-                headerShown: true,
-                title: 'Change Password',
-                headerStyle: styles.modalHeader,
-                headerTitleStyle: styles.modalHeaderTitle,
-                headerBackTitle: 'Back',
+                headerShown: false,
               }}
             />
             <Stack.Screen

@@ -16,7 +16,8 @@
         "userName":"Username",
         "phone":"Phone",
         "bio":"Bio",
-        "update":"Update"
+        "update":"Update",
+        "updating":"Updating..."
     },
     "Logout":
     {

@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Alert, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Alert, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Button from '../../components/Button';
 import Logo from '../../assets/Logo';
+import BackgroundImage from '../../assets/UserProfileBackground';
 import { useTranslation } from 'react-i18next';
 import { changePassword } from '../../store/slices/profileSlice';
 import { AppDispatch } from '../../store/store';
@@ -66,83 +67,116 @@ const ChangePassword = () => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.content}>
-                <Logo
-                    source={{ uri: 'https://codia-f2c.s3.us-west-1.amazonaws.com/image/2025-06-27/q89N1k9dDd.png' }}
-                    style={{ marginBottom: 8, marginTop: -10, alignSelf: 'center' }}
-                />
-                <Text style={styles.snapVaultText}>SnapVault</Text>
-                <Text style={styles.title}>{t('NewPassword.message')}</Text>
-                
-                <Text style={styles.label}>{t('NewPassword.currentPassword')}</Text>
-                <View style={styles.inputContainer}>
-                    <TextInput 
-                        style={styles.input} 
-                        secureTextEntry={!showCurrentPassword}
-                        value={currentPassword}
-                        onChangeText={setCurrentPassword}
-                        placeholder="Enter current password"
-                        placeholderTextColor="#666"
+            <BackgroundImage />
+            <ScrollView contentContainerStyle={styles.scrollContent} style={styles.scrollView} keyboardShouldPersistTaps="handled">
+                <View style={styles.content}>
+                    <Logo
+                        source={{ uri: 'https://codia-f2c.s3.us-west-1.amazonaws.com/image/2025-06-27/q89N1k9dDd.png' }}
+                        style={{ marginBottom: 8, marginTop: -10, alignSelf: 'center' }}
                     />
-                    <Text 
-                        style={styles.visibilityToggle}
-                        onPress={() => setShowCurrentPassword(!showCurrentPassword)}
-                    >
-                        {showCurrentPassword ? '👁️' : '🙈'}
-                    </Text>
-                </View>
+                    <Text style={styles.snapVaultText}>SnapVault</Text>
+                    <Text style={styles.title}>{t('NewPassword.message')}</Text>
+                    
+                    <View style={styles.inputWrapper}>
+                        <Text style={styles.inputLabel}>{t('NewPassword.currentPassword')}</Text>
+                        <View style={styles.inputRow}>
+                            <Image
+                                source={require('../../assets/Icons/lock.png')}
+                                style={{ width: 20, height: 20, tintColor: '#222831' }}
+                                resizeMode="contain"
+                            />
+                            <TextInput 
+                                style={styles.inputField} 
+                                secureTextEntry={!showCurrentPassword}
+                                value={currentPassword}
+                                onChangeText={setCurrentPassword}
+                                placeholder="Enter current password"
+                                placeholderTextColor="#666"
+                            />
+                            <TouchableOpacity onPress={() => setShowCurrentPassword(!showCurrentPassword)}>
+                                <Image
+                                    source={showCurrentPassword
+                                      ? require('../../assets/Icons/unlocked.png')
+                                      : require('../../assets/Icons/locked.png')}
+                                    style={{ width: 22, height: 22, tintColor: '#6BDCE1' }}
+                                    resizeMode="contain"
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
 
-                <Text style={styles.label}>{t('NewPassword.label1')}</Text>
-                <View style={styles.inputContainer}>
-                    <TextInput 
-                        style={styles.input} 
-                        secureTextEntry={!showNewPassword}
-                        value={newPassword}
-                        onChangeText={setNewPassword}
-                        placeholder="Enter new password"
-                        placeholderTextColor="#666"
-                    />
-                    <Text 
-                        style={styles.visibilityToggle}
-                        onPress={() => setShowNewPassword(!showNewPassword)}
-                    >
-                        {showNewPassword ? '👁️' : '🙈'}
-                    </Text>
-                </View>
+                    <View style={styles.inputWrapper}>
+                        <Text style={styles.inputLabel}>{t('NewPassword.label1')}</Text>
+                        <View style={styles.inputRow}>
+                            <Image
+                                source={require('../../assets/Icons/lock.png')}
+                                style={{ width: 20, height: 20, tintColor: '#222831' }}
+                                resizeMode="contain"
+                            />
+                            <TextInput 
+                                style={styles.inputField} 
+                                secureTextEntry={!showNewPassword}
+                                value={newPassword}
+                                onChangeText={setNewPassword}
+                                placeholder="Enter new password"
+                                placeholderTextColor="#666"
+                            />
+                            <TouchableOpacity onPress={() => setShowNewPassword(!showNewPassword)}>
+                                <Image
+                                    source={showNewPassword
+                                      ? require('../../assets/Icons/unlocked.png')
+                                      : require('../../assets/Icons/locked.png')}
+                                    style={{ width: 22, height: 22, tintColor: '#6BDCE1' }}
+                                    resizeMode="contain"
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
 
-                <Text style={styles.label}>{t('NewPassword.label2')}</Text>
-                <View style={styles.inputContainer}>
-                    <TextInput 
-                        style={styles.input} 
-                        secureTextEntry={!showConfirmPassword}
-                        value={confirmPassword}
-                        onChangeText={setConfirmPassword}
-                        placeholder="Confirm new password"
-                        placeholderTextColor="#666"
-                    />
-                    <Text 
-                        style={styles.visibilityToggle}
-                        onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                    >
-                        {showConfirmPassword ? '👁️' : '🙈'}
-                    </Text>
-                </View>
+                    <View style={styles.inputWrapper}>
+                        <Text style={styles.inputLabel}>{t('NewPassword.label2')}</Text>
+                        <View style={styles.inputRow}>
+                            <Image
+                                source={require('../../assets/Icons/lock.png')}
+                                style={{ width: 20, height: 20, tintColor: '#222831' }}
+                                resizeMode="contain"
+                            />
+                            <TextInput 
+                                style={styles.inputField} 
+                                secureTextEntry={!showConfirmPassword}
+                                value={confirmPassword}
+                                onChangeText={setConfirmPassword}
+                                placeholder="Confirm new password"
+                                placeholderTextColor="#666"
+                            />
+                            <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+                                <Image
+                                    source={showConfirmPassword
+                                      ? require('../../assets/Icons/unlocked.png')
+                                      : require('../../assets/Icons/locked.png')}
+                                    style={{ width: 22, height: 22, tintColor: '#6BDCE1' }}
+                                    resizeMode="contain"
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
 
-                <View style={styles.buttonContainer}>
-                    <Button
-                        title={t('Button.cancel')}
-                        onPress={handleCancel}
-                        textColor="black"
-                        style={styles.cancelButton}
-                    />
-                    <Button
-                        title={loading ? 'Updating...' : t('Button.confirm')}
-                        onPress={loading ? () => {} : handleChangePassword}
-                        textColor="black"
-                        style={loading ? { ...styles.updateButton, opacity: 0.6 } : styles.updateButton}
-                    />
+                    <View style={styles.buttonContainer}>
+                        <Button
+                            title={t('Button.cancel')}
+                            onPress={handleCancel}
+                            textColor="black"
+                            style={styles.cancelButton}
+                        />
+                        <Button
+                            title={loading ? 'Updating...' : t('Button.confirm')}
+                            onPress={loading ? () => {} : handleChangePassword}
+                            textColor="black"
+                            style={loading ? { ...styles.updateButton, opacity: 0.6 } : styles.updateButton}
+                        />
+                    </View>
                 </View>
-            </View>
+            </ScrollView>
         </View>
     );
 };
@@ -150,17 +184,25 @@ const ChangePassword = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#1F1F51',
+        position: 'relative',
+        backgroundColor: 'transparent',
+    },
+    scrollView: {
+        flex: 1,
+        backgroundColor: 'transparent',
+    },
+    scrollContent: {
+        flexGrow: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20,
+        paddingVertical: 40,
     },
     content: {
-        backgroundColor: '#1F1F51',
-        borderRadius: 20,
-        width: '100%',
+        backgroundColor: 'rgba(141, 184, 188, 0.9)',
+        borderRadius: 30,
+        width: '90%',
         maxWidth: 400,
-        padding: 20,
+        padding: '5%',
     },
     snapVaultText: {
         fontSize: 22,
@@ -176,29 +218,31 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: 'white',
     },
-    label: {
-        fontSize: 14,
-        marginTop: 10,
-        color: 'white',
+    inputWrapper: {
+        marginBottom: 16,
+        marginTop: 15,
+        marginLeft: 30,
+        width: '85%',
     },
-    inputContainer: {
+    inputLabel: {
+        fontSize: 16,
+        marginTop: 12,
+        marginBottom: 4,
+        color: '#222831',
+    },
+    inputRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 6,
-        padding: 10,
-        marginTop: 8,
-        backgroundColor: 'white',
+        borderBottomWidth: 1,
+        borderBottomColor: '#6BDCE1',
+        paddingBottom: 6,
     },
-    input: {
+    inputField: {
+        color: '#222831',
+        marginLeft: 10,
         flex: 1,
-        fontSize: 16,
-        color: '#000',
-    },
-    visibilityToggle: {
-        fontSize: 16,
-        marginLeft: 8,
+        fontSize: 14,
+        paddingVertical: 6,
     },
     buttonContainer: {
         flexDirection: 'row',

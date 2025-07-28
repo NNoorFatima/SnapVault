@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Alert, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, ActivityIndicator, Text } from 'react-native';
 import Field from '../../components/EditProfileInput';
 import Button from '../../components/Button';
 import BackgroundImage from '../../assets/UserProfileBackground';
+import Logo from '../../assets/Logo';
 import { useTranslation } from 'react-i18next';
 import { getUserService } from '../../api/ApiFactory';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -116,6 +117,13 @@ const EditProfile = () => {
             <BackgroundImage />
             <ScrollView contentContainerStyle={styles.scrollContent} style={styles.scrollView} keyboardShouldPersistTaps="handled">
                 <View style={styles.formBox}>
+                    <Logo
+                        source={{ uri: 'https://codia-f2c.s3.us-west-1.amazonaws.com/image/2025-06-27/q89N1k9dDd.png' }}
+                        style={{ marginBottom: 8, marginTop: -10, alignSelf: 'center' }}
+                    />
+                    <Text style={styles.snapVaultText}>SnapVault</Text>
+                    <Text style={styles.title}>{t('profile.editProfile')}</Text>
+                    
                     {/* TODO: Email field temporarily commented out - DO NOT REMOVE
                     Email update requires password verification which needs to be implemented
                     <Field label={t('editProfile.email')} icon={<Feather name="mail" size={20} color='#222831' />} value={email} onChangeText={setEmail} placeholder="sample@gmail.com" />
@@ -157,6 +165,20 @@ const styles = StyleSheet.create({
         width: '90%',
         padding: '5%',
         marginBottom: 20,
+    },
+    snapVaultText: {
+        fontSize: 22,
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginBottom: 12,
+    },
+    title: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 16,
+        textAlign: 'center',
+        color: 'white',
     },
     button: {
         marginTop: 10,
