@@ -6,7 +6,7 @@ import BackgroundImage from '../../assets/UserProfileBackground';
 import Logo from '../../assets/Logo';
 import { useTranslation } from 'react-i18next';
 import { getUserService } from '../../api/ApiFactory';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 // @ts-ignore
