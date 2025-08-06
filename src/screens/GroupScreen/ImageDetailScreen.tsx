@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import {View, Text, Dimensions, Animated, TouchableOpacity, Alert, Share, Image,} from 'react-native';
+import {View, Text, Dimensions, Animated, TouchableOpacity, Alert, Share,} from 'react-native';
 // @ts-ignore
 import Feather from 'react-native-vector-icons/Feather';
 import { styles } from './ImageDetailScreen.styles';
