@@ -7,6 +7,7 @@ import Feather from 'react-native-vector-icons/Feather'; //for icons
 import { I18nManager } from 'react-native';
 import { useSelector } from 'react-redux';
 import ApiFactory from '../../api/ApiFactory';
+import { getUserService } from '../../api/ApiFactory';
 
 // Import clipboard with fallback
 let Clipboard;
@@ -111,48 +112,75 @@ const GroupScreen = ({ route, navigation }) => {
     
     // Load photos when group data is available
     if (groupData.id) {
-      loadPhotos();
+      console.log('📸 Loading photos...');
+      console.log("creatorId in loadPhotos:", fullGroupData.creator.id);
+      loadPhotos(fullGroupData.creator.id);
     }
   }, [fullGroupData, groupId, groupName, groupDescription, groupCode, route.params, groupData.id]);
 
   // Load photos from API
-  const loadPhotos = async () => {
+  const loadPhotos = async (creatorId = null) => {
+    //fetching current user details 
+    const userService = getUserService();
+    const profile = await userService.getProfile();
+    console.log(' user profile:', profile);
+
     if (!groupData.id) return;
     
     setLoading(true);
     try {
-      // Load all photos in the group
-      const allPhotosResponse = await photosService.getGroupPhotos(groupData.id);
-      const allPhotos = allPhotosResponse.map(photo => ({
-        id: photo.id,
-        uri: photo.file_url || photo.file_path,
-        uploadedBy: 'Group Member',
-        date: new Date(photo.created_at).toLocaleDateString(),
-        created_at: photo.created_at
-      }));
-      setAllPictures(allPhotos);
-
-      // Load user's photos in the group
+       // Load user's photos in the group
+      console.log('📸 Fetching my photos...');
       const myPhotosResponse = await photosService.getMyPhotosInGroup(groupData.id);
-      const myPhotos = myPhotosResponse.map(photo => ({
-        id: photo.id,
-        uri: photo.file_url || photo.file_path,
-        uploadedBy: 'You',
-        date: new Date(photo.created_at).toLocaleDateString(),
-        created_at: photo.created_at
-      }));
-      setMyPictures(myPhotos);
-    } catch (error) {
-      console.error('Error loading photos:', error);
-      // Don't show alert for initial load, just log the error
-      if (!loading) {
-        Alert.alert('Error', 'Failed to load photos. Please try again.');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+      console.log('📸 Raw response:', myPhotosResponse);
+      const myPhotos = myPhotosResponse.map(photo => {
+        if (!photo.id || !photo.created_at) {
+          console.warn('⚠️ Skipping photo due to missing data:', photo);
+          return null;
+        }
 
+        return {
+          id: photo.id,
+          uri: photo.file_url || photo.file_path || '',
+          uploadedBy: 'You',
+          date: new Date(photo.created_at).toLocaleDateString(),
+          created_at: photo.created_at
+        };
+      }).filter(Boolean); // remove nulls
+
+    setMyPictures(myPhotos);
+    console.log('✅ done setting myPictures:', myPhotos);
+    console.log('🔍 Current user ID:', profile.id);
+    console.log("creatorId in loadPhotos:", creatorId);
+
+
+
+
+    if (Number(creatorId) === Number(profile.id)) {
+          console.log('👑 User is group creator, loading all group photos');
+          const allPhotosResponse = await photosService.getGroupPhotos(groupData.id);
+          const allPhotos = allPhotosResponse.map(photo => ({
+            id: photo.id,
+            uri: photo.file_url || photo.file_path || '',
+            uploadedBy: 'Group Member',
+            date: new Date(photo.created_at).toLocaleDateString(),
+            created_at: photo.created_at
+          }));
+          setAllPictures(allPhotos);
+        } else {
+          console.log('🔍 User is not the group creator, skipping all photos');
+          setAllPictures([]);
+        }
+
+      } catch (error) {
+        console.error('❌ Error loading photos:', error);
+        if (!loading) {
+          Alert.alert('Error', 'Failed to load photos. Please try again.');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
   // Refresh photos
   const refreshPhotos = async () => {
     setRefreshing(true);
@@ -339,7 +367,7 @@ const GroupScreen = ({ route, navigation }) => {
               </Text>
             </TouchableOpacity>
             {/* //added for highlights */}
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={[styles.tabButton, activeTab === 'highlights' && styles.activeTab]}
               onPress={() => {
                 // Navigate to HighlightsScreen
@@ -349,7 +377,7 @@ const GroupScreen = ({ route, navigation }) => {
               <Text style={[styles.tabText, activeTab === 'highlights' && styles.activeTabText]}>
                 Highlights
               </Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
 
           {/* Tab Content */}
