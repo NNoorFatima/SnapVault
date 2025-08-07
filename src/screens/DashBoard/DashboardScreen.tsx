@@ -278,8 +278,9 @@ const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
 
   const statsData = [
     { value: groupsData.length.toString(), label: t('Dashboard.groups') },
+    // { value: groupsData., label: t('Dashboard.groups') },
     { value: '124', label: t('Dashboard.photos') },
-    { value: '2.3GB', label: t('Dashboard.storage') },
+    // { value: '2.3GB', label: t('Dashboard.storage') },
   ];
 
   // Create sections for FlatList
