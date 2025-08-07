@@ -13,6 +13,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ImageDetailScreen from '../screens/GroupScreen/ImageDetailScreen'; // Adjust the path if needed
+import HighlightsScreen from '../screens/GroupScreen/Highlights';
 const Stack = createNativeStackNavigator();
 
 
@@ -146,6 +147,16 @@ const GroupScreenStack = () => {
           headerBackTitle: 'Back',
         }}
       />
+            <Stack.Screen
+        name="HighlightsScreen" // Add this line
+        component={HighlightsScreen} // Add this line
+        options={{
+          headerShown: false, // Adjust options as needed
+          headerBackTitle: 'Back', // Optional, change header back title
+        }}
+      />
     </Stack.Navigator>
+
+    // </Stack.Navigator>
   );
 };

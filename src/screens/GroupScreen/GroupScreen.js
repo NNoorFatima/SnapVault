@@ -338,6 +338,18 @@ const GroupScreen = ({ route, navigation }) => {
                 {t('GroupScreen.allPics')}
               </Text>
             </TouchableOpacity>
+            {/* //added for highlights */}
+            <TouchableOpacity
+              style={[styles.tabButton, activeTab === 'highlights' && styles.activeTab]}
+              onPress={() => {
+                // Navigate to HighlightsScreen
+                navigation.navigate('HighlightsScreen');
+              }}
+            >
+              <Text style={[styles.tabText, activeTab === 'highlights' && styles.activeTabText]}>
+                Highlights
+              </Text>
+            </TouchableOpacity>
           </View>
 
           {/* Tab Content */}
