@@ -367,17 +367,18 @@ const GroupScreen = ({ route, navigation }) => {
               </Text>
             </TouchableOpacity>
             {/* //added for highlights */}
-            {/* <TouchableOpacity
-              style={[styles.tabButton, activeTab === 'highlights' && styles.activeTab]}
+            <TouchableOpacity
+              style={[styles.tab, activeTab === 'highlights' && styles.activeTab]}
               onPress={() => {
                 // Navigate to HighlightsScreen
+                setActiveTab('highlights')
                 navigation.navigate('HighlightsScreen');
               }}
             >
               <Text style={[styles.tabText, activeTab === 'highlights' && styles.activeTabText]}>
                 Highlights
               </Text>
-            </TouchableOpacity> */}
+            </TouchableOpacity>
           </View>
 
           {/* Tab Content */}
@@ -596,7 +597,7 @@ const styles = StyleSheet.create({
   tab: {
     flex: 1,
     paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     borderRadius: 12,
     alignItems: 'center',
   },
@@ -605,7 +606,7 @@ const styles = StyleSheet.create({
   },
   tabText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
   },
   activeTabText: {
