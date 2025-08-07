@@ -137,57 +137,59 @@ const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
       console.log('Fetched user profile for dashboard:', profile);
       
       // Handle profile picture with fallback
-      let userImage = require('../../assets/temp-pfp.jpg');
-      
-      if (profile.profile_picture) {
-        try {
-          console.log('Profile picture path:', profile.profile_picture);
+      // let userImage = require('../../assets/temp-pfp.jpg');
+      const userImage = profile.profile_picture
+      ? { uri: profile.profile_picture }
+      : require('../../assets/temp-pfp.jpg');
+      // if (profile.profile_picture) {
+      //   try {
+      //     console.log('Profile picture path:', profile.profile_picture);
           
-          // Normalize the path - convert Windows backslashes to forward slashes
-          let imagePath = profile.profile_picture.replace(/\\/g, '/');
-          console.log('Normalized imagePath:', imagePath);
+      //     // Normalize the path - convert Windows backslashes to forward slashes
+      //     let imagePath = profile.profile_picture.replace(/\\/g, '/');
+      //     console.log('Normalized imagePath:', imagePath);
           
-          // Check if the path already starts with /uploads
-          if (!imagePath.startsWith('/uploads')) {
-            // If it's a relative path like "uploads/profile_pictures/...", convert it
-            if (imagePath.startsWith('uploads/')) {
-              imagePath = '/' + imagePath;
-              console.log('Converted uploads/ path to:', imagePath);
-            } else {
-              // If it's just a filename, assume it's in profile_pictures
-              imagePath = `/uploads/profile_pictures/${imagePath}`;
-              console.log('Converted filename to:', imagePath);
-            }
-          }
+      //     // Check if the path already starts with /uploads
+      //     if (!imagePath.startsWith('/uploads')) {
+      //       // If it's a relative path like "uploads/profile_pictures/...", convert it
+      //       if (imagePath.startsWith('uploads/')) {
+      //         imagePath = '/' + imagePath;
+      //         console.log('Converted uploads/ path to:', imagePath);
+      //       } else {
+      //         // If it's just a filename, assume it's in profile_pictures
+      //         imagePath = `/uploads/profile_pictures/${imagePath}`;
+      //         console.log('Converted filename to:', imagePath);
+      //       }
+      //     }
           
-          // Use the API config from the service
-          const baseURL = userService.config.getBaseURL();
-          console.log('Base URL:', baseURL);
-          const fullImageUrl = `${baseURL}${imagePath}`;
-          console.log('Full image URL:', fullImageUrl);
+      //     // Use the API config from the service
+      //     const baseURL = userService.config.getBaseURL();
+      //     console.log('Base URL:', baseURL);
+      //     const fullImageUrl = `${baseURL}${imagePath}`;
+      //     console.log('Full image URL:', fullImageUrl);
           
-          // Test if the image URL is accessible
-          console.log('Testing URL accessibility...');
-          const testResponse = await fetch(fullImageUrl, { method: 'HEAD' });
-          console.log('Response status:', testResponse.status);
-          console.log('Response headers:', testResponse.headers);
+      //     // Test if the image URL is accessible
+      //     console.log('Testing URL accessibility...');
+      //     const testResponse = await fetch(fullImageUrl, { method: 'HEAD' });
+      //     console.log('Response status:', testResponse.status);
+      //     console.log('Response headers:', testResponse.headers);
           
-          if (testResponse.ok) {
-            console.log('✅ Profile picture URL is accessible');
-            userImage = { uri: fullImageUrl };
-          } else {
-            console.log('❌ Profile picture URL returned status:', testResponse.status);
-            console.log('Response text:', await testResponse.text());
-            userImage = require('../../assets/temp-pfp.jpg');
-          }
-        } catch (error) {
-          console.log('❌ Error during profile picture processing:', error);
-          console.log('Error details:', error instanceof Error ? error.message : String(error));
-          userImage = require('../../assets/temp-pfp.jpg');
-        }
-      } else {
-        console.log('No profile picture found, using fallback');
-      }
+      //     if (testResponse.ok) {
+      //       console.log('✅ Profile picture URL is accessible');
+      //       userImage = { uri: fullImageUrl };
+      //     } else {
+      //       console.log('❌ Profile picture URL returned status:', testResponse.status);
+      //       console.log('Response text:', await testResponse.text());
+      //       userImage = require('../../assets/temp-pfp.jpg');
+      //     }
+      //   } catch (error) {
+      //     console.log('❌ Error during profile picture processing:', error);
+      //     console.log('Error details:', error instanceof Error ? error.message : String(error));
+      //     userImage = require('../../assets/temp-pfp.jpg');
+      //   }
+      // } else {
+      //   console.log('No profile picture found, using fallback');
+      // }
       
       setUserProfile({
         name: profile.name || 'User',
@@ -278,8 +280,9 @@ const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
 
   const statsData = [
     { value: groupsData.length.toString(), label: t('Dashboard.groups') },
+    // { value: groupsData., label: t('Dashboard.groups') },
     { value: '124', label: t('Dashboard.photos') },
-    { value: '2.3GB', label: t('Dashboard.storage') },
+    // { value: '2.3GB', label: t('Dashboard.storage') },
   ];
 
   // Create sections for FlatList

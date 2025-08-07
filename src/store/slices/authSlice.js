@@ -23,22 +23,29 @@ export const initializeAuth = createAsyncThunk(
 );
 
 // Login user
+// Login user
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async (credentials, { rejectWithValue }) => {
     try {
+      // Ensure the API factory is initialized
+      await apiFactory.initialize('development'); // Initialize once per app lifecycle
+      
+      // Now safely get the service
       const authService = getAuthService();
+
+      // Attempt login
       const response = await authService.login(credentials);
-      
-      console.log('AuthService login response:', response);
-      console.log('Response access_token:', response.access_token);
-      console.log('Response user:', response.user);
-      
+      console.log('Login response:', response);
+
       if (!response.access_token) {
-        console.error('No access_token in response:', response);
+        console.error('No access token in login response:', response);
         return rejectWithValue('Invalid response from server - no access token');
       }
-      
+
+      // Optionally re-initialize with token if required by your API design
+      // await apiFactory.initialize('development', response.access_token);
+
       return {
         token: response.access_token,
         user: response.user,

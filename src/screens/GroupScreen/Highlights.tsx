@@ -23,14 +23,28 @@ const HighlightsScreen = () => {
 
   // Render function for image items in the FlatList
   const renderItem = ({ item }: any) => (
-    <View style={styles.carouselItem}>
-      <Image
-        source={item}  // No need to use {uri: item.uri}, just pass the require directly
-        style={styles.carouselImage}
-        resizeMode="cover"
-      />
-    </View>
-  );
+  <TouchableOpacity
+    activeOpacity={1}
+    style={styles.carouselItem}
+    onPress={(event) => {
+      const touchX = event.nativeEvent.locationX;
+      const imageCenter = width / 2;
+
+      if (touchX < imageCenter) {
+        goToPrevious();
+      } else {
+        goToNext();
+      }
+    }}
+  >
+    <Image
+      source={item}
+      style={styles.carouselImage}
+      resizeMode="cover"
+    />
+  </TouchableOpacity>
+);
+
 
   // Handle scroll event to update active index
   const handleScroll = (event: any) => {
