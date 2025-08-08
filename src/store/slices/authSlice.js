@@ -34,7 +34,10 @@ export const loginUser = createAsyncThunk(
       // Now safely get the service
       const authService = getAuthService();
 
-      // Attempt login
+      // Attempt 
+      console.log('Attempting login with credentials:', credentials);
+      console.log('Auth service:', authService);
+      
       const response = await authService.login(credentials);
       console.log('Login response:', response);
 

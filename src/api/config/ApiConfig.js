@@ -6,8 +6,7 @@
 // Environment configurations
 const ENVIRONMENTS = {
   development: {
-    // baseURL: 'https://3a2d17f7d46f.ngrok-free.app',
-    baseURL:'https://c412c62b09de.ngrok-free.app',
+    baseURL: 'http://13.60.7.23:8000',
     timeout: 10000,
     retryAttempts: 3,
   },
