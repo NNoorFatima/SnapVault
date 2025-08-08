@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, Dimensions, FlatList, Image, TouchableOpacity, Text, ActivityIndicator, Alert } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { View, StyleSheet, Dimensions, FlatList, Image, TouchableOpacity, Text, ActivityIndicator } from 'react-native';
 // @ts-ignore
 import Feather from 'react-native-vector-icons/Feather';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -18,10 +18,13 @@ const HighlightsScreen = () => {
   const [images, setImages] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [loadedIds, setLoadedIds] = useState<Set<number>>(new Set());
 
   // Expecting { groupId } in params
   // @ts-ignore
   const groupId = (route.params as any)?.groupId;
+
+  const containerWidth = useMemo(() => Math.round(width * 0.88), []);
 
   useEffect(() => {
     const loadHighlights = async () => {
@@ -39,7 +42,14 @@ const HighlightsScreen = () => {
           created_at: p.created_at,
         }));
         setImages(mapped);
+        // Prefetch images in background (do not block UI)
+        mapped.forEach((m) => {
+          if (m.uri) {
+            Image.prefetch(m.uri).catch(() => {});
+          }
+        });
         setActiveIndex(0);
+        setLoadedIds(new Set());
       } catch (e: any) {
         console.error('Failed to load highlights', e);
         setError(e?.message || 'Failed to load highlights');
@@ -56,55 +66,67 @@ const HighlightsScreen = () => {
   }, [groupId]);
 
   // Render function for image items in the FlatList
-  const renderItem = ({ item }: any) => (
-  <TouchableOpacity
-    activeOpacity={1}
-    style={styles.carouselItem}
-    onPress={(event) => {
-      const touchX = event.nativeEvent.locationX;
-      const imageCenter = width / 2;
-
-      if (touchX < imageCenter) {
-        goToPrevious();
-      } else {
-        goToNext();
-      }
-    }}
-  >
-    <Image
-      source={{ uri: item.uri }}
-      style={styles.carouselImage}
-      resizeMode="cover"
-    />
-  </TouchableOpacity>
-);
+  const renderItem = useCallback(({ item }: any) => (
+    <TouchableOpacity
+      activeOpacity={1}
+      style={[styles.carouselItem, { width: containerWidth }]}
+      onPress={(event) => {
+        const touchX = event.nativeEvent.locationX;
+        const imageCenter = containerWidth / 2;
+        if (touchX < imageCenter) {
+          goToPrevious();
+        } else {
+          goToNext();
+        }
+      }}
+    >
+      <Image
+        source={{ uri: item.uri }}
+        style={styles.carouselImage}
+        resizeMode="cover"
+      />
+      {!loadedIds.has(item.id) && (
+        <View style={styles.imageLoaderOverlay}>
+          <ActivityIndicator size="large" color="#ffffff" />
+        </View>
+      )}
+    </TouchableOpacity>
+  ), [containerWidth, loadedIds]);
 
 
   // Handle scroll event to update active index
-  const handleScroll = (event: any) => {
+  const handleScroll = useCallback((event: any) => {
     const contentOffsetX = event.nativeEvent.contentOffset.x;
-    const newIndex = Math.floor(contentOffsetX / width);
+    const newIndex = Math.max(0, Math.min(images.length - 1, Math.round(contentOffsetX / containerWidth)));
     if (newIndex !== activeIndex) {
       setActiveIndex(newIndex);
     }
-  };
+  }, [activeIndex, containerWidth, images.length]);
 
   // Navigate to previous or next image
-  const goToPrevious = () => {
+  const goToPrevious = useCallback(() => {
     if (activeIndex > 0) {
       const newIndex = activeIndex - 1;
       setActiveIndex(newIndex);
-      flatListRef.current?.scrollToIndex({ index: newIndex, animated: true });
+      flatListRef.current?.scrollToOffset({ offset: newIndex * containerWidth, animated: true });
     }
-  };
+  }, [activeIndex, containerWidth]);
 
-  const goToNext = () => {
+  const goToNext = useCallback(() => {
     if (activeIndex < images.length - 1) {
       const newIndex = activeIndex + 1;
       setActiveIndex(newIndex);
-      flatListRef.current?.scrollToIndex({ index: newIndex, animated: true });
+      flatListRef.current?.scrollToOffset({ offset: newIndex * containerWidth, animated: true });
     }
-  };
+  }, [activeIndex, images.length, containerWidth]);
+
+  const onImageLoad = useCallback((id: number) => {
+    setLoadedIds((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -133,15 +155,49 @@ const HighlightsScreen = () => {
             <FlatList
               ref={flatListRef}
               data={images}
-              renderItem={renderItem}
+              renderItem={(props) => {
+                const { item } = props;
+                return (
+                  <View style={{ width: containerWidth, height: '100%' }}>
+                    <TouchableOpacity
+                      activeOpacity={1}
+                      style={[styles.carouselItem, { width: containerWidth }]}
+                      onPress={(event) => {
+                        const touchX = event.nativeEvent.locationX;
+                        const imageCenter = containerWidth / 2;
+                        if (touchX < imageCenter) {
+                          goToPrevious();
+                        } else {
+                          goToNext();
+                        }
+                      }}
+                    >
+                      <Image
+                        source={{ uri: item.uri }}
+                        style={styles.carouselImage}
+                        resizeMode="cover"
+                        onLoad={() => onImageLoad(item.id)}
+                      />
+                      {!loadedIds.has(item.id) && (
+                        <View style={styles.imageLoaderOverlay}>
+                          <ActivityIndicator size="large" color="#ffffff" />
+                        </View>
+                      )}
+                    </TouchableOpacity>
+                  </View>
+                );
+              }}
               keyExtractor={(item) => String(item.id)}
               horizontal
-              pagingEnabled
+              pagingEnabled={false}
               showsHorizontalScrollIndicator={false}
               onScroll={handleScroll}
               scrollEventThrottle={16}
-              getItemLayout={(_, index) => ({ length: width, offset: width * index, index })}
-              initialScrollIndex={0}
+              decelerationRate="fast"
+              snapToAlignment="center"
+              snapToInterval={containerWidth}
+              getItemLayout={(_, index) => ({ length: containerWidth, offset: containerWidth * index, index })}
+              removeClippedSubviews
             />
           )}
         </View>
@@ -205,7 +261,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   rectangle: {
-    width: width * 0.88,
     height: height * 0.5,
     backgroundColor: 'rgba(183, 226, 255, 0.3)',
     justifyContent: 'center',
@@ -217,7 +272,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   carouselItem: {
-    width: width, // Ensuring the image covers the full width
     height: '100%',
     borderRadius: 15,
     overflow: 'hidden',
@@ -226,6 +280,16 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     borderRadius: 15,
+  },
+  imageLoaderOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.2)'
   },
   carouselNav: {
     flexDirection: 'row',
