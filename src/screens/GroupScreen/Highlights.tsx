@@ -1,25 +1,59 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Dimensions, FlatList, Image, TouchableOpacity, Text } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, StyleSheet, Dimensions, FlatList, Image, TouchableOpacity, Text, ActivityIndicator, Alert } from 'react-native';
 // @ts-ignore
 import Feather from 'react-native-vector-icons/Feather';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { I18nManager } from 'react-native';
 import BackgroundImage from '../../assets/UserProfileBackground';
+import ApiFactory, { getPhotosService } from '../../api/ApiFactory';
 
 const { width, height } = Dimensions.get('window');
 const isRTL = I18nManager.isRTL;
 
 const HighlightsScreen = () => {
   const navigation = useNavigation();
-
-  // Corrected images array with local images using require directly
-  const images = [
-    require('../../assets/Images/i3.jpeg'), // Local image
-    require('../../assets/Images/i2.jpg'), // Local image
-    require('../../assets/Images/s.jpeg'), // Local image
-  ];
-
+  const route = useRoute();
+  const flatListRef = useRef<FlatList>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [images, setImages] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Expecting { groupId } in params
+  // @ts-ignore
+  const groupId = (route.params as any)?.groupId;
+
+  useEffect(() => {
+    const loadHighlights = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        if (!ApiFactory.isReady()) {
+          await ApiFactory.initialize('development');
+        }
+        const photosService = getPhotosService();
+        const response = await photosService.getGroupHighlights(groupId);
+        const mapped = (response || []).map((p: any) => ({
+          id: p.id,
+          uri: p.file_url || p.file_path || '',
+          created_at: p.created_at,
+        }));
+        setImages(mapped);
+        setActiveIndex(0);
+      } catch (e: any) {
+        console.error('Failed to load highlights', e);
+        setError(e?.message || 'Failed to load highlights');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (groupId) {
+      loadHighlights();
+    } else {
+      setError('Missing group id');
+    }
+  }, [groupId]);
 
   // Render function for image items in the FlatList
   const renderItem = ({ item }: any) => (
@@ -38,7 +72,7 @@ const HighlightsScreen = () => {
     }}
   >
     <Image
-      source={item}
+      source={{ uri: item.uri }}
       style={styles.carouselImage}
       resizeMode="cover"
     />
@@ -58,13 +92,17 @@ const HighlightsScreen = () => {
   // Navigate to previous or next image
   const goToPrevious = () => {
     if (activeIndex > 0) {
-      setActiveIndex(activeIndex - 1);
+      const newIndex = activeIndex - 1;
+      setActiveIndex(newIndex);
+      flatListRef.current?.scrollToIndex({ index: newIndex, animated: true });
     }
   };
 
   const goToNext = () => {
     if (activeIndex < images.length - 1) {
-      setActiveIndex(activeIndex + 1);
+      const newIndex = activeIndex + 1;
+      setActiveIndex(newIndex);
+      flatListRef.current?.scrollToIndex({ index: newIndex, animated: true });
     }
   };
 
@@ -84,17 +122,28 @@ const HighlightsScreen = () => {
 
         {/* Content: Rectangle box with FlatList for horizontal scroll */}
         <View style={styles.rectangle}>
-          {/* FlatList for horizontally scrollable images */}
-          <FlatList
-            data={images}
-            renderItem={renderItem}
-            keyExtractor={(item, index) => index.toString()}
-            horizontal // This makes the list scroll horizontally
-            pagingEnabled // Enable paging for smooth scrolling
-            showsHorizontalScrollIndicator={false} // Hide the horizontal scroll indicator
-            onScroll={handleScroll} // Track scroll position to update activeIndex
-            scrollEventThrottle={16} // Throttle scroll event for better performance
-          />
+          {/* Loading / Error / Data states */}
+          {loading ? (
+            <ActivityIndicator size="large" color="#fff" />
+          ) : error ? (
+            <Text style={{ color: 'white' }}>{error}</Text>
+          ) : images.length === 0 ? (
+            <Text style={{ color: 'white' }}>No highlights yet</Text>
+          ) : (
+            <FlatList
+              ref={flatListRef}
+              data={images}
+              renderItem={renderItem}
+              keyExtractor={(item) => String(item.id)}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              onScroll={handleScroll}
+              scrollEventThrottle={16}
+              getItemLayout={(_, index) => ({ length: width, offset: width * index, index })}
+              initialScrollIndex={0}
+            />
+          )}
         </View>
 
         {/* Carousel navigation buttons */}
@@ -106,7 +155,7 @@ const HighlightsScreen = () => {
           >
             <Feather name="chevron-left" size={30} color={activeIndex === 0 ? 'gray' : 'white'} />
           </TouchableOpacity>
-          <Text style={styles.activeIndexText}>{activeIndex + 1} / {images.length}</Text>
+          <Text style={styles.activeIndexText}>{images.length > 0 ? `${activeIndex + 1} / ${images.length}` : '0 / 0'}</Text>
           <TouchableOpacity
             onPress={goToNext}
             disabled={activeIndex === images.length - 1}

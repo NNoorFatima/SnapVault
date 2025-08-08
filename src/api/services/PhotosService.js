@@ -115,6 +115,29 @@ class PhotosService extends BaseService {
   }
 
   /**
+   * Get highlighted photos for a specific group
+   * @param {number} groupId - Group ID
+   * @returns {Promise<Array>} List of highlighted photos
+   */
+  async getGroupHighlights(groupId) {
+    try {
+      if (!groupId || groupId <= 0) {
+        throw new Error('Invalid group ID');
+      }
+
+      const url = this.buildUrl(API_ROUTES.PHOTOS.GET_HIGHLIGHTS, { group_id: groupId });
+      const response = await this.authenticatedRequest(() =>
+        this.client.get(url)
+      );
+
+      return this.transformResponse(response);
+    } catch (error) {
+      this.logError('Get group highlights failed', error);
+      throw error;
+    }
+  }
+
+  /**
    * Get specific photo details
    * @param {number} photoId - Photo ID
    * @returns {Promise<Object>} Photo details
