@@ -372,7 +372,7 @@ const GroupScreen = ({ route, navigation }) => {
               onPress={() => {
                 // Navigate to HighlightsScreen
                 setActiveTab('highlights')
-                navigation.navigate('HighlightsScreen');
+                navigation.navigate('HighlightsScreen', { groupId: groupData?.id });
               }}
             >
               <Text style={[styles.tabText, activeTab === 'highlights' && styles.activeTabText]}>

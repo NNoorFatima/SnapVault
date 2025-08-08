@@ -54,6 +54,7 @@ export const API_ROUTES = {
     GET_GROUP_PHOTOS: '/photos/group/{group_id}',
     GET_MY_PHOTOS: '/photos/my/photos/all',
     GET_MY_PHOTOS_IN_GROUP: '/photos/my/photos/{group_id}',
+    GET_HIGHLIGHTS: '/photos/highlights/{group_id}',
     GET_PHOTO: '/photos/{photo_id}',
   },
   TESTING: {
