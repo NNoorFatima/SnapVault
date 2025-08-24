@@ -1,21 +1,24 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text } from "react-native";
 import Button from "./Button";
 import styles from './ConfirmationPopup.styles';
 import { useNavigation } from '@react-navigation/native'; //used for navigation among pages 
 import { RootStackParamList } from '../navigation/AppNavigator';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Logo from '../assets/Logo';
+//for localization
+import { useTranslation } from 'react-i18next';
 interface Props {
-  message: string;
-  onCancel: () => void;
-  onConfirm: () => void;
+    message: string;
+    onCancel: () => void;
+    onConfirm: () => void;
 }
 
 
 const ConfirmationPopUp: React.FC<Props> = ({  message, onCancel, onConfirm}) => {
-    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-    
+    // const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    //for localization 
+    const { t } = useTranslation();
     return (
         
         <View style={styles.backdrop}>
@@ -25,7 +28,7 @@ const ConfirmationPopUp: React.FC<Props> = ({  message, onCancel, onConfirm}) =>
             <Text style={styles.message}>{message}</Text>
             <View style={styles.buttonRow}>
                 <Button
-                    title="Cancel"
+                    title={t('Button.cancel')}
                     onPress={onCancel} //should go back to the current screen 
                     backgroundColor="#D7EDEF"
                     textColor="black"
@@ -33,8 +36,8 @@ const ConfirmationPopUp: React.FC<Props> = ({  message, onCancel, onConfirm}) =>
 
                 />
                 <Button
-                    title="Confirm"
-                    onPress={() => console.log('Button Pressed')} //should go to splash screen 
+                    title={t('Button.confirm')}
+                    onPress= {onConfirm} //should go to splash screen 
                     backgroundColor="#73DBE5"
                     textColor="black"
                     style={{ width: '50%' }}

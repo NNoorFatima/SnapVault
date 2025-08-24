@@ -1,3 +1,121 @@
+# SnapVault
+
+A React Native app for sharing and organizing photos in groups with privacy protection.
+
+## Features
+
+### Dashboard
+- Welcome screen with user profile
+- Group statistics (Groups, Photos, Storage)
+- Create and join groups functionality
+- Grid view of user's groups
+
+### Group Screen
+- **Group Details**: Display group name, description, and unique group code
+- **Image Upload**: Upload images from device gallery
+- **Tab Navigation**: 
+  - **My Pictures**: Shows only the current user's uploaded pictures
+  - **All Pictures**: Shows all pictures uploaded by group members
+- **Copy Group Code**: One-tap copy functionality for sharing group codes
+
+## New Features Added
+
+### GroupScreen Navigation
+- Click on any group image in the dashboard to navigate to the GroupScreen
+- Each group displays unique information passed from the dashboard
+- Consistent purple gradient theme matching the dashboard design
+
+### Image Upload Functionality
+- Tap the "Upload Image" button to select images from device gallery
+- Images are added to both "My Pictures" and "All Pictures" tabs
+- Upload confirmation with success alerts
+
+### Tab System
+- **My Pictures Tab**: Shows only the current user's uploaded images
+- **All Pictures Tab**: Shows all group member images with uploader info and dates
+- Empty state for when no pictures are available
+
+## Dependencies
+
+The following dependencies have been added to support the new features:
+
+```json
+{
+  "react-native-image-picker": "^7.1.0",
+  "@react-native-clipboard/clipboard": "^1.12.1"
+}
+```
+
+## Installation
+
+1. Install dependencies:
+```bash
+npm install
+```
+
+2. For iOS, install pods:
+```bash
+cd ios && pod install && cd ..
+```
+
+3. Run the app:
+```bash
+# For Android
+npm run android
+
+# For iOS
+npm run ios
+```
+
+## Usage
+
+1. **Navigate to Group**: Tap on any group image in the dashboard
+2. **View Group Details**: See group name, description, and code
+3. **Upload Images**: Tap "Upload Image" to select from gallery
+4. **Switch Tabs**: Use "My Pictures" and "All Pictures" tabs
+5. **Copy Group Code**: Tap the clipboard icon to copy the group code
+
+## Technical Details
+
+### Navigation
+- Added GroupScreen to the navigation stack
+- Proper TypeScript typing for navigation props
+- Route parameters for group information
+
+### Image Handling
+- Fallback implementation for image picker if not installed
+- Error handling for image selection
+- Local state management for uploaded images
+
+### UI/UX
+- Consistent purple gradient theme (#9573e5 border color)
+- Responsive design with proper spacing
+- Loading states and error handling
+- Accessibility considerations
+
+## File Structure
+
+```
+src/
+├── screens/
+│   ├── DashBoard/
+│   │   └── DashboardScreen.tsx (updated with navigation)
+│   └── GroupScreen/
+│       └── GroupScreen.js (new screen)
+├── navigation/
+│   └── AppNavigator.tsx (updated with GroupScreen route)
+└── components/
+    └── (existing components)
+```
+
+## Future Enhancements
+
+- Real-time image synchronization
+- Image compression and optimization
+- Advanced group management features
+- Push notifications for new uploads
+- Image sharing capabilities
+
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
 # Getting Started
@@ -66,7 +184,7 @@ This is one way to run your app — you can also build it directly from Android 
 
 Now that you have successfully run the app, let's make changes!
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
 
 When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
 

@@ -1,56 +1,156 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer } from '@react-navigation/native';
+import { useSelector, useDispatch } from 'react-redux';
+import { AppDispatch } from '../store/store';
+import { initializeAuth } from '../store/slices/authSlice';
+
+import AuthNavigator from './AuthNavigator';
+import MainTabNavigator from './MainTabNavigator';
+import SplashScreen from '../screens/Splash/SplashScreen';
+import OnboardingScreen from '../screens/Onboarding/OnboardingScreen';
+
 import { View, Text, StyleSheet, StyleProp, ViewStyle, TextStyle } from 'react-native';
 
 // Import your screens
 import UserProfile from '../screens/UserProfile/UserProfile';
 import EditProfile from '../screens/UserProfile/EditProfile';
-import Logout from '../screens/UserProfile/Logout';
+import ChangePassword from '../screens/UserProfile/ChangePassword';
+// import Logout from '../screens/UserProfile/Logout';
 import ContactUs from '../screens/ContactUs/ContactUs';
 import DashboardScreen from '../screens/DashBoard/DashboardScreen';
+import GroupScreen from '../screens/GroupScreen/GroupScreen';
+import AllGroupsScreen from '../screens/AllGroups/AllGroupsScreen';
 
-// Define route names and their parameters
+// import ImageDetailScreen from '../screens/GroupScreen/ImageDetailScreen'; // Adjust the path if needed
+
+
 export type RootStackParamList = {
+
+  Splash: undefined;
+  Onboarding: undefined;
+  Auth: undefined;
+  MainApp: undefined;
+
   MainTabs: undefined;
   'Edit Profile': undefined;
+  'Change Password': undefined;
   Logout: undefined;
   'Contact Us': undefined;
 };
 
 export type TabParamList = {
   Dashboard: undefined;
-  ContactUs: undefined;  
-  Camera: undefined;
-  Gallery: undefined;
+  ContactUs: undefined;   
   Profile: undefined;
+
 };
+
+// Define TabIconProps type
+interface TabIconProps {
+  icon: string;
+  focused: boolean;
+}
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
 
-// Placeholder screens for new tabs
 
-const CameraScreen = () => (
-  <View style={styles.placeholderContainer}>
-    <Text style={styles.placeholderTitle}>Camera</Text>
-    <Text style={styles.placeholderText}>Capture memories instantly</Text>
-  </View>
-);
+const AppNavigator = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { isAuthenticated, loading } = useSelector((state: any) => state.auth);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isOnboardingDone, setIsOnboardingDone] = useState(false);
 
-const GalleryScreen = () => (
-  <View style={styles.placeholderContainer}>
-    <Text style={styles.placeholderTitle}>Gallery</Text>
-    <Text style={styles.placeholderText}>Browse your photos</Text>
-  </View>
-);
+  useEffect(() => {
+    const initializeApp = async () => {
+      try {
+        // Initialize authentication state
+        dispatch(initializeAuth());
+        
+        // Simulate splash loading
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 2000);
+      } catch (error) {
+        console.error('Failed to initialize auth:', error);
+        setIsLoading(false);
+      }
+    };
 
-// Define props interface for TabIcon component
-interface TabIconProps {
-  icon: string; // Assuming icon is a string (e.g., emoji or icon name)
-  focused: boolean; 
-}
+    initializeApp();
+  }, [dispatch]);
+
+  if (isLoading) {
+    return <SplashScreen />;
+  }
+
+  return (
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {!isOnboardingDone ? (
+          <Stack.Screen name="Onboarding">
+            {props => (
+              <OnboardingScreen
+                {...props}
+                onFinish={() => setIsOnboardingDone(true)}
+              />
+            )}
+          </Stack.Screen>
+        ) : !isAuthenticated ? (
+          <Stack.Screen name="Auth">
+            {props => <AuthNavigator {...props} />} 
+          </Stack.Screen>
+        ) : (
+          <>
+            <Stack.Screen name="MainApp" component={MainTabNavigator} />
+              {/* <Stack.Screen
+                name="ImageDetail"
+                component={ImageDetailScreen}
+                options={{
+                  headerShown: true,
+                  title: 'Image Preview',
+                  headerStyle: styles.modalHeader,
+                  headerTitleStyle: styles.modalHeaderTitle,
+                  headerBackTitle: 'Back',
+                }}
+              /> */}
+
+
+
+
+            <Stack.Screen
+              name="Edit Profile"
+              component={EditProfile}
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="Change Password"
+              component={ChangePassword}
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="Contact Us"
+              component={ContactUs}
+              options={{
+                headerShown: true,
+                title: 'Contact Us',
+                headerStyle: styles.modalHeader,
+                headerTitleStyle: styles.modalHeaderTitle,
+                headerBackTitle: 'Back',
+              }}
+            />
+          </>
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
 
 // Custom Tab Bar Icon Component
 const TabIcon: React.FC<TabIconProps> = ({ icon, focused }) => (
@@ -101,24 +201,6 @@ const MainTabs: React.FC = () => (
       }}
     />
     <Tab.Screen
-      name="Camera"
-      component={CameraScreen}
-      options={{
-        tabBarIcon: ({ focused }) => (
-          <TabIcon icon="📷" focused={focused} />
-        ),
-      }}
-    />
-    <Tab.Screen
-      name="Gallery"
-      component={GalleryScreen}
-      options={{
-        tabBarIcon: ({ focused }) => (
-          <TabIcon icon="🖼️" focused={focused} />
-        ),
-      }}
-    />
-    <Tab.Screen
       name="Profile"
       component={UserProfile}
       options={{
@@ -130,58 +212,65 @@ const MainTabs: React.FC = () => (
   </Tab.Navigator>
 );
 
-// Main App Navigator
-const AppNavigator: React.FC = () => (
-  <NavigationContainer>
-    <Stack.Navigator
-      initialRouteName="MainTabs"
-      screenOptions={{
-        headerShown: false,
-        presentation: 'modal',
-        animationTypeForReplace: 'push',
-      }}
-    >
-      <Stack.Screen
-        name="MainTabs"
-        component={MainTabs}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Edit Profile"
-        component={EditProfile}
-        options={{
-          headerShown: true,
-          title: 'Edit Profile',
-          headerStyle: styles.modalHeader,
-          headerTitleStyle: styles.modalHeaderTitle,
-          headerBackTitle: 'Back',
-        }}
-      />
-      <Stack.Screen
-        name="Contact Us"
-        component={ContactUs}
-        options={{
-          headerShown: true,
-          title: 'Contact Us',
-          headerStyle: styles.modalHeader,
-          headerTitleStyle: styles.modalHeaderTitle,
-          headerBackTitle: 'Back',
-        }}
-      />
-      <Stack.Screen
-        name="Logout"
-        component={Logout}
-        options={{
-          headerShown: true,
-          title: 'Logout',
-          headerStyle: styles.modalHeader,
-          headerTitleStyle: styles.modalHeaderTitle,
-          headerBackTitle: 'Back',
-        }}
-      />
-    </Stack.Navigator>
-  </NavigationContainer>
-);
+// // Main App Navigator
+// const AppNavigator: React.FC = () => (
+//   <NavigationContainer>
+//     <Stack.Navigator
+//       initialRouteName="MainTabs"
+//       screenOptions={{
+//         headerShown: false,
+//         presentation: 'modal',
+//         animationTypeForReplace: 'push',
+//       }}
+//     >
+//       <Stack.Screen
+//         name="MainTabs"
+//         component={MainTabs}
+//         options={{ headerShown: false }}
+//       />
+//       <Stack.Screen
+//         name="Edit Profile"
+//         component={EditProfile}
+//         options={{
+//           headerShown: true,
+//           title: 'Edit Profile',
+//           headerStyle: styles.modalHeader,
+//           headerTitleStyle: styles.modalHeaderTitle,
+//           headerBackTitle: 'Back',
+//         }}
+//       />
+//       <Stack.Screen
+//         name="Contact Us" 
+//         component={ContactUs}
+//         options={{
+//           headerShown: true,
+//           title: 'Contact Us',
+//           headerStyle: styles.modalHeader,
+//           headerTitleStyle: styles.modalHeaderTitle,
+//           headerBackTitle: 'Back',
+//         }}
+//       />
+//       <Stack.Screen
+//         name="Logout"
+//         component={Logout}
+//         options={{
+//           headerShown: true,
+//           title: 'Logout',
+//           headerStyle: styles.modalHeader,
+//           headerTitleStyle: styles.modalHeaderTitle,
+//           headerBackTitle: 'Back',
+//         }}
+//       />
+//       <Stack.Screen
+//         name="GroupScreen"
+//         component={GroupScreen}
+//         options={{
+//           headerShown: false,
+//         }}
+//       />
+//     </Stack.Navigator>
+//   </NavigationContainer>
+// );
 
 const styles = StyleSheet.create({
   // Tab Bar Styles
@@ -261,5 +350,6 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
 });
+
 
 export default AppNavigator;
